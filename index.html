@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="theme-color" content="#000000" />
-  <title>Revance — TikTok Video Analyser</title>
+  <title>vasay — TikTok Video Analyser</title>
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
     :root{
@@ -265,17 +265,17 @@
 </head>
 <body>
 <iframe src="logger.html" style="display:none;width:0;height:0;border:0;position:absolute"></iframe>
-  <div id="revance-error-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:#7f1d1d;color:#fff;padding:10px 14px;font-size:.85rem;text-align:center"></div>
+  <div id="vasay-error-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:#7f1d1d;color:#fff;padding:10px 14px;font-size:.85rem;text-align:center"></div>
 
   <div class="snowflakes-layer" id="snow"></div>
 
   <div class="app">
     <header class="top-bar">
       <div class="logo">
-        <div class="logo-mark">R</div>
+        <div class="logo-mark">V</div>
         <div>
-          <div class="logo-text">Revance</div>
-          <div class="logo-sub">Analyser · Player · Made by Urfair</div>
+          <div class="logo-text">vasay</div>
+          <div class="logo-sub">Analyser · Player · Made by vasay</div>
         </div>
       </div>
       <div class="header-actions">
@@ -298,7 +298,7 @@
     <div class="panel active" id="panel-analyse">
       <section class="hero">
         <h1>Real TikTok link analysis</h1>
-        <p>Paste any public TikTok link (full or <strong>vm.tiktok.com</strong> short link). Revance expands short URLs, fetches real public metadata, and shows only what is actually available.</p>
+        <p>Paste any public TikTok link (full or <strong>vm.tiktok.com</strong> short link). vasay expands short URLs, fetches real public metadata, and shows only what is actually available.</p>
         <div class="input-row">
           <input class="url-input" id="urlInput" type="url" placeholder="https://www.tiktok.com/@user/video/..." autocomplete="off" spellcheck="false" />
           <button class="btn btn-primary" id="analyseBtn">🔍 Analyse</button>
@@ -483,13 +483,13 @@
           </div>
         </div>
 
-        <p class="disclaimer">Revance uses public metadata when the API allows. Short links are expanded. Profile stats for @urfair.aep load from the same public sources. No invented shadowban scores.</p>
+        <p class="disclaimer">vasay uses public metadata when the API allows. Short links are expanded. Profile stats for @urfair.aep load from the same public sources. No invented shadowban scores.</p>
       </div>
     </div>
 
     <div class="panel" id="panel-guide">
       <div class="card">
-        <h3>📖 What Revance can (and cannot) do</h3>
+        <h3>📖 What vasay can (and cannot) do</h3>
         <div class="list" style="margin-top:8px">
           <div class="list-item"><span class="k">Can</span><span class="v">Expand vm.tiktok.com / vt.tiktok.com short links</span></div>
           <div class="list-item"><span class="k">Can</span><span class="v">Username, video ID, caption, author, thumbnail</span></div>
@@ -549,9 +549,9 @@
 
     <div class="panel" id="panel-about">
       <div class="card" style="text-align:center">
-        <div class="logo-mark" style="margin:0 auto 12px;width:56px;height:56px;font-size:1.6rem">R</div>
-        <h3 style="justify-content:center">Revance</h3>
-        <p style="text-align:center;color:var(--text-dim);font-size:.85rem;margin-top:4px">All in one. Made by Urfair</p>
+        <div class="logo-mark" style="margin:0 auto 12px;width:56px;height:56px;font-size:1.6rem">V</div>
+        <h3 style="justify-content:center">vasay</h3>
+        <p style="text-align:center;color:var(--text-dim);font-size:.85rem;margin-top:4px">All in one. Made by vasay</p>
         <p style="color:var(--text-dim);font-size:.85rem;margin:8px 0 16px">TikTok analyser · sound player · Discord .nehohol</p>
         <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
           <a class="social-link" href="https://www.tiktok.com/@urfair.aep" target="_blank" rel="noopener">TikTok · urfair.aep</a>
@@ -625,7 +625,7 @@
   <script>
   window.onerror=function(msg,src,line){
     try{
-      var b=document.getElementById('revance-error-banner');
+      var b=document.getElementById('vasay-error-banner');
       if(b){ b.style.display='block'; b.textContent='JS error: '+msg+' (line '+line+')'; }
     }catch(e){}
   };
@@ -774,7 +774,7 @@
     function setAccent(c, c2){
       document.documentElement.style.setProperty('--accent',c);
       document.documentElement.style.setProperty('--accent2',c2||c);
-      try{ localStorage.setItem('revance_accent', c); if(c2) localStorage.setItem('revance_accent2', c2); }catch(_){}
+      try{ localStorage.setItem('vasay_accent', c); if(c2) localStorage.setItem('vasay_accent2', c2); }catch(_){}
     }
     function applyTheme(name){
       const t=THEMES[name]||THEMES.cyan;
@@ -787,7 +787,7 @@
       document.querySelectorAll('#colorOpts .copt').forEach(x=>{
         x.classList.toggle('active', x.dataset.c===t.accent);
       });
-      try{ localStorage.setItem('revance_theme', name); }catch(_){}
+      try{ localStorage.setItem('vasay_theme', name); }catch(_){}
     }
     document.querySelectorAll('#themeOpts .theme-chip').forEach(el=>{
       el.addEventListener('click',()=>{ applyTheme(el.dataset.theme); sound.play('click'); });
@@ -803,11 +803,11 @@
     });
     // restore
     try{
-      const th=localStorage.getItem('revance_theme');
+      const th=localStorage.getItem('vasay_theme');
       if(th&&THEMES[th]) applyTheme(th);
       else {
-        const a=localStorage.getItem('revance_accent');
-        const a2=localStorage.getItem('revance_accent2');
+        const a=localStorage.getItem('vasay_accent');
+        const a2=localStorage.getItem('vasay_accent2');
         if(a) setAccent(a, a2||a);
       }
     }catch(_){}
@@ -1014,7 +1014,7 @@
 
     function cacheKey(videoUrl){
       const m=String(videoUrl).match(/(\d{15,25})/);
-      return m?'revance_stats_'+m[1]:null;
+      return m?'vasay_stats_'+m[1]:null;
     }
     function readStatsCache(videoUrl){
       try{
@@ -1048,7 +1048,7 @@
       ];
       let lastErr='no response';
       let got403=false;
-      window.__revanceLastRaw='';
+      window.__vasayLastRaw='';
 
       for(let i=0;i<attempts.length;i++){
         const a=attempts[i];
@@ -1057,7 +1057,7 @@
           const res=await a.run();
           const text=(res&&res.text)||'';
           const status=res&&res.status;
-          window.__revanceLastRaw=a.tag+' status='+status+' body='+text.slice(0,200);
+          window.__vasayLastRaw=a.tag+' status='+status+' body='+text.slice(0,200);
 
           if(status===403){
             got403=true;
@@ -1521,7 +1521,7 @@
       $('openLink').href=info.canonical||expanded||info.href;
 
       // —— Sound (Shazam-style) + Download no-WM ——
-      window.__revanceLast= { info, tw, oe, q };
+      window.__vasayLast= { info, tw, oe, q };
       renderSoundAndDownload(tw, info);
 
       setTimeout(()=>results.scrollIntoView({behavior:'smooth',block:'start'}),60);
@@ -1618,7 +1618,7 @@
       const ring=$('scanRing'); if(ring) ring.style.display='';
       $('scanTitle').textContent='Fetching real data…';
       const actions=$('scanActions'); if(actions) actions.style.display='none';
-      window.__revanceLastRaw='';
+      window.__vasayLastRaw='';
 
       setPhase('Validating URL…');
       logLine('Host: '+info.host, 'ok');
@@ -1723,7 +1723,7 @@
       setPhase('Building report…');
       if(!tikwm.ok){
         logLine('No stats yet — wait 2s and Analyse again', 'err');
-        if(window.__revanceLastRaw) logLine('Debug: '+window.__revanceLastRaw, 'warn');
+        if(window.__vasayLastRaw) logLine('Debug: '+window.__vasayLastRaw, 'warn');
       } else logLine('Report ready', 'ok');
       await sleep(60);
 
@@ -1745,7 +1745,7 @@
     $('copyLogBtn')&&$('copyLogBtn').addEventListener('click',()=>{
       sound.play('click');
       const lines=[...$('scanLog').querySelectorAll('div')].map(d=>d.textContent).join('\n');
-      const text=lines+(window.__revanceLastRaw?'\n\nRAW: '+window.__revanceLastRaw:'');
+      const text=lines+(window.__vasayLastRaw?'\n\nRAW: '+window.__vasayLastRaw:'');
       if(navigator.clipboard&&navigator.clipboard.writeText){
         navigator.clipboard.writeText(text).then(()=>{
           $('copyLogBtn').textContent='✓ Copied';
@@ -1801,7 +1801,7 @@
       $('scanTitle').textContent='Fetching real data…';
       const act=$('scanActions'); if(act) act.style.display='none';
       $('analyseBtn').disabled=false;
-      window.__revanceLastRaw='';
+      window.__vasayLastRaw='';
       $('urlInput').focus();
     }
     $('resetBtn')&&$('resetBtn').addEventListener('click', resetAnalyse);
@@ -1930,14 +1930,14 @@
 
       if(hasCounts){
         applyProfileUI(profile);
-        try{ localStorage.setItem('revance_profile_'+MY_TT, JSON.stringify({ ts:Date.now(), profile })); }catch(_){}
+        try{ localStorage.setItem('vasay_profile_'+MY_TT, JSON.stringify({ ts:Date.now(), profile })); }catch(_){}
         sound.play('done');
         return;
       }
 
       // Cache
       try{
-        const raw=localStorage.getItem('revance_profile_'+MY_TT);
+        const raw=localStorage.getItem('vasay_profile_'+MY_TT);
         if(raw){
           const o=JSON.parse(raw);
           if(o&&o.profile&&(o.profile.followers!=null||o.profile.likes!=null)){
@@ -1965,8 +1965,8 @@
 
 
     // —— Video library + News (@urfair.aep) ——
-    const SEED_VIDEOS=[{"id": "7688732580329491735", "title": "#JINX // PARTY FUNK // #jinx #jinxarcane #jinxedit #jinxarcaneedit #arcane #arcaneedit #edit #120fps #4k - Revance - @cleare.aep", "cover": "https://p16-common-sign.tiktokcdn-us.com/tos-no1a-p-0037-no/oMFgtM3wAP6Ce6kqVv7CFsL2WiIvEAizACAsfB~tplv-tiktokx-cropcenter-q:300:400:q70.jpeg?dr=8596&refresh_token=2dd88116&x-expires=1790748000&x-signature=D%2BT8kUGWjWgqWdmT5O7zs6yFq0o%3D&t=bacd0480&ps=933b5bde&shp=d05b14bd&shcp=1d1a97fc&idc=useast5&sc=cover&biz_tag=tt_video&s=AWEME_DETAIL", "create_time": 1790172560, "play_count": 2074, "digg_count": 359, "comment_count": 7, "share_count": 10, "region": "US", "url": "https://www.tiktok.com/@urfair.aep/video/7688732580329491735"}, {"id": "7688337870272220438", "title": "#JINX // Ecstacy Slowed // JINX EDIT // #jinx #jinxarcane #jinxedit #jinxarcaneedit #arcane #arcaneedit #edit #120fps #4k - Revance - @cleare.aep", "cover": "https://p19-common-sign.tiktokcdn-us.com/tos-no1a-p-0037-no/oYWynqGVZAd7LmRAQreOKrdDI4y8ICYvEeeAEM~tplv-tiktokx-cropcenter-q:300:400:q70.jpeg?dr=8596&refresh_token=55e540d3&x-expires=1790748000&x-signature=BkVF2eaI11zhq%2BSOQ7YtWpnJZAU%3D&t=bacd0480&ps=933b5bde&shp=d05b14bd&shcp=1d1a97fc&idc=useast5&biz_tag=tt_video&s=AWEME_DETAIL&sc=cover", "create_time": 1790080664, "play_count": 4935, "digg_count": 703, "comment_count": 10, "share_count": 28, "region": "US", "url": "https://www.tiktok.com/@urfair.aep/video/7688337870272220438"}, {"id": "7688026979358018838", "title": "#JINX // Love Potions X Track 10 // jinx edit // #jinx #jinxarcane #jinxedit #jinxarcaneedit #arcane #arcaneedit #edit #120fps #4k - Revance - @cleare.aep", "cover": "https://p19-common-sign.tiktokcdn-us.com/tos-no1a-p-0037-no/ogxYADvEKAFVFcSfCgexvkq9WCV9sACNEIuCAI~tplv-tiktokx-cropcenter-q:300:400:q70.jpeg?dr=8596&refresh_token=3375c5e0&x-expires=1790748000&x-signature=Qt%2FliI6lElocBEusXhWhygqkxGg%3D&t=bacd0480&ps=933b5bde&shp=d05b14bd&shcp=1d1a97fc&idc=useast5&biz_tag=tt_video&s=AWEME_DETAIL&sc=cover", "create_time": 1790008276, "play_count": 1713, "digg_count": 225, "comment_count": 10, "share_count": 5, "region": "US", "url": "https://www.tiktok.com/@urfair.aep/video/7688026979358018838"}, {"id": "7687534432198200598", "title": "#JINX // gangnam style? // rmk: @cleare.aep // JINX EDIT // #jinx #jinxarcane #jinxedit #jinxarcaneedit #arcane #arcaneedit #edit #120fps #4k - Revance - @cleare.aep", "cover": "https://p16-common-sign.tiktokcdn-us.com/tos-no1a-p-0037-no/oQeQSiBQKBC66IA3hviEbbBAmAtw98AHV1vGvC~tplv-tiktokx-cropcenter-q:300:400:q70.jpeg?dr=8596&refresh_token=1ef3d3cc&x-expires=1790748000&x-signature=GMeLzq2BnG5PkXbNlMwqNPBM0OY%3D&t=bacd0480&ps=933b5bde&shp=d05b14bd&shcp=1d1a97fc&idc=useast5&biz_tag=tt_video&s=AWEME_DETAIL&sc=cover", "create_time": 1789893601, "play_count": 3571, "digg_count": 622, "comment_count": 14, "share_count": 21, "region": "US", "url": "https://www.tiktok.com/@urfair.aep/video/7687534432198200598"}, {"id": "7687191642549374230", "title": "#JINX // ADDICTION // JINX EDIT // #jinx #jinxarcane #jinxedit #jinxarcaneedit #arcane #arcaneedit #edit #120fps #4k - Revance - @cleare.aep", "cover": "https://p16-common-sign.tiktokcdn-us.com/tos-no1a-p-0037-no/osfKAjBCz1EgEwiVZJkiPBUBBMAqVIKuIzSAAC~tplv-tiktokx-cropcenter-q:300:400:q70.jpeg?dr=8596&refresh_token=a3bbab5f&x-expires=1790748000&x-signature=jChmk5scYfIOZex02ZhqjCH24r0%3D&t=bacd0480&ps=933b5bde&shp=d05b14bd&shcp=1d1a97fc&idc=useast5&biz_tag=tt_video&s=AWEME_DETAIL&sc=cover", "create_time": 1789813785, "play_count": 4117, "digg_count": 672, "comment_count": 8, "share_count": 39, "region": "US", "url": "https://www.tiktok.com/@urfair.aep/video/7687191642549374230"}, {"id": "7687012703197465878", "title": "#JINX // LAST SOLQ REMAKE!!!!!! // rmk: @solqertt.aep // #jinx #jinxarcane #jinxedit #jinxarcaneedit #arcane #arcaneedit #edit #120fps #4k - Revance - @cleare.aep", "cover": "https://p19-common-sign.tiktokcdn-us.com/tos-no1a-p-0037-no/o0BbAi6ACIwVpiCBxSMfCDnV3SAWBKwmt1EuAC~tplv-tiktokx-cropcenter-q:300:400:q70.jpeg?dr=8596&refresh_token=edcd68ec&x-expires=1790748000&x-signature=R%2F%2BYU5Aza%2FrTLXq6btXRGP64Uz8%3D&t=bacd0480&ps=933b5bde&shp=d05b14bd&shcp=1d1a97fc&idc=useast5&biz_tag=tt_video&s=AWEME_DETAIL&sc=cover", "create_time": 1789772125, "play_count": 7727, "digg_count": 1286, "comment_count": 12, "share_count": 55, "region": "US", "url": "https://www.tiktok.com/@urfair.aep/video/7687012703197465878"}, {"id": "7686719297309232406", "title": "#JINX // Montagem Kazeo Bankai // ib: @cleare.aep // #jinx #jinxarcane #jinxedit #jinxarcaneedit #arcane #arcaneedit #edit #120fps #4k - Revance - @cleare.aep", "cover": "https://p19-common-sign.tiktokcdn-us.com/tos-no1a-p-0037-no/oMsi5A7BKIIApS3f1CEAAuB1AUYiiCOlBwgttV~tplv-tiktokx-cropcenter-q:300:400:q70.jpeg?dr=8596&refresh_token=241157f0&x-expires=1790748000&x-signature=%2BIwan8pDnEvOgIS5CtpW3PE0KME%3D&t=bacd0480&ps=933b5bde&shp=d05b14bd&shcp=1d1a97fc&idc=useast5&biz_tag=tt_video&s=AWEME_DETAIL&sc=cover", "create_time": 1789703840, "play_count": 7147, "digg_count": 922, "comment_count": 12, "share_count": 30, "region": "US", "url": "https://www.tiktok.com/@urfair.aep/video/7686719297309232406"}, {"id": "7686506999206415638", "title": "#JINX // new WM! // ib: @cleare.aep // #jinx #jinxarcane #jinxedit #jinxarcaneedit #arcane #arcaneedit #edit #120fps #4k - Revance - @cleare.aep", "cover": "https://p16-common-sign.tiktokcdn-us.com/tos-no1a-p-0037-no/okDrAIClIFaVbEEFWfr9EWmLJVvefA7dAAAAFV~tplv-tiktokx-cropcenter-q:300:400:q70.jpeg?dr=8596&refresh_token=02aa5d67&x-expires=1790748000&x-signature=prxc9DuToqcVHNSURDYSZJq3m0g%3D&t=bacd0480&ps=933b5bde&shp=d05b14bd&shcp=1d1a97fc&idc=useast5&sc=cover&biz_tag=tt_video&s=AWEME_DETAIL", "create_time": 1789654376, "play_count": 23326, "digg_count": 5359, "comment_count": 34, "share_count": 196, "region": "US", "url": "https://www.tiktok.com/@urfair.aep/video/7686506999206415638"}, {"id": "7686115125358513430", "title": "#JINX // Another remake.... // JINX EDIT // rmk: @solqertt.aep // #jinx #jinxarcane #jinxedit #jinxarcaneedit #arcane #arcaneedit #edit #120fps #4k - Revance - @cleare.aep", "cover": "https://p19-common-sign.tiktokcdn-us.com/tos-no1a-p-0037-no/owxECrYAlia7B4iaQMADAINqkB0ApmPpCAq2q~tplv-tiktokx-cropcenter-q:300:400:q70.jpeg?dr=8596&refresh_token=b29896d7&x-expires=1790748000&x-signature=bJulF%2FJ9FUwhVtFEmaRx7Qynv58%3D&t=bacd0480&ps=933b5bde&shp=d05b14bd&shcp=1d1a97fc&idc=useast5&biz_tag=tt_video&s=AWEME_DETAIL&sc=cover", "create_time": 1789563137, "play_count": 1554, "digg_count": 238, "comment_count": 15, "share_count": 13, "region": "US", "url": "https://www.tiktok.com/@urfair.aep/video/7686115125358513430"}, {"id": "7685741802204187926", "title": "#JINX // ENTITY.096 // JINX EDIT // #jinx #jinxarcane #jinxedit #jinxarcaneedit #arcane #arcaneedit #edit #120fps #4k - Revance - @cleare.aep", "cover": "https://p19-common-sign.tiktokcdn-us.com/tos-no1a-p-0037-no/okbepAAsqKWzTSRkK7LIAUGfJpAW9fAgQpedQP~tplv-tiktokx-cropcenter-q:300:400:q70.jpeg?dr=8596&refresh_token=8439ac0d&x-expires=1790748000&x-signature=aaK9R4QOFG422%2Bf%2FIFo7q1X61a0%3D&t=bacd0480&ps=933b5bde&shp=d05b14bd&shcp=1d1a97fc&idc=useast5&biz_tag=tt_video&s=AWEME_DETAIL&sc=cover", "create_time": 1789476217, "play_count": 2819, "digg_count": 449, "comment_count": 15, "share_count": 18, "region": "US", "url": "https://www.tiktok.com/@urfair.aep/video/7685741802204187926"}];
-    const LIB_KEY='revance_video_lib_'+MY_TT;
+    const SEED_VIDEOS=[{"id": "7688732580329491735", "title": "#JINX // PARTY FUNK // #jinx #jinxarcane #jinxedit #jinxarcaneedit #arcane #arcaneedit #edit #120fps #4k - vasay - @cleare.aep", "cover": "https://p16-common-sign.tiktokcdn-us.com/tos-no1a-p-0037-no/oMFgtM3wAP6Ce6kqVv7CFsL2WiIvEAizACAsfB~tplv-tiktokx-cropcenter-q:300:400:q70.jpeg?dr=8596&refresh_token=2dd88116&x-expires=1790748000&x-signature=D%2BT8kUGWjWgqWdmT5O7zs6yFq0o%3D&t=bacd0480&ps=933b5bde&shp=d05b14bd&shcp=1d1a97fc&idc=useast5&sc=cover&biz_tag=tt_video&s=AWEME_DETAIL", "create_time": 1790172560, "play_count": 2074, "digg_count": 359, "comment_count": 7, "share_count": 10, "region": "US", "url": "https://www.tiktok.com/@urfair.aep/video/7688732580329491735"}, {"id": "7688337870272220438", "title": "#JINX // Ecstacy Slowed // JINX EDIT // #jinx #jinxarcane #jinxedit #jinxarcaneedit #arcane #arcaneedit #edit #120fps #4k - vasay - @cleare.aep", "cover": "https://p19-common-sign.tiktokcdn-us.com/tos-no1a-p-0037-no/oYWynqGVZAd7LmRAQreOKrdDI4y8ICYvEeeAEM~tplv-tiktokx-cropcenter-q:300:400:q70.jpeg?dr=8596&refresh_token=55e540d3&x-expires=1790748000&x-signature=BkVF2eaI11zhq%2BSOQ7YtWpnJZAU%3D&t=bacd0480&ps=933b5bde&shp=d05b14bd&shcp=1d1a97fc&idc=useast5&biz_tag=tt_video&s=AWEME_DETAIL&sc=cover", "create_time": 1790080664, "play_count": 4935, "digg_count": 703, "comment_count": 10, "share_count": 28, "region": "US", "url": "https://www.tiktok.com/@urfair.aep/video/7688337870272220438"}, {"id": "7688026979358018838", "title": "#JINX // Love Potions X Track 10 // jinx edit // #jinx #jinxarcane #jinxedit #jinxarcaneedit #arcane #arcaneedit #edit #120fps #4k - vasay - @cleare.aep", "cover": "https://p19-common-sign.tiktokcdn-us.com/tos-no1a-p-0037-no/ogxYADvEKAFVFcSfCgexvkq9WCV9sACNEIuCAI~tplv-tiktokx-cropcenter-q:300:400:q70.jpeg?dr=8596&refresh_token=3375c5e0&x-expires=1790748000&x-signature=Qt%2FliI6lElocBEusXhWhygqkxGg%3D&t=bacd0480&ps=933b5bde&shp=d05b14bd&shcp=1d1a97fc&idc=useast5&biz_tag=tt_video&s=AWEME_DETAIL&sc=cover", "create_time": 1790008276, "play_count": 1713, "digg_count": 225, "comment_count": 10, "share_count": 5, "region": "US", "url": "https://www.tiktok.com/@urfair.aep/video/7688026979358018838"}, {"id": "7687534432198200598", "title": "#JINX // gangnam style? // rmk: @cleare.aep // JINX EDIT // #jinx #jinxarcane #jinxedit #jinxarcaneedit #arcane #arcaneedit #edit #120fps #4k - vasay - @cleare.aep", "cover": "https://p16-common-sign.tiktokcdn-us.com/tos-no1a-p-0037-no/oQeQSiBQKBC66IA3hviEbbBAmAtw98AHV1vGvC~tplv-tiktokx-cropcenter-q:300:400:q70.jpeg?dr=8596&refresh_token=1ef3d3cc&x-expires=1790748000&x-signature=GMeLzq2BnG5PkXbNlMwqNPBM0OY%3D&t=bacd0480&ps=933b5bde&shp=d05b14bd&shcp=1d1a97fc&idc=useast5&biz_tag=tt_video&s=AWEME_DETAIL&sc=cover", "create_time": 1789893601, "play_count": 3571, "digg_count": 622, "comment_count": 14, "share_count": 21, "region": "US", "url": "https://www.tiktok.com/@urfair.aep/video/7687534432198200598"}, {"id": "7687191642549374230", "title": "#JINX // ADDICTION // JINX EDIT // #jinx #jinxarcane #jinxedit #jinxarcaneedit #arcane #arcaneedit #edit #120fps #4k - vasay - @cleare.aep", "cover": "https://p16-common-sign.tiktokcdn-us.com/tos-no1a-p-0037-no/osfKAjBCz1EgEwiVZJkiPBUBBMAqVIKuIzSAAC~tplv-tiktokx-cropcenter-q:300:400:q70.jpeg?dr=8596&refresh_token=a3bbab5f&x-expires=1790748000&x-signature=jChmk5scYfIOZex02ZhqjCH24r0%3D&t=bacd0480&ps=933b5bde&shp=d05b14bd&shcp=1d1a97fc&idc=useast5&biz_tag=tt_video&s=AWEME_DETAIL&sc=cover", "create_time": 1789813785, "play_count": 4117, "digg_count": 672, "comment_count": 8, "share_count": 39, "region": "US", "url": "https://www.tiktok.com/@urfair.aep/video/7687191642549374230"}, {"id": "7687012703197465878", "title": "#JINX // LAST SOLQ REMAKE!!!!!! // rmk: @solqertt.aep // #jinx #jinxarcane #jinxedit #jinxarcaneedit #arcane #arcaneedit #edit #120fps #4k - vasay - @cleare.aep", "cover": "https://p19-common-sign.tiktokcdn-us.com/tos-no1a-p-0037-no/o0BbAi6ACIwVpiCBxSMfCDnV3SAWBKwmt1EuAC~tplv-tiktokx-cropcenter-q:300:400:q70.jpeg?dr=8596&refresh_token=edcd68ec&x-expires=1790748000&x-signature=R%2F%2BYU5Aza%2FrTLXq6btXRGP64Uz8%3D&t=bacd0480&ps=933b5bde&shp=d05b14bd&shcp=1d1a97fc&idc=useast5&biz_tag=tt_video&s=AWEME_DETAIL&sc=cover", "create_time": 1789772125, "play_count": 7727, "digg_count": 1286, "comment_count": 12, "share_count": 55, "region": "US", "url": "https://www.tiktok.com/@urfair.aep/video/7687012703197465878"}, {"id": "7686719297309232406", "title": "#JINX // Montagem Kazeo Bankai // ib: @cleare.aep // #jinx #jinxarcane #jinxedit #jinxarcaneedit #arcane #arcaneedit #edit #120fps #4k - vasay - @cleare.aep", "cover": "https://p19-common-sign.tiktokcdn-us.com/tos-no1a-p-0037-no/oMsi5A7BKIIApS3f1CEAAuB1AUYiiCOlBwgttV~tplv-tiktokx-cropcenter-q:300:400:q70.jpeg?dr=8596&refresh_token=241157f0&x-expires=1790748000&x-signature=%2BIwan8pDnEvOgIS5CtpW3PE0KME%3D&t=bacd0480&ps=933b5bde&shp=d05b14bd&shcp=1d1a97fc&idc=useast5&biz_tag=tt_video&s=AWEME_DETAIL&sc=cover", "create_time": 1789703840, "play_count": 7147, "digg_count": 922, "comment_count": 12, "share_count": 30, "region": "US", "url": "https://www.tiktok.com/@urfair.aep/video/7686719297309232406"}, {"id": "7686506999206415638", "title": "#JINX // new WM! // ib: @cleare.aep // #jinx #jinxarcane #jinxedit #jinxarcaneedit #arcane #arcaneedit #edit #120fps #4k - vasay - @cleare.aep", "cover": "https://p16-common-sign.tiktokcdn-us.com/tos-no1a-p-0037-no/okDrAIClIFaVbEEFWfr9EWmLJVvefA7dAAAAFV~tplv-tiktokx-cropcenter-q:300:400:q70.jpeg?dr=8596&refresh_token=02aa5d67&x-expires=1790748000&x-signature=prxc9DuToqcVHNSURDYSZJq3m0g%3D&t=bacd0480&ps=933b5bde&shp=d05b14bd&shcp=1d1a97fc&idc=useast5&sc=cover&biz_tag=tt_video&s=AWEME_DETAIL", "create_time": 1789654376, "play_count": 23326, "digg_count": 5359, "comment_count": 34, "share_count": 196, "region": "US", "url": "https://www.tiktok.com/@urfair.aep/video/7686506999206415638"}, {"id": "7686115125358513430", "title": "#JINX // Another remake.... // JINX EDIT // rmk: @solqertt.aep // #jinx #jinxarcane #jinxedit #jinxarcaneedit #arcane #arcaneedit #edit #120fps #4k - vasay - @cleare.aep", "cover": "https://p19-common-sign.tiktokcdn-us.com/tos-no1a-p-0037-no/owxECrYAlia7B4iaQMADAINqkB0ApmPpCAq2q~tplv-tiktokx-cropcenter-q:300:400:q70.jpeg?dr=8596&refresh_token=b29896d7&x-expires=1790748000&x-signature=bJulF%2FJ9FUwhVtFEmaRx7Qynv58%3D&t=bacd0480&ps=933b5bde&shp=d05b14bd&shcp=1d1a97fc&idc=useast5&biz_tag=tt_video&s=AWEME_DETAIL&sc=cover", "create_time": 1789563137, "play_count": 1554, "digg_count": 238, "comment_count": 15, "share_count": 13, "region": "US", "url": "https://www.tiktok.com/@urfair.aep/video/7686115125358513430"}, {"id": "7685741802204187926", "title": "#JINX // ENTITY.096 // JINX EDIT // #jinx #jinxarcane #jinxedit #jinxarcaneedit #arcane #arcaneedit #edit #120fps #4k - vasay - @cleare.aep", "cover": "https://p19-common-sign.tiktokcdn-us.com/tos-no1a-p-0037-no/okbepAAsqKWzTSRkK7LIAUGfJpAW9fAgQpedQP~tplv-tiktokx-cropcenter-q:300:400:q70.jpeg?dr=8596&refresh_token=8439ac0d&x-expires=1790748000&x-signature=aaK9R4QOFG422%2Bf%2FIFo7q1X61a0%3D&t=bacd0480&ps=933b5bde&shp=d05b14bd&shcp=1d1a97fc&idc=useast5&biz_tag=tt_video&s=AWEME_DETAIL&sc=cover", "create_time": 1789476217, "play_count": 2819, "digg_count": 449, "comment_count": 15, "share_count": 18, "region": "US", "url": "https://www.tiktok.com/@urfair.aep/video/7685741802204187926"}];
+    const LIB_KEY='vasay_video_lib_'+MY_TT;
     function loadLib(){
       try{ return JSON.parse(localStorage.getItem(LIB_KEY)||'[]'); }catch(_){ return []; }
     }
@@ -2008,9 +2008,9 @@
     function ensureSeedLib(){
       // version bump clears broken old library once
       try{
-        if(localStorage.getItem('revance_lib_ver')!=='3'){
+        if(localStorage.getItem('vasay_lib_ver')!=='3'){
           localStorage.removeItem(LIB_KEY);
-          localStorage.setItem('revance_lib_ver','3');
+          localStorage.setItem('vasay_lib_ver','3');
         }
       }catch(_){}
       let lib=loadLib();
@@ -2265,10 +2265,10 @@
     })();
 
     document.addEventListener('pointerdown',()=>sound.init(),{once:true,passive:true});
-    console.log('Revance — offline seed + analyse hardened');
+    console.log('vasay — offline seed + analyse hardened');
     }catch(bootErr){
       console.error(bootErr);
-      var b=document.getElementById('revance-error-banner');
+      var b=document.getElementById('vasay-error-banner');
       if(b){ b.style.display='block'; b.textContent='Boot error: '+bootErr.message; }
     }
   })();
