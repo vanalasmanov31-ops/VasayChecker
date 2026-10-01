@@ -1,0 +1,2276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#000000" />
+  <title>Revance — TikTok Video Analyser</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{
+      --bg:#000;--panel:#05050a;--panel-light:#0c0c14;--border:#252538;
+      --text:#f0f0fc;--text-dim:#8888a0;--accent:#66d9ff;--accent2:#a78bfa;
+      --gold:#ffd700;--danger:#ff6b6b;--success:#4ade80;--warn:#fbbf24;
+      --radius:20px;--font:'Inter',system-ui,-apple-system,sans-serif;
+      --nav-h:64px;--ui-glow:1;--snow-brightness:1.6;
+      --bg-gradient:radial-gradient(1100px 650px at 50% -8%,rgba(102,217,255,.09),transparent 55%),radial-gradient(800px 500px at 0% 100%,rgba(167,139,250,.07),transparent 55%),#000;
+    }
+    html,body{background:var(--bg-gradient)!important;min-height:100%;min-height:100dvh;font-family:var(--font);color:var(--text);overflow-x:hidden;-webkit-text-size-adjust:100%}
+    body{display:flex;flex-direction:column;align-items:center;padding:12px 12px calc(var(--nav-h) + 20px);user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+    body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:linear-gradient(125deg,rgba(102,217,255,.03),transparent 35%,rgba(167,139,250,.03) 70%,transparent);opacity:calc(.4 + var(--ui-glow)*.5)}
+    ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px}
+
+    .snowflakes-layer{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;mix-blend-mode:screen;contain:strict}
+    .snowflake{position:absolute;top:-10px;background:rgba(255,255,255,.9);border-radius:50%;opacity:calc(.32 * var(--snow-brightness));animation:fall linear infinite;filter:blur(.2px);box-shadow:0 0 8px rgba(255,255,255,.85),0 0 16px rgba(102,217,255,.4);will-change:transform}
+    .snowflake:nth-child(3n){width:5px!important;height:5px!important;box-shadow:0 0 12px #fff,0 0 22px rgba(102,217,255,.55)}
+    @keyframes fall{0%{transform:translateY(-10px) rotate(0) scale(1);opacity:.3}50%{opacity:.55}100%{transform:translateY(110vh) rotate(720deg) scale(.8);opacity:.15}}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(18px) scale(.98)}to{opacity:1;transform:none}}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    @keyframes scaleIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:none}}
+    @keyframes slideInRight{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:none}}
+    @keyframes pulseGlow{0%,100%{box-shadow:0 0 18px color-mix(in srgb,var(--accent) 25%,transparent)}50%{box-shadow:0 0 32px color-mix(in srgb,var(--accent) 45%,transparent)}}
+    @keyframes shimmer{0%{background-position:200% center}100%{background-position:-200% center}}
+    @keyframes logoPulse{0%,100%{transform:scale(1);filter:brightness(1)}50%{transform:scale(1.06);filter:brightness(1.15)}}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @keyframes bounceSoft{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+    @keyframes progressShine{0%{left:-40%}100%{left:120%}}
+    @keyframes cardStagger{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+    @keyframes ripple{0%{transform:scale(0);opacity:.35}100%{transform:scale(2.4);opacity:0}}
+    @keyframes navPop{0%{transform:scale(1)}40%{transform:scale(1.18)}100%{transform:scale(1.08)}}
+
+    .app{position:relative;z-index:1;width:100%;max-width:720px;display:flex;flex-direction:column;gap:14px;animation:fadeIn .5s ease}
+
+    .top-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:rgba(5,5,12,.92);border:1px solid rgba(255,255,255,.1);border-radius:var(--radius);padding:12px 16px;box-shadow:0 12px 40px rgba(0,0,0,.55),0 0 calc(28px * var(--ui-glow)) rgba(102,217,255,.04),inset 0 1px 0 rgba(255,255,255,.04);backdrop-filter:blur(16px)}
+    .logo{display:flex;align-items:center;gap:10px}
+    .logo-mark{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;font-size:1.35rem;font-weight:900;color:#000;box-shadow:0 0 28px rgba(102,217,255,.25);animation:logoPulse 3.5s ease-in-out infinite}
+    .logo-text{font-size:1.45rem;font-weight:900;letter-spacing:1.5px;background:linear-gradient(90deg,#fff,var(--accent),var(--accent2),#fff);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:shimmer 4s linear infinite}
+    .logo-sub{font-size:.65rem;color:var(--text-dim);letter-spacing:.8px;margin-top:1px}
+    .header-actions{display:flex;align-items:center;gap:8px}
+    .social-link{display:inline-flex;align-items:center;gap:5px;color:var(--text);text-decoration:none;font-size:.7rem;font-weight:500;background:var(--panel-light);border:1px solid var(--border);padding:5px 12px;border-radius:30px;transition:.25s}
+    .social-link:hover{background:var(--accent);color:#000;border-color:var(--accent);box-shadow:0 0 30px rgba(102,217,255,.15)}
+    .social-link svg{width:14px;height:14px;fill:currentColor}
+    .icon-btn{width:40px;height:40px;border-radius:50%;border:1px solid var(--border);background:var(--panel-light);color:var(--text);font-size:1.1rem;cursor:pointer;display:grid;place-items:center;transition:.3s;box-shadow:0 4px 14px rgba(0,0,0,.35)}
+    .icon-btn:hover{transform:rotate(50deg) scale(1.06);background:var(--accent);color:#000;border-color:var(--accent)}
+
+    .hero{background:rgba(5,5,12,.92);border:1px solid rgba(255,255,255,.1);border-radius:var(--radius);padding:22px 18px;box-shadow:0 14px 45px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.035);text-align:center;position:relative;overflow:hidden;animation:fadeUp .55s cubic-bezier(.22,1,.36,1)}
+    .hero::before{content:"";position:absolute;left:15%;right:15%;top:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),var(--accent2),transparent);opacity:.55;border-radius:99px;background-size:200% 100%;animation:shimmer 3s linear infinite}
+    .hero::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 40%,rgba(255,255,255,.04) 50%,transparent 60%);background-size:200% 100%;animation:shimmer 6s linear infinite;pointer-events:none}
+    .hero h1{font-size:1.55rem;font-weight:800;letter-spacing:.5px;margin-bottom:6px}
+    .hero p{color:var(--text-dim);font-size:.85rem;margin-bottom:18px;line-height:1.45}
+    .input-row{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+    .btn-sm{padding:8px 14px;font-size:.78rem}
+    .upload-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:12px;padding:12px 14px;border-radius:14px;background:linear-gradient(135deg,rgba(167,139,250,.1),rgba(102,217,255,.06));border:1px solid rgba(255,255,255,.08)}
+    .upload-bar-text{display:flex;flex-direction:column;gap:2px;min-width:0}
+    .upload-bar-text strong{font-size:.85rem}
+    .upload-bar-text span{font-size:.72rem;color:var(--text-dim)}
+    .profile-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+    .profile-avatar{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;font-weight:900;font-size:1.2rem;color:#000;overflow:hidden;flex-shrink:0;box-shadow:0 0 20px rgba(102,217,255,.2)}
+    .profile-avatar img{width:100%;height:100%;object-fit:cover}
+    .profile-meta{flex:1;min-width:0}
+    .profile-name{font-weight:800;font-size:1rem}
+    .profile-handle a{color:var(--accent);text-decoration:none;font-size:.85rem}
+    .profile-handle a:hover{text-decoration:underline}
+    .url-input{flex:1;min-width:180px;padding:14px 16px;border-radius:50px;border:2px solid var(--border);background:#000;color:var(--text);font-size:.95rem;outline:none;transition:.25s}
+    .url-input:focus{border-color:var(--accent);box-shadow:0 0 28px rgba(102,217,255,.12)}
+    .url-input::placeholder{color:#555}
+    .btn{padding:12px 22px;border-radius:50px;border:none;font-weight:700;font-size:.9rem;cursor:pointer;transition:.28s cubic-bezier(.34,1.56,.64,1);touch-action:manipulation;letter-spacing:.3px;display:inline-flex;align-items:center;justify-content:center;gap:7px;position:relative;overflow:hidden;text-decoration:none;user-select:none;-webkit-user-select:none}
+    .btn::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.18),transparent 55%);pointer-events:none;opacity:.7}
+    .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#0a0a0f;box-shadow:0 6px 28px color-mix(in srgb,var(--accent) 35%,transparent),inset 0 1px 0 rgba(255,255,255,.25)}
+    .btn-primary:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 12px 40px color-mix(in srgb,var(--accent) 45%,transparent),inset 0 1px 0 rgba(255,255,255,.3)}
+    .btn-primary:active{transform:scale(.96)}
+    .btn-primary:disabled{opacity:.5;pointer-events:none;filter:grayscale(.2)}
+    .btn-ghost,.btn-secondary{background:rgba(255,255,255,.04);color:var(--text);border:1px solid rgba(255,255,255,.12);box-shadow:0 4px 16px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.05)}
+    .btn-ghost:hover,.btn-secondary:hover{border-color:color-mix(in srgb,var(--accent) 55%,transparent);background:color-mix(in srgb,var(--accent) 12%,transparent);color:#fff;box-shadow:0 6px 24px color-mix(in srgb,var(--accent) 18%,transparent)}
+    .btn-ghost:active,.btn-secondary:active{transform:scale(.97)}
+    .btn-sm{padding:9px 16px;font-size:.78rem;border-radius:40px;font-weight:650}
+    .btn-sm::after{opacity:.5}
+    a.btn{color:inherit}
+    a.btn-primary{color:#0a0a0f}
+    .icon-btn{transition:.28s cubic-bezier(.34,1.56,.64,1)}
+    .icon-btn:hover{border-color:var(--accent);box-shadow:0 0 20px color-mix(in srgb,var(--accent) 30%,transparent);transform:scale(1.06)}
+    .icon-btn:active{transform:scale(.94)}
+    .nav-item{transition:.25s}
+    .nav-item.active{color:var(--accent)}
+    .nav-item:active{transform:scale(.95)}
+    .quick-tips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:14px}
+    .chip{font-size:.68rem;padding:5px 12px;border-radius:30px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--text-dim)}
+
+    .scan-status{display:none;background:rgba(5,5,12,.95);border:1px solid rgba(255,255,255,.1);border-radius:var(--radius);padding:20px;text-align:center}
+    .scan-status.active{display:block;animation:fadeUp .45s cubic-bezier(.22,1,.36,1)}
+    .scan-ring{width:56px;height:56px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;margin:0 auto 14px;animation:spin .85s linear infinite;box-shadow:0 0 20px color-mix(in srgb,var(--accent) 30%,transparent)}
+    .results.visible{display:flex}
+    .results.visible .card{animation:cardStagger .5s cubic-bezier(.22,1,.36,1) both}
+    .results.visible .card:nth-child(1){animation-delay:.04s}
+    .results.visible .card:nth-child(2){animation-delay:.09s}
+    .results.visible .card:nth-child(3){animation-delay:.14s}
+    .results.visible .card:nth-child(4){animation-delay:.19s}
+    .results.visible .card:nth-child(5){animation-delay:.24s}
+    .results.visible .card:nth-child(6){animation-delay:.29s}
+    .results.visible .card:nth-child(7){animation-delay:.34s}
+    .results.visible .card:nth-child(8){animation-delay:.39s}
+    .results.visible .card:nth-child(9){animation-delay:.44s}
+    .results.visible .card:nth-child(10){animation-delay:.49s}
+    .stat-box .num{transition:color .3s,transform .3s}
+    .stat-box:hover .num{transform:scale(1.08);color:var(--accent2)}
+    .card{transition:border-color .3s,box-shadow .3s,transform .3s}
+    .card:hover{border-color:color-mix(in srgb,var(--accent) 35%,transparent);box-shadow:0 14px 44px rgba(0,0,0,.5),0 0 28px color-mix(in srgb,var(--accent) 10%,transparent)}
+    .scan-log{font-size:.78rem;color:var(--text-dim);max-height:140px;overflow-y:auto;text-align:left;margin-top:12px;font-family:ui-monospace,monospace;line-height:1.55}
+    .scan-log.log-hidden{display:none!important}
+    .scan-log .ok{color:var(--success)}.scan-log .warn{color:var(--warn)}.scan-log .err{color:var(--danger)}
+    #scanActions{display:none;margin-top:12px;gap:8px;flex-wrap:wrap;justify-content:center}
+    #scanActions[style*="flex"]{display:flex!important}
+
+    .results{display:none;flex-direction:column;gap:12px}
+    /* results animation handled via .results.visible .card stagger */
+    .card{background:rgba(5,5,12,.92);border:1px solid rgba(255,255,255,.1);border-radius:var(--radius);padding:16px;box-shadow:0 12px 40px rgba(0,0,0,.45),0 0 calc(24px * var(--ui-glow)) rgba(102,217,255,.03),inset 0 1px 0 rgba(255,255,255,.03)}
+    .card h3{font-size:1rem;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+    .preview-wrap{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start}
+    .preview-box{width:140px;flex-shrink:0;border-radius:14px;overflow:hidden;background:#0a0a12;border:1px solid var(--border);aspect-ratio:9/16;display:flex;align-items:center;justify-content:center}
+    .preview-box img{width:100%;height:100%;object-fit:cover;display:block}
+    .preview-meta{flex:1;min-width:180px}
+    .preview-meta .title{font-size:.95rem;font-weight:600;line-height:1.35;margin-bottom:8px;word-break:break-word}
+    .preview-meta .author{font-size:.85rem;color:var(--accent);margin-bottom:10px}
+    .preview-meta .author a{color:inherit;text-decoration:none}
+    .preview-meta .author a:hover{text-decoration:underline}
+
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    .stat-box{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:12px;text-align:center}
+    .stat-box .num{font-size:1.15rem;font-weight:800;color:var(--accent);word-break:break-all}
+    .stat-box .lbl{font-size:.62rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;margin-top:2px}
+    .badge{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:30px;font-size:.72rem;font-weight:700}
+    .badge-ok{background:rgba(74,222,128,.12);color:var(--success);border:1px solid rgba(74,222,128,.25)}
+    .badge-warn{background:rgba(251,191,36,.12);color:var(--warn);border:1px solid rgba(251,191,36,.25)}
+    .badge-bad{background:rgba(255,107,107,.12);color:var(--danger);border:1px solid rgba(255,107,107,.25)}
+    .badge-info{background:rgba(102,217,255,.1);color:var(--accent);border:1px solid rgba(102,217,255,.2)}
+    .badge-muted{background:rgba(255,255,255,.06);color:var(--text-dim);border:1px solid var(--border)}
+
+    .list{display:flex;flex-direction:column;gap:8px}
+    .list-item{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:10px 12px;background:rgba(255,255,255,.025);border:1px solid var(--border);border-radius:12px;font-size:.82rem}
+    .list-item .k{color:var(--text-dim);flex-shrink:0}.list-item .v{font-weight:600;text-align:right;word-break:break-word}
+
+    .device-panel{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .device-card .res-big{font-size:1.45rem;font-weight:900;color:var(--accent);margin:6px 0 2px;letter-spacing:.5px;text-shadow:0 0 18px rgba(102,217,255,.25)}
+    .device-card.active{border-color:rgba(102,217,255,.35);box-shadow:0 0 24px rgba(102,217,255,.08),inset 0 0 20px rgba(102,217,255,.04)}
+    .vq-row{display:flex;align-items:center;gap:14px;padding:12px 14px;margin-bottom:12px;border-radius:14px;background:linear-gradient(135deg,rgba(102,217,255,.08),rgba(167,139,250,.06));border:1px solid rgba(255,255,255,.08)}
+    .vq-score{text-align:center;min-width:72px}
+    .vq-score span{display:block;font-size:1.6rem;font-weight:900;color:var(--accent)}
+    .vq-score small{font-size:.62rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px}
+    .vq-meta{font-size:.85rem;font-weight:600;color:var(--text);line-height:1.4}
+    .stream-list{display:flex;flex-direction:column;gap:8px}
+    .stream-item{padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);transition:.2s}
+    .stream-item:hover{border-color:rgba(102,217,255,.25);background:rgba(102,217,255,.05)}
+    .stream-item .si-name{font-size:.72rem;font-weight:700;color:var(--accent);margin-bottom:3px;word-break:break-all}
+    .stream-item .si-meta{font-size:.78rem;color:var(--text);font-weight:500}
+    .stream-item .si-meta span{color:var(--text-dim);margin:0 4px}
+    .device-card{padding:14px;border-radius:14px;border:1px solid var(--border);background:linear-gradient(145deg,rgba(255,255,255,.03),rgba(102,217,255,.02));text-align:center}
+    .device-card.active{border-color:var(--accent);box-shadow:0 0 24px rgba(102,217,255,.12)}
+    .device-card .ico{font-size:1.8rem;margin-bottom:4px}
+    .device-card .title{font-weight:700;font-size:.9rem}
+    .device-card .sub{font-size:.68rem;color:var(--text-dim);margin-top:3px;line-height:1.35}
+
+    .note{font-size:.78rem;color:var(--text-dim);line-height:1.45;padding:10px 12px;background:rgba(255,255,255,.03);border-radius:12px;border:1px solid var(--border)}
+    .note strong{color:var(--text)}
+    .disclaimer{font-size:.68rem;color:var(--text-dim);text-align:center;line-height:1.4;opacity:.8;padding:4px 8px}
+
+    .settings-panel{display:none;position:fixed;top:12px;right:12px;left:12px;max-width:360px;margin-left:auto;z-index:100;background:#000;border:1px solid rgba(255,255,255,.12);border-radius:var(--radius);padding:18px;box-shadow:0 20px 60px rgba(0,0,0,.7);max-height:calc(100dvh - 24px);overflow-y:auto}
+    .settings-panel.open{display:flex;flex-direction:column;gap:12px;animation:fadeUp .3s ease}
+    .settings-panel::before{content:"";display:block;height:3px;margin:-18px -18px 6px;background:linear-gradient(90deg,var(--accent),var(--accent2),transparent);border-radius:20px}
+    .setting-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.04)}
+    .setting-row:last-child{border:none;padding:0}
+    .setting-row label{font-size:.8rem;font-weight:500}
+    .toggle{width:44px;height:22px;background:#333;border-radius:22px;cursor:pointer;position:relative;transition:.3s;flex-shrink:0}
+    .toggle.active{background:var(--accent);box-shadow:0 0 20px rgba(102,217,255,.15)}
+    .toggle::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;background:#fff;border-radius:50%;transition:.3s cubic-bezier(.34,1.56,.64,1)}
+    .toggle.active::after{transform:translateX(22px)}
+    .color-row{display:flex;gap:5px;flex-wrap:wrap}
+    .theme-row{display:flex;flex-wrap:wrap;gap:8px}
+    .theme-chip{padding:8px 14px;border-radius:30px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:var(--text-dim);font-size:.72rem;font-weight:700;cursor:pointer;letter-spacing:.3px;transition:.25s}
+    .theme-chip:hover{border-color:var(--accent);color:#fff}
+    .theme-chip.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#0a0a0f;border-color:transparent;box-shadow:0 4px 18px color-mix(in srgb,var(--accent) 30%,transparent)}
+    .logo-sub{font-size:.68rem;color:var(--text-dim);letter-spacing:.35px;margin-top:2px;font-weight:500;opacity:.9}
+    .copt{width:26px;height:26px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:.2s}
+    .copt.active{border-color:#fff;transform:scale(1.12)}
+    .glow-slider{flex:1;min-width:80px;accent-color:var(--accent)}
+    .close-x{position:absolute;top:10px;right:10px;width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,.15);background:#000;color:var(--text);font-size:18px;cursor:pointer;display:grid;place-items:center}
+
+
+    .import-area{width:100%;min-height:88px;padding:12px 14px;border-radius:14px;border:1px solid rgba(255,255,255,.1);background:#000;color:var(--text);font-size:.82rem;resize:vertical;outline:none;font-family:inherit;line-height:1.4}
+    .import-area:focus{border-color:var(--accent);box-shadow:0 0 20px color-mix(in srgb,var(--accent) 15%,transparent)}
+    /* Video feed cards */
+    .feed-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+    .video-feed{display:flex;flex-direction:column;gap:10px}
+    .vcard{display:flex;gap:12px;padding:12px;border-radius:16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);transition:transform .28s cubic-bezier(.34,1.56,.64,1),border-color .25s,background .25s,box-shadow .3s;cursor:pointer;animation:cardStagger .45s cubic-bezier(.22,1,.36,1) both}
+    .vcard:nth-child(1){animation-delay:.03s}.vcard:nth-child(2){animation-delay:.07s}.vcard:nth-child(3){animation-delay:.11s}
+    .vcard:nth-child(4){animation-delay:.15s}.vcard:nth-child(5){animation-delay:.19s}.vcard:nth-child(6){animation-delay:.23s}
+    .vcard:nth-child(7){animation-delay:.27s}.vcard:nth-child(8){animation-delay:.31s}.vcard:nth-child(9){animation-delay:.35s}
+    .vcard:nth-child(10){animation-delay:.39s}.vcard:nth-child(n+11){animation-delay:.43s}
+    .vcard:hover{border-color:color-mix(in srgb,var(--accent) 40%,transparent);background:color-mix(in srgb,var(--accent) 6%,transparent);transform:translateY(-3px) scale(1.01);box-shadow:0 10px 28px rgba(0,0,0,.4),0 0 20px color-mix(in srgb,var(--accent) 12%,transparent)}
+    .vcard:active{transform:scale(.98)}
+    .vcard-cover{width:72px;height:96px;border-radius:12px;object-fit:cover;background:#111;flex-shrink:0;transition:transform .35s cubic-bezier(.34,1.56,.64,1)}
+    .vcard:hover .vcard-cover{transform:scale(1.05)}
+    .vcard-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+    .vcard-title{font-weight:700;font-size:.88rem;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .vcard-meta{font-size:.72rem;color:var(--text-dim);display:flex;flex-wrap:wrap;gap:6px 10px}
+    .vcard-stats{font-size:.75rem;color:var(--text);display:flex;flex-wrap:wrap;gap:8px;margin-top:auto}
+    .vcard-stats span{opacity:.85}
+    .feed-empty{text-align:center;padding:28px 16px;color:var(--text-dim);font-size:.9rem;line-height:1.5}
+
+    .bottom-nav{position:fixed;bottom:0;left:0;right:0;height:calc(var(--nav-h) + env(safe-area-inset-bottom));padding:4px 6px env(safe-area-inset-bottom);background:rgba(5,5,12,.95);border-top:1px solid var(--border);display:flex;justify-content:space-around;align-items:center;z-index:50;backdrop-filter:blur(18px);box-shadow:0 -4px 30px rgba(0,0,0,.5)}
+    .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;border:none;background:transparent;color:var(--text-dim);font-size:.55rem;font-weight:600;cursor:pointer;text-transform:uppercase;letter-spacing:.3px;border-radius:12px;transition:.25s;min-height:48px;position:relative}
+    .nav-item .ico{font-size:1.35rem}
+    .nav-item.active{color:var(--accent);transform:translateY(-2px)}
+    .nav-item.active::after{content:"";position:absolute;top:0;left:22%;right:22%;height:3px;background:var(--accent);border-radius:0 0 4px 4px;box-shadow:0 0 20px rgba(102,217,255,.35)}
+
+    /* Mini music player (above bottom nav) */
+    .music-player{position:fixed;left:12px;right:12px;bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 8px);z-index:55;display:none;align-items:center;gap:10px;padding:10px 12px;border-radius:16px;background:rgba(8,8,16,.94);border:1px solid rgba(255,255,255,.12);box-shadow:0 12px 40px rgba(0,0,0,.55),0 0 28px rgba(102,217,255,.08);backdrop-filter:blur(18px);max-width:720px;margin:0 auto}
+    .music-player.visible{display:flex;animation:slideInRight .4s cubic-bezier(.22,1,.36,1)}
+    .music-player .mp-art{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;font-size:1.2rem;flex-shrink:0;overflow:hidden}
+    .music-player .mp-art img{width:100%;height:100%;object-fit:cover}
+    .music-player .mp-meta{flex:1;min-width:0}
+    .music-player .mp-title{font-size:.82rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .music-player .mp-artist{font-size:.68rem;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .music-player .mp-progress{height:3px;background:rgba(255,255,255,.1);border-radius:99px;margin-top:6px;overflow:hidden;cursor:pointer}
+    .music-player .mp-progress-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:99px;transition:width .15s linear}
+    .music-player .mp-controls{display:flex;align-items:center;gap:6px;flex-shrink:0}
+    .music-player .mp-btn{width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:var(--text);font-size:1rem;cursor:pointer;display:grid;place-items:center;transition:.2s}
+    .music-player .mp-btn:hover{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 18%,transparent)}
+    .music-player .mp-btn.play-main{width:40px;height:40px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#0a0a0f;border:none;font-size:1.05rem}
+    .music-player .mp-time{font-size:.62rem;color:var(--text-dim);min-width:34px;text-align:right}
+    body.has-player{padding-bottom:calc(var(--nav-h) + 88px)}
+
+    .panel{display:none}.panel.active{display:block;animation:fadeUp .4s cubic-bezier(.22,1,.36,1)}
+    .nav-item.active .ico{animation:navPop .4s cubic-bezier(.34,1.56,.64,1)}
+    .btn-primary{position:relative;overflow:hidden}
+    .btn-primary::before{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,.25) 50%,transparent 70%);background-size:200% 100%;animation:shimmer 3.5s linear infinite;pointer-events:none;opacity:.6}
+    .device-card.active{animation:pulseGlow 2.5s ease-in-out infinite}
+    .chip{transition:transform .2s,border-color .2s,background .2s}
+    .chip:hover{transform:translateY(-2px);border-color:var(--accent);color:var(--text)}
+    .badge{animation:scaleIn .35s cubic-bezier(.34,1.56,.64,1) both}
+    .list-item{transition:background .2s,border-color .2s,transform .2s}
+    .list-item:hover{background:rgba(255,255,255,.05);transform:translateX(3px)}
+    @media(prefers-reduced-motion:reduce){
+      .logo-mark,.logo-text,.hero::before,.hero::after,.btn-primary::before,.device-card.active,.vcard,.results.visible .card{animation:none!important}
+    }
+
+    @media(max-width:600px){
+      .grid-2,.grid-3,.device-panel{grid-template-columns:1fr 1fr}
+      .hero h1{font-size:1.3rem}
+      .social-link span{display:none}
+      .preview-box{width:120px}
+    }
+    @media(prefers-reduced-motion:reduce){.snowflakes-layer{display:none!important}*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+    @media(hover:none){.btn:hover,.social-link:hover,.icon-btn:hover{transform:none}}
+  </style>
+</head>
+<body>
+  <div id="revance-error-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:#7f1d1d;color:#fff;padding:10px 14px;font-size:.85rem;text-align:center"></div>
+
+  <div class="snowflakes-layer" id="snow"></div>
+
+  <div class="app">
+    <header class="top-bar">
+      <div class="logo">
+        <div class="logo-mark">R</div>
+        <div>
+          <div class="logo-text">Revance</div>
+          <div class="logo-sub">Analyser · Player · Made by Urfair</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <a class="social-link" href="https://www.tiktok.com/@urfair.aep" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24"><path d="M12.53.02C13.84 0 15.14.01 16.44 0c.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.53c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
+          <span>urfair.aep</span>
+        </a>
+        <a class="social-link" href="https://t.me/tturfair" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+          <span>tturfair</span>
+        </a>
+        <a class="social-link" href="https://discord.com/users/nehohol" target="_blank" rel="noopener" title="Discord · .nehohol">
+          <svg viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.548-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+          <span>.nehohol</span>
+        </a>
+        <button class="icon-btn" id="settingsBtn" title="Settings">⚙️</button>
+      </div>
+    </header>
+
+    <div class="panel active" id="panel-analyse">
+      <section class="hero">
+        <h1>Real TikTok link analysis</h1>
+        <p>Paste any public TikTok link (full or <strong>vm.tiktok.com</strong> short link). Revance expands short URLs, fetches real public metadata, and shows only what is actually available.</p>
+        <div class="input-row">
+          <input class="url-input" id="urlInput" type="url" placeholder="https://www.tiktok.com/@user/video/..." autocomplete="off" spellcheck="false" />
+          <button class="btn btn-primary" id="analyseBtn">🔍 Analyse</button>
+          <button class="btn btn-ghost" id="resetBtn" type="button" title="Reset analysis">↺ Reset</button>
+        </div>
+        <div class="upload-bar">
+          <div class="upload-bar-text">
+            <strong>Auto convert for TikTok</strong>
+            <span>Opens CompressBase → pick video → method → download</span>
+          </div>
+          <a class="btn btn-primary btn-sm" href="https://compressbase.com/upload-method" target="_blank" rel="noopener" id="compressBtn">🎬 Convert now</a>
+        </div>
+        <div class="quick-tips">
+          <span class="chip">Real public stats</span>
+          <span class="chip">Music player</span>
+          <span class="chip">Phone / PC quality</span>
+          <span class="chip">Region</span>
+          <span class="chip">Discord · .nehohol</span>
+        </div>
+      </section>
+
+      <!-- Creator profile @urfair.aep -->
+      <section class="card" id="myProfileCard">
+        <h3>👤 My TikTok · @urfair.aep</h3>
+        <div class="profile-head">
+          <div class="profile-avatar" id="myAvatar">U</div>
+          <div class="profile-meta">
+            <div class="profile-name" id="myNickname">urfair.aep</div>
+            <div class="profile-handle"><a href="https://www.tiktok.com/@urfair.aep" target="_blank" rel="noopener">@urfair.aep</a></div>
+          </div>
+          <button class="btn btn-ghost btn-sm" type="button" id="refreshProfileBtn">↻ Refresh</button>
+        </div>
+        <div class="grid-2" id="myProfileStats" style="margin:12px 0;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="stat-box"><div class="num" id="myFollowers">—</div><div class="lbl">Followers</div></div>
+          <div class="stat-box"><div class="num" id="myLikes">—</div><div class="lbl">Total likes</div></div>
+          <div class="stat-box"><div class="num" id="myFollowing">—</div><div class="lbl">Following</div></div>
+          <div class="stat-box"><div class="num" id="myVideos">—</div><div class="lbl">Videos</div></div>
+        </div>
+        <div class="note" id="myProfileNote">Tap <strong>Refresh</strong> to load public profile stats. Same API limits as video analysis may apply.</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px">
+          <a class="btn btn-ghost btn-sm" href="https://www.tiktok.com/@urfair.aep" target="_blank" rel="noopener">Open profile</a>
+          <a class="btn btn-ghost btn-sm" href="https://t.me/tturfair" target="_blank" rel="noopener">Telegram</a>
+          <a class="btn btn-ghost btn-sm" href="https://discord.com/users/nehohol" target="_blank" rel="noopener">Discord · .nehohol</a>
+          <a class="btn btn-primary btn-sm" href="https://compressbase.com/upload-method" target="_blank" rel="noopener" id="compressBtn2">🎬 Convert on CompressBase</a>
+        </div>
+      </section>
+
+
+        <div class="card" id="quickSeedCard" style="margin-top:4px">
+          <h3>⚡ Quick analyse · your posts</h3>
+          <p style="font-size:.8rem;color:var(--text-dim);margin-bottom:10px">Works offline from preloaded data when the API is blocked.</p>
+          <div id="quickSeedList" style="display:flex;flex-direction:column;gap:8px"></div>
+        </div>
+
+      <div class="scan-status" id="scanStatus">
+        <div class="scan-ring" id="scanRing"></div>
+        <div style="font-weight:700;margin-bottom:4px" id="scanTitle">Fetching real data…</div>
+        <div style="font-size:.8rem;color:var(--text-dim)" id="scanPhase">Starting</div>
+        <div class="scan-log" id="scanLog"></div>
+        <div id="scanActions" style="display:none;margin-top:12px;gap:8px;flex-wrap:wrap;justify-content:center">
+          <button type="button" class="btn btn-ghost" id="copyLogBtn" style="padding:8px 14px;font-size:.78rem">📋 Copy log</button>
+          <button type="button" class="btn btn-ghost" id="toggleLogBtn" style="padding:8px 14px;font-size:.78rem">📜 Hide log</button>
+        </div>
+      </div>
+
+      <div class="results" id="results">
+        <!-- Video identity (real) -->
+        <div class="card">
+          <h3>🎬 Video (public data)</h3>
+          <div class="preview-wrap">
+            <div class="preview-box" id="previewBox">
+              <span style="color:var(--text-dim);font-size:.75rem;padding:8px;text-align:center" id="previewPlaceholder">No thumbnail</span>
+            </div>
+            <div class="preview-meta">
+              <div class="title" id="videoTitle">—</div>
+              <div class="author" id="videoAuthor">—</div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px" id="identityBadges"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Link & IDs (real from URL) -->
+        <div class="card">
+          <h3>🔗 Link structure</h3>
+          <div class="list" id="linkList"></div>
+        </div>
+
+        <!-- oEmbed technical (real) -->
+        <div class="card">
+          <h3>📡 oEmbed / public API</h3>
+          <div class="list" id="oembedList"></div>
+          <div class="note" style="margin-top:12px" id="oembedNote"></div>
+        </div>
+
+        <!-- Quality — phone / PC resolutions + stream ladder -->
+        <div class="card" id="qualityCard">
+          <h3>⭐ Quality</h3>
+          <div class="device-panel" style="margin-bottom:12px">
+            <div class="device-card" id="devPhone">
+              <div class="ico">📱</div>
+              <div class="title">Phone</div>
+              <div class="res-big" id="phoneRes">—</div>
+              <div class="sub" id="phoneNote">Adaptive mobile stream</div>
+            </div>
+            <div class="device-card" id="devBrowser">
+              <div class="ico">💻</div>
+              <div class="title">Browser / PC</div>
+              <div class="res-big" id="browserRes">—</div>
+              <div class="sub" id="browserNote">Adaptive desktop stream</div>
+            </div>
+          </div>
+          <div class="vq-row" id="vqRow">
+            <div class="vq-score"><span id="vqNum">—</span><small>VQ Score</small></div>
+            <div class="vq-meta" id="vqMeta">Original · —</div>
+          </div>
+          <div class="stream-list" id="streamList"></div>
+          <div class="list" id="qualityList" style="margin-top:10px"></div>
+          <div class="note" style="margin-top:12px" id="qualityNote">Resolutions estimated from public file size + duration when pixel data isn’t exposed. Labels match common TikTok ladders (1080p / 720p / 540p).</div>
+        </div>
+
+        <!-- Shadowban & reach -->
+        <div class="card">
+          <h3>👻 Shadowban & reach</h3>
+          <div style="margin-bottom:12px">
+            <span class="badge badge-muted" id="shadowBadge">Not published by TikTok</span>
+          </div>
+          <div class="note" id="shadowNote">
+            <strong>Honest answer:</strong> TikTok does not publish shadowban / FYP eligibility on public video data. Only the account owner sees that in Creator Analytics. Use engagement health (views vs likes) as a rough signal — not a shadowban detector.
+          </div>
+        </div>
+
+        <!-- Country / upload origin -->
+        <div class="card">
+          <h3>🌍 Region signal</h3>
+          <div style="margin-bottom:12px">
+            <span class="badge badge-info" id="regionBadge">—</span>
+          </div>
+          <div class="note" id="regionNote">
+            Public parsers sometimes return a <strong>region code</strong> (e.g. IT, US). That is a platform signal, not guaranteed GPS of the uploader.
+          </div>
+        </div>
+
+        <!-- Engagement -->
+        <div class="card">
+          <h3>📈 Engagement (public signals)</h3>
+          <div class="grid-3" id="engStats" style="margin-bottom:12px"></div>
+          <div class="list" id="engList"></div>
+          <div class="note" style="margin-top:12px" id="engNote">
+            Likes / comments may appear in the public share description when available. Full view counts and shadowban status are not exposed by public endpoints.
+          </div>
+        </div>
+
+        <!-- Sound ID (Shazam-style) + Download no-WM -->
+        <div class="card" id="toolsCard">
+          <h3>🎵 Sound · Shazam</h3>
+          <div class="list" id="soundList">
+            <div class="list-item"><span class="k">Status</span><span class="v">Analyse a video first</span></div>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px" id="soundActions"></div>
+          <div class="note" style="margin-top:12px">Uses the video’s public music metadata (title / author / id). Not a full Shazam fingerprint — TikTok already tags most sounds.</div>
+
+          <h3 style="margin-top:18px">⬇️ Download (no watermark)</h3>
+          <div class="list" id="dlList">
+            <div class="list-item"><span class="k">Status</span><span class="v">Analyse a video first</span></div>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px" id="dlActions"></div>
+          <div class="note" style="margin-top:12px"><strong>HD / no-WM</strong> links come from public stream URLs when the stats API succeeds. Quality matches the server file (not re-encoded). If TikTok CDN blocks in-app download, the link still opens in a new tab.</div>
+        </div>
+
+        <!-- What you can do -->
+        <div class="card">
+          <h3>💡 What you can check yourself</h3>
+          <div class="list">
+            <div class="list-item"><span class="k">Shadowban / FYP</span><span class="v">TikTok app → Profile → Creator tools / Analytics</span></div>
+            <div class="list-item"><span class="k">Exact quality</span><span class="v">Download your own export or check device playback</span></div>
+            <div class="list-item"><span class="k">Country of audience</span><span class="v">Analytics → Audience → Location</span></div>
+            <div class="list-item"><span class="k">Open video</span><span class="v"><a id="openLink" href="#" target="_blank" rel="noopener" style="color:var(--accent)">Open on TikTok</a></span></div>
+            <div class="list-item"><span class="k">Upload prep</span><span class="v"><a href="https://compressbase.com/upload-method" target="_blank" rel="noopener" style="color:var(--accent)">CompressBase upload method</a></span></div>
+          </div>
+          <div style="margin-top:12px">
+            <a class="btn btn-primary" href="https://compressbase.com/upload-method" target="_blank" rel="noopener" id="compressBtn3" style="width:100%">🎬 Auto convert for TikTok (CompressBase)</a>
+          </div>
+        </div>
+
+        <p class="disclaimer">Revance uses public metadata when the API allows. Short links are expanded. Profile stats for @urfair.aep load from the same public sources. No invented shadowban scores.</p>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-guide">
+      <div class="card">
+        <h3>📖 What Revance can (and cannot) do</h3>
+        <div class="list" style="margin-top:8px">
+          <div class="list-item"><span class="k">Can</span><span class="v">Expand vm.tiktok.com / vt.tiktok.com short links</span></div>
+          <div class="list-item"><span class="k">Can</span><span class="v">Username, video ID, caption, author, thumbnail</span></div>
+          <div class="list-item"><span class="k">Can</span><span class="v">Public likes/comments when present in share metadata</span></div>
+          <div class="list-item"><span class="k">Can</span><span class="v">Published date & language signals when available</span></div>
+          <div class="list-item"><span class="k">Cannot</span><span class="v">Detect shadowban (private to TikTok)</span></div>
+          <div class="list-item"><span class="k">Cannot</span><span class="v">Know exact upload country from the public link</span></div>
+          <div class="list-item"><span class="k">Cannot</span><span class="v">Measure real bitrate / resolution without the media file</span></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <h3>How the fetch works</h3>
+        <p style="font-size:.82rem;color:var(--text-dim);line-height:1.5;margin-top:6px">
+          1. Validate TikTok URL (full or short).<br>
+          2. Call Microlink (CORS-friendly) — expands short links and returns public share metadata.<br>
+          3. Try TikTok oEmbed on the expanded URL for extra fields.<br>
+          4. Show only real fields; never invent shadowban % or fake counters.
+        </p>
+      </div>
+    </div>
+
+
+    <div class="panel" id="panel-news">
+      <section class="card">
+        <h3>📰 News · @urfair.aep</h3>
+        <p style="font-size:.85rem;color:var(--text-dim);margin-bottom:12px">Latest posts from @urfair.aep — preloaded from your public profile embed. Tap a card to analyse.</p>
+        <div style="border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,.08);margin-bottom:14px;background:#111">
+          <iframe src="https://www.tiktok.com/embed/@urfair.aep" title="urfair.aep" style="width:100%;height:320px;border:0;display:block" loading="lazy" allow="encrypted-media"></iframe>
+        </div>
+        <div class="feed-toolbar">
+          <button type="button" class="btn btn-primary btn-sm" id="newsRefreshBtn">↻ Try live feed</button>
+          <span class="chip" id="newsCount">0 posts</span>
+        </div>
+        <div class="video-feed" id="newsFeed">
+          <div class="feed-empty">Loading…</div>
+        </div>
+      </section>
+    </div>
+
+    <div class="panel" id="panel-videos">
+      <section class="card">
+        <h3>🎬 All my videos</h3>
+        <p style="font-size:.85rem;color:var(--text-dim);margin-bottom:12px">Library with date, views, likes. Import links below if the live feed is blocked.</p>
+        <div class="feed-toolbar">
+          <button type="button" class="btn btn-primary btn-sm" id="videosRefreshBtn">↻ Try live feed</button>
+          <button type="button" class="btn btn-ghost btn-sm" id="videosClearBtn">Clear library</button>
+          <span class="chip" id="videosCount">0 videos</span>
+        </div>
+        <textarea id="importLinks" class="import-area" placeholder="Paste TikTok links (one per line or separated by space)…&#10;https://www.tiktok.com/@urfair.aep/video/…&#10;https://vm.tiktok.com/…"></textarea>
+        <button type="button" class="btn btn-primary" id="importLinksBtn" style="width:100%;margin:10px 0 14px">📥 Import links → library</button>
+        <div class="note" id="importStatus" style="margin-bottom:12px">Import uses the same video API as Analyse (more reliable than the blocked “user posts” endpoint).</div>
+        <div class="video-feed" id="videosFeed">
+          <div class="feed-empty">No videos yet. Import links or Analyse your posts.</div>
+        </div>
+      </section>
+    </div>
+
+    <div class="panel" id="panel-about">
+      <div class="card" style="text-align:center">
+        <div class="logo-mark" style="margin:0 auto 12px;width:56px;height:56px;font-size:1.6rem">R</div>
+        <h3 style="justify-content:center">Revance</h3>
+        <p style="text-align:center;color:var(--text-dim);font-size:.85rem;margin-top:4px">All in one. Made by Urfair</p>
+        <p style="color:var(--text-dim);font-size:.85rem;margin:8px 0 16px">TikTok analyser · sound player · Discord .nehohol</p>
+        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+          <a class="social-link" href="https://www.tiktok.com/@urfair.aep" target="_blank" rel="noopener">TikTok · urfair.aep</a>
+          <a class="social-link" href="https://t.me/tturfair" target="_blank" rel="noopener">Telegram · tturfair</a>
+          <a class="social-link" href="https://discord.com/users/nehohol" target="_blank" rel="noopener">Discord · .nehohol</a>
+        </div>
+        <p style="font-size:.7rem;color:var(--text-dim);margin-top:18px;opacity:.6">v1.3 · Music player · Discord · Real public data</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="settings-panel" id="settingsPanel">
+    <button class="close-x" id="settingsClose">×</button>
+    <h3 style="margin-bottom:4px">⚙️ Settings</h3>
+    <div class="setting-row" style="flex-direction:column;align-items:stretch;gap:8px">
+      <label>Theme</label>
+      <div class="theme-row" id="themeOpts">
+        <button type="button" class="theme-chip active" data-theme="cyan">Cyan</button>
+        <button type="button" class="theme-chip" data-theme="violet">Violet</button>
+        <button type="button" class="theme-chip" data-theme="mint">Mint</button>
+        <button type="button" class="theme-chip" data-theme="amber">Amber</button>
+        <button type="button" class="theme-chip" data-theme="rose">Rose</button>
+        <button type="button" class="theme-chip" data-theme="crimson">Crimson</button>
+        <button type="button" class="theme-chip" data-theme="mono">Mono</button>
+        <button type="button" class="theme-chip" data-theme="sunset">Sunset</button>
+      </div>
+    </div>
+    <div class="setting-row">
+      <label>Accent colour</label>
+      <div class="color-row" id="colorOpts">
+        <div class="copt active" data-c="#66d9ff" style="background:#66d9ff"></div>
+        <div class="copt" data-c="#a78bfa" style="background:#a78bfa"></div>
+        <div class="copt" data-c="#4ade80" style="background:#4ade80"></div>
+        <div class="copt" data-c="#fbbf24" style="background:#fbbf24"></div>
+        <div class="copt" data-c="#ff6b6b" style="background:#ff6b6b"></div>
+        <div class="copt" data-c="#ec4899" style="background:#ec4899"></div>
+        <div class="copt" data-c="#fb923c" style="background:#fb923c"></div>
+        <div class="copt" data-c="#fff" style="background:#fff;border-color:#666"></div>
+      </div>
+    </div>
+    <div class="setting-row"><label>UI Glow</label><input type="range" class="glow-slider" id="uiGlow" min="0" max="150" value="100"><span id="uiGlowVal" style="min-width:36px;text-align:right;font-size:.8rem">100%</span></div>
+    <div class="setting-row"><label>Snow brightness</label><input type="range" class="glow-slider" id="snowBright" min="40" max="220" value="160"><span id="snowBrightVal" style="min-width:36px;text-align:right;font-size:.8rem">160%</span></div>
+    <div class="setting-row"><label>Snowflakes</label><div class="toggle active" id="snowToggle"></div></div>
+    <div class="setting-row"><label>Sound</label><div class="toggle active" id="soundToggle"></div></div>
+  </div>
+
+  <!-- Mini music player -->
+  <div class="music-player" id="musicPlayer" aria-label="Sound player">
+    <div class="mp-art" id="mpArt">🎵</div>
+    <div class="mp-meta">
+      <div class="mp-title" id="mpTitle">No track</div>
+      <div class="mp-artist" id="mpArtist">Analyse a video to play its sound</div>
+      <div class="mp-progress" id="mpProgress"><div class="mp-progress-fill" id="mpProgressFill"></div></div>
+    </div>
+    <span class="mp-time" id="mpTime">0:00</span>
+    <div class="mp-controls">
+      <button type="button" class="mp-btn play-main" id="mpPlayBtn" title="Play / Pause">▶</button>
+      <button type="button" class="mp-btn" id="mpCloseBtn" title="Close">✕</button>
+    </div>
+    <audio id="mpAudio" preload="none" crossorigin="anonymous"></audio>
+  </div>
+
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-tab="analyse"><span class="ico">🔍</span>Analyse</button>
+    <button class="nav-item" data-tab="news"><span class="ico">📰</span>News</button>
+    <button class="nav-item" data-tab="videos"><span class="ico">🎬</span>Videos</button>
+    <button class="nav-item" data-tab="guide"><span class="ico">📖</span>Guide</button>
+    <button class="nav-item" data-tab="about"><span class="ico">✦</span>About</button>
+  </nav>
+
+  <script>
+  window.onerror=function(msg,src,line){
+    try{
+      var b=document.getElementById('revance-error-banner');
+      if(b){ b.style.display='block'; b.textContent='JS error: '+msg+' (line '+line+')'; }
+    }catch(e){}
+  };
+  (function(){
+    'use strict';
+    try{
+
+    const $ = id => document.getElementById(id);
+
+    // —— sound (UI beeps) ——
+    const sound = {
+      ctx:null, enabled:true,
+      init(){ if(this.ctx) return; try{ this.ctx=new(window.AudioContext||window.webkitAudioContext)(); }catch(e){ this.enabled=false; } },
+      beep(freq, dur, type, gain, delay){
+        if(!this.ctx) return;
+        const t=this.ctx.currentTime+(delay||0);
+        const o=this.ctx.createOscillator(), g=this.ctx.createGain();
+        o.type=type||'sine';
+        o.frequency.value=freq;
+        g.gain.setValueAtTime(gain||0.06, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t+dur);
+        o.connect(g); g.connect(this.ctx.destination);
+        o.start(t); o.stop(t+dur+0.02);
+      },
+      play(type){
+        if(!this.enabled) return; this.init(); if(!this.ctx) return;
+        if(this.ctx.state==='suspended') this.ctx.resume().catch(()=>{});
+        if(type==='click'){ this.beep(920, 0.04, 'triangle', 0.05); }
+        else if(type==='scan'){ this.beep(480, 0.05, 'sine', 0.04); this.beep(620, 0.05, 'sine', 0.03, 0.05); }
+        else if(type==='ok'){ this.beep(660, 0.07, 'sine', 0.06); this.beep(880, 0.08, 'sine', 0.04, 0.06); }
+        else if(type==='warn'){ this.beep(320, 0.1, 'square', 0.04); }
+        else if(type==='err'){ this.beep(180, 0.12, 'sawtooth', 0.05); this.beep(140, 0.14, 'sawtooth', 0.03, 0.08); }
+        else if(type==='done'){ this.beep(523, 0.08, 'sine', 0.06); this.beep(659, 0.1, 'sine', 0.05, 0.08); this.beep(784, 0.14, 'sine', 0.04, 0.16); }
+        else this.beep(880, 0.04, 'sine', 0.05);
+      }
+    };
+
+    // —— Mini music player (TikTok sound stream) ——
+    const musicPlayer = {
+      audio: null,
+      track: null,
+      init(){
+        this.audio = $('mpAudio');
+        if(!this.audio) return;
+        this.audio.addEventListener('timeupdate', ()=> this.tick());
+        this.audio.addEventListener('ended', ()=>{ this.setPlaying(false); });
+        this.audio.addEventListener('error', ()=>{
+          if($('mpArtist')) $('mpArtist').textContent = 'Stream blocked — open in new tab';
+        });
+        $('mpPlayBtn')&&$('mpPlayBtn').addEventListener('click', ()=> this.toggle());
+        $('mpCloseBtn')&&$('mpCloseBtn').addEventListener('click', ()=> this.close());
+        $('mpProgress')&&$('mpProgress').addEventListener('click', (e)=>{
+          if(!this.audio || !this.audio.duration) return;
+          const r = e.currentTarget.getBoundingClientRect();
+          const p = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+          this.audio.currentTime = p * this.audio.duration;
+          this.tick();
+        });
+      },
+      fmt(s){
+        s = Math.floor(s||0);
+        return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
+      },
+      tick(){
+        if(!this.audio) return;
+        const d = this.audio.duration || 0;
+        const c = this.audio.currentTime || 0;
+        if($('mpProgressFill')) $('mpProgressFill').style.width = (d ? (c/d*100) : 0) + '%';
+        if($('mpTime')) $('mpTime').textContent = this.fmt(c);
+      },
+      setPlaying(on){
+        if($('mpPlayBtn')) $('mpPlayBtn').textContent = on ? '⏸' : '▶';
+      },
+      load(opts){
+        if(!this.audio) this.init();
+        if(!opts || !opts.url) return;
+        this.track = opts;
+        const bar = $('musicPlayer');
+        if(bar) bar.classList.add('visible');
+        document.body.classList.add('has-player');
+        if($('mpTitle')) $('mpTitle').textContent = opts.title || 'Original sound';
+        if($('mpArtist')) $('mpArtist').textContent = opts.artist || 'TikTok sound';
+        if($('mpArt')){
+          if(opts.cover){
+            $('mpArt').innerHTML = '<img src="'+esc(opts.cover)+'" alt="" referrerpolicy="no-referrer" onerror="this.parentNode.textContent=\'🎵\'" />';
+          } else {
+            $('mpArt').textContent = '🎵';
+          }
+        }
+        this.audio.src = opts.url;
+        this.audio.load();
+        this.setPlaying(false);
+        this.tick();
+      },
+      toggle(){
+        if(!this.audio || !this.audio.src) return;
+        sound.play('click');
+        if(this.audio.paused){
+          this.audio.play().then(()=> this.setPlaying(true)).catch(()=>{
+            if($('mpArtist')) $('mpArtist').textContent = 'Tap again or open stream link';
+          });
+        } else {
+          this.audio.pause();
+          this.setPlaying(false);
+        }
+      },
+      close(){
+        sound.play('click');
+        if(this.audio){ this.audio.pause(); this.audio.removeAttribute('src'); this.audio.load(); }
+        this.setPlaying(false);
+        const bar = $('musicPlayer');
+        if(bar) bar.classList.remove('visible');
+        document.body.classList.remove('has-player');
+      }
+    };
+    // defer init until DOM ready (script runs at end of body)
+    setTimeout(()=>{ try{ musicPlayer.init(); }catch(_){} }, 0);
+
+    // —— snow ——
+    let snowOn=true;
+    function makeSnow(){
+      const box=$('snow'); if(!box) return; box.innerHTML='';
+      if(!snowOn) return;
+      const n=Math.min(80, Math.floor(window.innerWidth/9));
+      for(let i=0;i<n;i++){
+        const f=document.createElement('div'); f.className='snowflake';
+        const s=2+Math.random()*4; f.style.width=s+'px'; f.style.height=s+'px';
+        f.style.left=Math.random()*100+'%'; f.style.animationDuration=(6+Math.random()*9)+'s';
+        f.style.animationDelay=Math.random()*8+'s'; box.appendChild(f);
+      }
+    }
+    makeSnow();
+    window.addEventListener('resize',()=>{ clearTimeout(window.__sn); window.__sn=setTimeout(makeSnow,200); });
+
+    // —— theme ——
+    const THEMES={
+      cyan:   {accent:'#66d9ff', accent2:'#22d3ee', bg:'#000000'},
+      violet: {accent:'#a78bfa', accent2:'#8b5cf6', bg:'#07050f'},
+      mint:   {accent:'#4ade80', accent2:'#22c55e', bg:'#030a06'},
+      amber:  {accent:'#fbbf24', accent2:'#f59e0b', bg:'#0a0803'},
+      rose:   {accent:'#ec4899', accent2:'#f472b6', bg:'#0a0308'},
+      crimson:{accent:'#ff6b6b', accent2:'#ef4444', bg:'#0a0404'},
+      mono:   {accent:'#e5e7eb', accent2:'#9ca3af', bg:'#050505'},
+      sunset: {accent:'#fb923c', accent2:'#f43f5e', bg:'#0a0503'}
+    };
+    function setAccent(c, c2){
+      document.documentElement.style.setProperty('--accent',c);
+      document.documentElement.style.setProperty('--accent2',c2||c);
+      try{ localStorage.setItem('revance_accent', c); if(c2) localStorage.setItem('revance_accent2', c2); }catch(_){}
+    }
+    function applyTheme(name){
+      const t=THEMES[name]||THEMES.cyan;
+      setAccent(t.accent, t.accent2);
+      document.documentElement.style.setProperty('--bg', t.bg);
+      document.body.style.background=t.bg;
+      document.querySelectorAll('#themeOpts .theme-chip').forEach(x=>{
+        x.classList.toggle('active', x.dataset.theme===name);
+      });
+      document.querySelectorAll('#colorOpts .copt').forEach(x=>{
+        x.classList.toggle('active', x.dataset.c===t.accent);
+      });
+      try{ localStorage.setItem('revance_theme', name); }catch(_){}
+    }
+    document.querySelectorAll('#themeOpts .theme-chip').forEach(el=>{
+      el.addEventListener('click',()=>{ applyTheme(el.dataset.theme); sound.play('click'); });
+    });
+    document.querySelectorAll('#colorOpts .copt').forEach(el=>{
+      el.addEventListener('click',()=>{
+        document.querySelectorAll('#colorOpts .copt').forEach(x=>x.classList.remove('active'));
+        el.classList.add('active');
+        setAccent(el.dataset.c, el.dataset.c);
+        document.querySelectorAll('#themeOpts .theme-chip').forEach(x=>x.classList.remove('active'));
+        sound.play('click');
+      });
+    });
+    // restore
+    try{
+      const th=localStorage.getItem('revance_theme');
+      if(th&&THEMES[th]) applyTheme(th);
+      else {
+        const a=localStorage.getItem('revance_accent');
+        const a2=localStorage.getItem('revance_accent2');
+        if(a) setAccent(a, a2||a);
+      }
+    }catch(_){}
+    $('uiGlow').addEventListener('input',e=>{
+      document.documentElement.style.setProperty('--ui-glow',(+e.target.value)/100);
+      $('uiGlowVal').textContent=e.target.value+'%';
+    });
+    $('snowBright').addEventListener('input',e=>{
+      document.documentElement.style.setProperty('--snow-brightness',(+e.target.value)/100);
+      $('snowBrightVal').textContent=e.target.value+'%';
+    });
+    $('snowToggle').addEventListener('click',()=>{
+      snowOn=!snowOn; $('snowToggle').classList.toggle('active',snowOn); makeSnow(); sound.play('click');
+    });
+    $('soundToggle').addEventListener('click',()=>{
+      sound.enabled=!sound.enabled; $('soundToggle').classList.toggle('active',sound.enabled);
+      if(sound.enabled) sound.play('click');
+    });
+    $('settingsBtn').addEventListener('click',()=>{ $('settingsPanel').classList.add('open'); sound.play('click'); });
+    $('settingsClose').addEventListener('click',()=>{ $('settingsPanel').classList.remove('open'); sound.play('click'); });
+
+    // —— nav ——
+    document.querySelectorAll('.nav-item').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+        const panel=$('panel-'+btn.dataset.tab);
+        if(panel) panel.classList.add('active');
+        sound.play('click');
+        if(btn.dataset.tab==='news'||btn.dataset.tab==='videos'){
+          try{ paintFeeds(); }catch(_){}
+          if(!loadLib().length){ try{ fetchUserPosts(); }catch(_){} }
+        }
+      });
+    });
+
+    // —— parse URL (real) ——
+    function parseTikTokUrl(raw){
+      let input=raw.trim();
+      if(!/^https?:\/\//i.test(input)) input='https://'+input;
+      try{
+        const u=new URL(input);
+        const host=u.hostname.replace(/^www\./,'');
+        if(!/tiktok\.com$/i.test(host) && !/^(vm|vt)\.tiktok\.com$/i.test(host)) return null;
+        let id=null, user=null;
+        const path=u.pathname;
+        const mVideo=path.match(/\/video\/(\d+)/);
+        if(mVideo) id=mVideo[1];
+        const mUser=path.match(/@([\w.\-]+)/);
+        if(mUser) user=mUser[1];
+        const isShort=/^(vm|vt)\.tiktok\.com$/i.test(host);
+        return {
+          ok:true,
+          href:u.href,
+          canonical: id && user ? `https://www.tiktok.com/@${user}/video/${id}` : u.href,
+          id, user, isShort, host, pathname:path
+        };
+      }catch(e){ return null; }
+    }
+
+    function parseFromFullUrl(fullUrl){
+      try{
+        const u=new URL(fullUrl);
+        const id=(u.pathname.match(/\/video\/(\d+)/)||[])[1]||null;
+        const user=(u.pathname.match(/@([\w.\-]+)/)||[])[1]||null;
+        return { id, user, canonical: id && user ? `https://www.tiktok.com/@${user}/video/${id}` : fullUrl.split('?')[0] };
+      }catch(e){ return { id:null, user:null, canonical:fullUrl }; }
+    }
+
+    function parseEngagementFromText(text){
+      if(!text) return { likes:null, comments:null, views:null };
+      const likes=(text.match(/([\d,.\s]+)\s*likes?/i)||[])[1];
+      const comments=(text.match(/([\d,.\s]+)\s*comments?/i)||[])[1];
+      const views=(text.match(/([\d,.\s]+)\s*views?/i)||[])[1];
+      const clean=s=>{ if(!s) return null; const n=parseInt(String(s).replace(/[^\d]/g,''),10); return Number.isFinite(n)?n:null; };
+      return { likes:clean(likes), comments:clean(comments), views:clean(views) };
+    }
+
+    function fmtNum(n){
+      if(n==null) return '—';
+      if(n>=1e6) return (n/1e6).toFixed(1)+'M';
+      if(n>=1e3) return (n/1e3).toFixed(1)+'K';
+      return String(n);
+    }
+
+    // —— Expand short links (vm/vt) via unshorten.me (CORS allowed) ——
+    async function expandShortUrl(shortUrl){
+      const candidates=[
+        'https://unshorten.me/json/'+shortUrl.replace(/^https?:\/\//i,''),
+        'https://unshorten.me/json/'+encodeURIComponent(shortUrl)
+      ];
+      for(const endpoint of candidates){
+        try{
+          const r=await Promise.race([
+            fetch(endpoint,{ mode:'cors' }),
+            new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),10000))
+          ]);
+          if(!r || !r.ok) continue;
+          const j=await r.json();
+          const u=j.resolved_url||j.destination||j.longUrl||j.url;
+          if(u && /tiktok\.com/i.test(u)) return { ok:true, url:u, via:'unshorten.me' };
+        }catch(_){}
+      }
+      return { ok:false, error:'Could not expand short link' };
+    }
+
+    // —— Microlink (user's IP; may rate-limit free tier) ——
+    async function fetchMicrolink(videoUrl){
+      try{
+        const r=await Promise.race([
+          fetch('https://api.microlink.io/?url='+encodeURIComponent(videoUrl),{ mode:'cors' }),
+          new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),12000))
+        ]);
+        const j=await r.json().catch(()=>null);
+        if(j && j.status==='success' && j.data) return { ok:true, data:j.data, via:'microlink' };
+        return { ok:false, error:(j && (j.message||j.code)) || ('Microlink HTTP '+r.status) };
+      }catch(e){ return { ok:false, error:'Microlink unavailable' }; }
+    }
+
+    // —— TikTok oEmbed: direct + CORS proxies ——
+    async function fetchOEmbed(videoUrl){
+      const target='https://www.tiktok.com/oembed?url='+encodeURIComponent(videoUrl);
+      const attempts=[
+        () => fetch(target,{ mode:'cors', credentials:'omit' }),
+        () => fetch('https://api.allorigins.win/raw?url='+encodeURIComponent(target),{ mode:'cors' }),
+        () => fetch('https://api.allorigins.win/get?url='+encodeURIComponent(target),{ mode:'cors' }),
+        () => fetch('https://corsproxy.org/?'+encodeURIComponent(target),{ mode:'cors' })
+      ];
+      for(let i=0;i<attempts.length;i++){
+        try{
+          const r=await Promise.race([
+            attempts[i](),
+            new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),12000))
+          ]);
+          if(!r || !r.ok) continue;
+          const text=await r.text();
+          let j=null;
+          try{ j=JSON.parse(text); }catch(_){
+            try{ const wrap=JSON.parse(text); if(wrap.contents) j=JSON.parse(wrap.contents); }catch(__){
+              const m=text.match(/\{[\s\S]*"author_name"[\s\S]*?\}/);
+              if(m) try{ j=JSON.parse(m[0]); }catch(___){}
+            }
+          }
+          if(j && (j.title!=null || j.author_name || j.thumbnail_url || j.html))
+            return { ok:true, data:j, via:i===0?'oembed-direct':'oembed-proxy' };
+        }catch(_){}
+      }
+      return { ok:false, error:'oEmbed blocked (CORS)' };
+    }
+
+    // —— Real stats/quality via public parsers (multiple fallbacks) ——
+    async function fetchJsonTimeout(url, opts, ms){
+      const ctrl=typeof AbortController!=='undefined'?new AbortController():null;
+      const t=setTimeout(()=>{ try{ ctrl&&ctrl.abort(); }catch(_){} }, ms||14000);
+      try{
+        const r=await fetch(url, Object.assign({ mode:'cors', credentials:'omit', signal:ctrl?ctrl.signal:undefined }, opts||{}));
+        clearTimeout(t);
+        return r;
+      }catch(e){ clearTimeout(t); throw e; }
+    }
+
+    function parseLooseJson(text){
+      if(!text) return null;
+      text=String(text).trim().replace(/^\uFEFF/,'').replace(/[\u200B-\u200D\uFEFF]/g,'');
+      try{ return JSON.parse(text); }catch(_){}
+      // allorigins sometimes wraps
+      try{
+        const wrap=JSON.parse(text);
+        if(wrap && typeof wrap.contents==='string') return parseLooseJson(wrap.contents);
+      }catch(_){}
+      const start=text.indexOf('{');
+      if(start<0) return null;
+      let depth=0, end=-1;
+      for(let i=start;i<text.length;i++){
+        const ch=text[i];
+        if(ch==='{') depth++;
+        else if(ch==='}'){ depth--; if(depth===0){ end=i; break; } }
+      }
+      if(end>start){
+        try{ return JSON.parse(text.slice(start,end+1)); }catch(_){}
+      }
+      return null;
+    }
+
+    // XHR fallback — some mobile browsers handle it more reliably than fetch from file://
+    function xhrJson(url, method, body, timeoutMs){
+      return new Promise((resolve)=>{
+        try{
+          const x=new XMLHttpRequest();
+          x.open(method||'GET', url, true);
+          x.timeout=timeoutMs||16000;
+          x.setRequestHeader('Accept','application/json,text/plain,*/*');
+          if(method==='POST') x.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+          x.onload=()=>resolve({ ok:x.status>=200&&x.status<300, status:x.status, text:x.responseText||'' });
+          x.onerror=()=>resolve({ ok:false, status:0, text:'', error:'xhr network' });
+          x.ontimeout=()=>resolve({ ok:false, status:0, text:'', error:'xhr timeout' });
+          x.send(body||null);
+        }catch(e){
+          resolve({ ok:false, status:0, text:'', error:e.message||'xhr fail' });
+        }
+      });
+    }
+
+    function cacheKey(videoUrl){
+      const m=String(videoUrl).match(/(\d{15,25})/);
+      return m?'revance_stats_'+m[1]:null;
+    }
+    function readStatsCache(videoUrl){
+      try{
+        const k=cacheKey(videoUrl); if(!k) return null;
+        const raw=localStorage.getItem(k); if(!raw) return null;
+        const o=JSON.parse(raw);
+        if(o&&o.data&&o.ts&&(Date.now()-o.ts)<6*60*60*1000) return o.data;
+      }catch(_){}
+      return null;
+    }
+    function writeStatsCache(videoUrl, data){
+      try{
+        const k=cacheKey(videoUrl); if(!k||!data) return;
+        localStorage.setItem(k, JSON.stringify({ ts:Date.now(), data }));
+      }catch(_){}
+    }
+
+    async function fetchTikwm(videoUrl){
+      const cached=readStatsCache(videoUrl);
+      if(cached){
+        logLine('Using cached stats for this video (<6h)', 'ok');
+        return { ok:true, data:cached, via:'cache' };
+      }
+
+      const q='url='+encodeURIComponent(videoUrl)+'&hd=1';
+      // Few attempts only — spamming causes HTTP 403 bans on mobile
+      const attempts=[
+        { tag:'POST-xhr', run:()=>xhrJson('https://www.tikwm.com/api/','POST',q,20000) },
+        { tag:'GET-xhr', run:()=>xhrJson('https://www.tikwm.com/api/?'+q,'GET',null,20000) },
+        { tag:'POST-fetch', run:()=>fetchJsonTimeout('https://www.tikwm.com/api/',{ method:'POST', headers:{ 'Content-Type':'application/x-www-form-urlencoded','Accept':'application/json' }, credentials:'omit', body:q },20000).then(async r=>({ status:r?r.status:0, text:r?await r.text():'' })) }
+      ];
+      let lastErr='no response';
+      let got403=false;
+      window.__revanceLastRaw='';
+
+      for(let i=0;i<attempts.length;i++){
+        const a=attempts[i];
+        try{
+          if(i>0){ logLine('Retry in 3s…', 'warn'); await sleep(3000); }
+          const res=await a.run();
+          const text=(res&&res.text)||'';
+          const status=res&&res.status;
+          window.__revanceLastRaw=a.tag+' status='+status+' body='+text.slice(0,200);
+
+          if(status===403){
+            got403=true;
+            lastErr='HTTP 403';
+            logLine(a.tag+': HTTP 403 — API temporarily blocked this network', 'err');
+            break; // stop — more hits make the ban worse
+          }
+
+          const j=parseLooseJson(text);
+          if(j&&j.code===0&&j.data){
+            logLine('Stats OK via '+a.tag, 'ok');
+            writeStatsCache(videoUrl, j.data);
+            return { ok:true, data:j.data, via:a.tag };
+          }
+          if(j&&/limit|rate|1 request/i.test(String(j.msg||''))){
+            lastErr='rate limited';
+            logLine(a.tag+': rate limited — wait 3s', 'warn');
+            await sleep(3000);
+            continue;
+          }
+          if(j){ lastErr=String(j.msg||('code '+j.code)); logLine(a.tag+': '+lastErr, 'warn'); }
+          else { lastErr='no JSON (HTTP '+status+')'; logLine(a.tag+': '+lastErr, 'warn'); }
+        }catch(e){
+          lastErr=a.tag+': '+(e.name==='AbortError'?'timeout':(e.message||'fail'));
+          logLine(lastErr, 'warn');
+        }
+      }
+
+      if(got403){
+        lastErr='tikwm HTTP 403 — wait 5–10 minutes (or switch Wi‑Fi/VPN), then Analyse once only';
+      }
+      // Offline fallback: seeded @urfair.aep videos
+      try{
+        const mid=String(videoUrl).match(/(\d{15,25})/);
+        if(mid && typeof SEED_VIDEOS!=='undefined'){
+          const seed=SEED_VIDEOS.find(v=>String(v.id)===mid[1]);
+          if(seed){
+            logLine('Using offline seed data for this video', 'ok');
+            return { ok:true, data:{
+              id:seed.id, title:seed.title, cover:seed.cover, origin_cover:seed.cover,
+              create_time:seed.create_time, play_count:seed.play_count, digg_count:seed.digg_count,
+              comment_count:seed.comment_count, share_count:seed.share_count, region:seed.region,
+              author:{ unique_id:'urfair.aep', nickname:'𝙐𝙍𝙁𝘼𝙄𝙍' },
+              duration:null, size:null, hd_size:null
+            }, via:'seed-offline' };
+          }
+        }
+      }catch(_){}
+      return { ok:false, error:lastErr };
+    }
+
+    // Same approach as analyzer.js: parse __UNIVERSAL_DATA_FOR_REHYDRATION__ when available
+    function parseRehydration(html){
+      if(!html) return { ok:false, error:'empty' };
+      const patterns=[
+        /id="__UNIVERSAL_DATA_FOR_REHYDRATION__"[^>]*>([^<]+)<\/script>/i,
+        /<script[^>]*id="__UNIVERSAL_DATA_FOR_REHYDRATION__"[^>]*>([^<]+)<\/script>/i,
+        /id="SIGI_STATE"[^>]*>([^<]+)<\/script>/i
+      ];
+      let raw=null;
+      for(const p of patterns){ const m=html.match(p); if(m&&m[1]){ raw=m[1]; break; } }
+      if(!raw) return { ok:false, error:'no page JSON' };
+      let data; try{ data=JSON.parse(raw); }catch(_){ return { ok:false, error:'page JSON bad' }; }
+      try{
+        const scope=data.__DEFAULT_SCOPE__||data;
+        const detail=scope['webapp.reflow.video.detail']||{};
+        const item=(detail.itemInfo&&detail.itemInfo.itemStruct)||null;
+        if(!item) return { ok:false, error:'no itemStruct' };
+        const st=item.stats||{}, vid=item.video||{}, author=item.author||{};
+        return { ok:true, via:'rehydration', data:{
+          id:item.id, title:item.desc||'', create_time:item.createTime?Number(item.createTime):null,
+          region:item.locationCreated||null,
+          play_count:st.playCount, digg_count:st.diggCount, comment_count:st.commentCount,
+          share_count:st.shareCount, collect_count:st.collectCount,
+          duration:vid.duration, width:vid.width, height:vid.height,
+          cover:vid.cover||vid.originCover,
+          author:{ unique_id:author.uniqueId, nickname:author.nickname }
+        }};
+      }catch(_){ return { ok:false, error:'item parse fail' }; }
+    }
+
+    async function fetchPageStats(videoUrl){
+      try{
+        const r=await fetchJsonTimeout(videoUrl,{ method:'GET', headers:{ 'Accept':'text/html' }, credentials:'omit' },10000);
+        if(!r||!r.ok) return { ok:false, error:'page blocked' };
+        return parseRehydration(await r.text());
+      }catch(_){ return { ok:false, error:'page CORS' }; }
+    }
+
+    // Probe stream over the device network (size / type)
+    async function probeStream(url){
+      if(!url) return null;
+      try{
+        const r=await fetchJsonTimeout(url, { method:'HEAD', mode:'cors' }, 8000);
+        if(!r) return null;
+        const len=r.headers.get('content-length');
+        const type=r.headers.get('content-type');
+        return {
+          ok:r.ok,
+          bytes:len?Number(len):null,
+          type:type||null,
+          status:r.status
+        };
+      }catch(_){
+        // many CDNs block HEAD/CORS — ignore
+        return null;
+      }
+    }
+
+    function resLabelFromBitrate(kbps, preferHigh){
+      // Map bitrate → common TikTok ladder labels (1080p / 720p / 540p)
+      if(kbps==null) return '—';
+      if(preferHigh){
+        if(kbps>=1800) return '1080p60';
+        if(kbps>=1100) return '1080p30';
+        if(kbps>=700) return '720p60';
+        if(kbps>=450) return '720p30';
+        if(kbps>=280) return '540p30';
+        return '360p30';
+      }
+      if(kbps>=2200) return '1080p60';
+      if(kbps>=1400) return '720p60';
+      if(kbps>=900) return '720p30';
+      if(kbps>=500) return '540p30';
+      if(kbps>=300) return '540p30';
+      return '360p30';
+    }
+    function codecGuess(kbps, isHd){
+      // TikTok often uses HEVC for adaptive higher tiers, H.264 for compatibility
+      if(isHd && kbps!=null && kbps>=800) return 'hevc';
+      if(kbps!=null && kbps>=1500) return 'hevc';
+      return 'h264';
+    }
+    function fmtBitrate(kbps){
+      if(kbps==null) return '—';
+      if(kbps>=1000) return (kbps/1000).toFixed(1)+' Mbps';
+      return Math.round(kbps)+' kbps';
+    }
+    function estimateQuality(tw, probe){
+      if(!tw && !probe) return null;
+      const dur=tw?Number(tw.duration)||0:0;
+      const hd=tw?Number(tw.hd_size)||0:0;
+      const sd=tw?Number(tw.size)||0:0;
+      const wm=tw?Number(tw.wm_size)||0:0;
+      let bytes=hd||sd||(probe&&probe.bytes)||0;
+      const bitrate=dur&&bytes?Math.round(bytes*8/dur/1000):null;
+      const sdBitrate=dur&&sd?Math.round(sd*8/dur/1000):null;
+      const hdBitrate=dur&&hd?Math.round(hd*8/dur/1000):null;
+      const w=tw&&tw.width?Number(tw.width):null;
+      const h=tw&&tw.height?Number(tw.height):null;
+
+      // Phone usually gets the higher adaptive tier; browser often a mid tier
+      const phoneLabel=resLabelFromBitrate(hdBitrate||bitrate, true);
+      const browserLabel=resLabelFromBitrate(sdBitrate||(bitrate?Math.round(bitrate*0.75):null), false);
+
+      let vq=null;
+      if(bitrate!=null){
+        // rough VQ-like score 0–100 from bitrate + HD presence (not official TikTok VQ)
+        vq=Math.max(15, Math.min(98, Math.round(25 + Math.min(bitrate,3500)/3500*55 + (hd>sd?10:0) + (w&&w>=1080?8:0))));
+        vq=Math.round(vq*10)/10;
+      }
+
+      let original='—';
+      if(w&&h) original=w+'×'+h;
+      else if(phoneLabel&&phoneLabel!=='—') original=phoneLabel.replace(/p\d+$/,'')+' class';
+
+      // Stream ladder rows (like the Telegram checker)
+      const streams=[];
+      if(hd>0&&dur){
+        streams.push({
+          name:'adapt_hd / hdplay',
+          label:resLabelFromBitrate(hdBitrate, true),
+          bitrate:hdBitrate, codec:codecGuess(hdBitrate, true), size:hd, tip:'Higher adaptive tier'
+        });
+      }
+      if(sd>0&&dur){
+        streams.push({
+          name:'play_addr / normal',
+          label:resLabelFromBitrate(sdBitrate, false),
+          bitrate:sdBitrate, codec:codecGuess(sdBitrate, false), size:sd, tip:'Standard play stream'
+        });
+      }
+      if(wm>0&&wm!==sd&&dur){
+        streams.push({
+          name:'wmplay / watermark',
+          label:resLabelFromBitrate(Math.round(wm*8/dur/1000), false),
+          bitrate:Math.round(wm*8/dur/1000), codec:codecGuess(Math.round(wm*8/dur/1000), false), size:wm, tip:'Watermarked stream'
+        });
+      }
+      // synthetic lower tier for display when we only have one size
+      if(streams.length===1 && bitrate!=null && bitrate>400){
+        const lowB=Math.round(bitrate*0.45);
+        streams.push({
+          name:'lower_540_est',
+          label:resLabelFromBitrate(lowB, false),
+          bitrate:lowB, codec:codecGuess(lowB, false), size:Math.round(bytes*0.45), tip:'Estimated lower ladder (not measured)'
+        });
+      }
+
+      return {
+        duration:dur||null, sizeBytes:bytes||null, hdBytes:hd||null, sdBytes:sd||null, wmBytes:wm||null,
+        bitrateKbps:bitrate, hdBitrate, sdBitrate,
+        phoneLabel, browserLabel, original,
+        vqScore:vq, streams,
+        width:w, height:h, hasHd:hd>sd,
+        probeType:probe&&probe.type||null, probeBytes:probe&&probe.bytes||null
+      };
+    }
+    function fmtBytes(n){
+      if(n==null||!n) return '—';
+      if(n>=1e6) return (n/1e6).toFixed(2)+' MB';
+      if(n>=1e3) return (n/1e3).toFixed(1)+' KB';
+      return n+' B';
+    }
+
+    function loadImageSize(url){
+      return new Promise(resolve=>{
+        if(!url){ resolve(null); return; }
+        const img=new Image();
+        img.onload=()=>resolve({ w:img.naturalWidth, h:img.naturalHeight });
+        img.onerror=()=>resolve(null);
+        img.referrerPolicy='no-referrer';
+        img.crossOrigin='anonymous';
+        img.src=url;
+      });
+    }
+
+    function logLine(msg, cls){
+      const log=$('scanLog');
+      const d=document.createElement('div');
+      d.className=cls||'';
+      d.textContent='› '+msg;
+      log.appendChild(d);
+      log.scrollTop=log.scrollHeight;
+    }
+    function setPhase(t){ $('scanPhase').textContent=t; }
+    function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+    function render(info, meta){
+      const results=$('results');
+      results.classList.add('visible');
+
+      const ml=meta.microlink && meta.microlink.ok ? meta.microlink.data : null;
+      const oe=meta.oembed && meta.oembed.ok ? meta.oembed.data : null;
+      const tw=meta.tikwm && meta.tikwm.ok ? meta.tikwm.data : null;
+      const q=estimateQuality(tw, meta.streamProbe||null);
+
+      // Prefer expanded URL
+      const expanded=(tw && info.canonical) || (ml && ml.url) || (info.canonical||info.href);
+      const fromExp=parseFromFullUrl(expanded);
+      if(fromExp.user) info.user=fromExp.user;
+      if(fromExp.id) info.id=fromExp.id;
+      if(fromExp.canonical) info.canonical=fromExp.canonical;
+      if(tw && tw.author && tw.author.unique_id) info.user=tw.author.unique_id;
+      if(tw && tw.id) info.id=String(tw.id);
+
+      const title=(tw && tw.title) || (oe && oe.title) || (ml && (ml.description||ml.title)) || (info.user?`Video by @${info.user}`:'TikTok video');
+      let displayTitle=title;
+      const quoted=(String(title).match(/[“"]([^”"]+)[”"]/)||[])[1];
+      if(quoted) displayTitle=quoted;
+
+      let author=(tw && tw.author && (tw.author.nickname||tw.author.unique_id)) || (oe && oe.author_name) || null;
+      if(!author && ml && ml.author) author=String(ml.author).replace(/^TikTok\s*·\s*/i,'').trim();
+      if(!author && info.user) author=info.user;
+      const authorUrl=(oe && oe.author_url) || (info.user?`https://www.tiktok.com/@${info.user}`:null);
+      const thumb=(tw && tw.cover) || (oe && oe.thumbnail_url) || (ml && ml.image && ml.image.url) || null;
+      // Real stats from tikwm first
+      let eng={ likes:null, comments:null, views:null, shares:null, saves:null, downloads:null };
+      if(tw){
+        eng={
+          likes:tw.digg_count!=null?Number(tw.digg_count):null,
+          comments:tw.comment_count!=null?Number(tw.comment_count):null,
+          views:tw.play_count!=null?Number(tw.play_count):null,
+          shares:tw.share_count!=null?Number(tw.share_count):null,
+          saves:tw.collect_count!=null?Number(tw.collect_count):null,
+          downloads:tw.download_count!=null?Number(tw.download_count):null
+        };
+      } else {
+        eng=parseEngagementFromText((ml && ml.description)||'') || parseEngagementFromText(title);
+      }
+      const dateStr=tw && tw.create_time ? new Date(Number(tw.create_time)*1000).toLocaleString() : (ml && ml.date ? new Date(ml.date).toLocaleString() : null);
+      const lang=ml && ml.lang ? ml.lang : null;
+      const region=tw && tw.region ? tw.region : null;
+
+      // Preview — thumbnail or TikTok embed when we have video ID
+      const box=$('previewBox');
+      box.innerHTML='';
+      if(thumb){
+        const img=document.createElement('img');
+        img.src=thumb; img.alt='Thumbnail'; img.referrerPolicy='no-referrer';
+        img.onerror=()=>{
+          if(info.id){
+            box.innerHTML=`<iframe src="https://www.tiktok.com/embed/v2/${esc(info.id)}" style="width:100%;height:100%;border:0;border-radius:12px" allowfullscreen loading="lazy" title="TikTok"></iframe>`;
+          } else {
+            box.innerHTML='<span style="color:var(--text-dim);font-size:.75rem;padding:8px;text-align:center">Thumbnail failed</span>';
+          }
+        };
+        box.appendChild(img);
+      } else if(info.id){
+        box.innerHTML=`<iframe src="https://www.tiktok.com/embed/v2/${esc(info.id)}" style="width:100%;height:100%;border:0;border-radius:12px" allowfullscreen loading="lazy" title="TikTok"></iframe>`;
+      } else {
+        box.innerHTML='<span style="color:var(--text-dim);font-size:.75rem;padding:8px;text-align:center">No thumbnail</span>';
+      }
+
+      $('videoTitle').textContent=displayTitle||'—';
+      if(authorUrl){
+        $('videoAuthor').innerHTML=`<a href="${esc(authorUrl)}" target="_blank" rel="noopener">@${esc(String(author).replace(/^@/,''))}</a>`;
+      } else {
+        $('videoAuthor').textContent=author?('@'+String(author).replace(/^@/,'')):'—';
+      }
+
+      const badges=$('identityBadges');
+      badges.innerHTML='';
+      if(meta.tikwm && meta.tikwm.ok) badges.innerHTML+=`<span class="badge badge-ok">Stats OK</span>`;
+      if(meta.oembed && meta.oembed.ok) badges.innerHTML+=`<span class="badge badge-ok">oEmbed</span>`;
+      if(info.id && info.user) badges.innerHTML+=`<span class="badge badge-ok">Resolved</span>`;
+      else if(!(meta.tikwm&&meta.tikwm.ok)) badges.innerHTML+=`<span class="badge badge-warn">Limited data</span>`;
+      if(info.id) badges.innerHTML+=`<span class="badge badge-info">ID ${esc(info.id)}</span>`;
+      if(info.isShort) badges.innerHTML+=`<span class="badge badge-info">Short link expanded</span>`;
+      if(region) badges.innerHTML+=`<span class="badge badge-info">Region ${esc(region)}</span>`;
+
+      // Link structure
+      $('linkList').innerHTML=`
+        <div class="list-item"><span class="k">Input URL</span><span class="v" style="font-size:.72rem">${esc(info.href)}</span></div>
+        <div class="list-item"><span class="k">Host</span><span class="v">${esc(info.host)}</span></div>
+        <div class="list-item"><span class="k">Username</span><span class="v">${info.user?'@'+esc(info.user):'—'}</span></div>
+        <div class="list-item"><span class="k">Video ID</span><span class="v">${info.id?esc(info.id):'—'}</span></div>
+        <div class="list-item"><span class="k">Expanded / canonical</span><span class="v" style="font-size:.72rem">${esc(info.canonical||expanded)}</span></div>
+        <div class="list-item"><span class="k">Region signal</span><span class="v">${region?esc(region)+' (public API)':'—'}</span></div>
+        <div class="list-item"><span class="k">Short link?</span><span class="v">${info.isShort?'Yes — expanded':'No'}</span></div>`;
+
+      // Public API fields
+      const srcParts=[];
+      if(meta.tikwm&&meta.tikwm.ok) srcParts.push('tikwm');
+      if(meta.oembed&&meta.oembed.ok) srcParts.push('oEmbed');
+      if(meta.microlink&&meta.microlink.ok) srcParts.push('Microlink');
+      $('oembedList').innerHTML=`
+        <div class="list-item"><span class="k">Caption / title</span><span class="v">${esc(displayTitle||'—')}</span></div>
+        <div class="list-item"><span class="k">Author</span><span class="v">${esc(author||'—')}</span></div>
+        <div class="list-item"><span class="k">Author URL</span><span class="v">${authorUrl?`<a href="${esc(authorUrl)}" target="_blank" rel="noopener" style="color:var(--accent)">${esc(authorUrl)}</a>`:'—'}</span></div>
+        <div class="list-item"><span class="k">Published</span><span class="v">${esc(dateStr||'—')}</span></div>
+        <div class="list-item"><span class="k">Region</span><span class="v">${esc(region||'—')}</span></div>
+        <div class="list-item"><span class="k">Duration</span><span class="v">${q&&q.duration?q.duration+'s':'—'}</span></div>
+        <div class="list-item"><span class="k">Data sources</span><span class="v">${esc(srcParts.join(' + ')||'URL only')}</span></div>`;
+      $('oembedNote').innerHTML=srcParts.length
+        ? '<strong>Source:</strong> Live public video data. Short links expanded before analysis.'
+        : 'Could not reach public APIs. Showing URL structure only.';
+
+      // Quality — from real file size + duration
+      const ts=meta.thumbSize;
+      const phoneL=q&&q.phoneLabel?q.phoneLabel:'—';
+      const browserL=q&&q.browserLabel?q.browserLabel:'—';
+      if($('phoneRes')) $('phoneRes').textContent=phoneL;
+      if($('browserRes')) $('browserRes').textContent=browserL;
+      if($('phoneNote')) $('phoneNote').textContent=q&&q.hdBitrate?fmtBitrate(q.hdBitrate)+' · mobile adaptive':(q?'From file size':'No size data');
+      if($('browserNote')) $('browserNote').textContent=q&&q.sdBitrate?fmtBitrate(q.sdBitrate)+' · desktop adaptive':(q?'From file size':'No size data');
+      if($('devPhone')) $('devPhone').classList.toggle('active', phoneL!=='—' && !/^360/.test(phoneL));
+      if($('devBrowser')) $('devBrowser').classList.toggle('active', browserL!=='—' && !/^360/.test(browserL));
+
+      if($('vqNum')) $('vqNum').textContent=q&&q.vqScore!=null?q.vqScore:'—';
+      if($('vqMeta')){
+        let orig=q&&q.original?q.original:'—';
+        if(q&&q.width&&q.height) orig=q.width+'×'+q.height;
+        else if(ts) orig='cover '+ts.w+'×'+ts.h;
+        $('vqMeta').innerHTML='Original <strong>'+esc(orig)+'</strong>'+(q&&q.duration?' · '+q.duration+'s':'');
+      }
+
+      const sl=$('streamList');
+      if(sl){
+        if(q&&q.streams&&q.streams.length){
+          sl.innerHTML=q.streams.map(s=>`<div class="stream-item"><div class="si-name">${esc(s.name)}</div><div class="si-meta">${esc(s.label)} <span>·</span> ${fmtBitrate(s.bitrate)} <span>·</span> ${esc(s.codec)} <span>·</span> ${fmtBytes(s.size)}</div></div>`).join('');
+        } else {
+          sl.innerHTML='<div class="stream-item"><div class="si-name">No stream sizes</div><div class="si-meta">Need stats API file size for 1080p / 720p / 540p estimates</div></div>';
+        }
+      }
+
+      const netInfo=(()=>{ const c=navigator.connection||navigator.mozConnection||navigator.webkitConnection; if(!c) return '—'; const parts=[]; if(c.effectiveType) parts.push(c.effectiveType); if(c.downlink) parts.push(c.downlink+' Mbps'); if(c.rtt) parts.push(c.rtt+' ms RTT'); return parts.join(' · ')||'—'; })();
+      $('qualityList').innerHTML=`
+        <div class="list-item"><span class="k">Phone</span><span class="v">${esc(phoneL)}</span></div>
+        <div class="list-item"><span class="k">Browser / PC</span><span class="v">${esc(browserL)}</span></div>
+        <div class="list-item"><span class="k">HD size</span><span class="v">${fmtBytes(q&&q.hdBytes)}</span></div>
+        <div class="list-item"><span class="k">Standard size</span><span class="v">${fmtBytes(q&&q.sdBytes)}</span></div>
+        <div class="list-item"><span class="k">Your network</span><span class="v">${esc(netInfo)}</span></div>
+        <div class="list-item"><span class="k">Your screen</span><span class="v">${window.innerWidth}×${window.innerHeight}</span></div>`;
+      if($('qualityNote')) $('qualityNote').innerHTML='Labels like <strong>1080p60</strong> / <strong>720p30</strong> / <strong>540p30</strong> are estimated from public file size ÷ duration (checker-style). Official ladders need private media metadata.';
+
+      // Engagement — full public counters + health ratios (inspired by analyzer.js)
+      const hasEng=eng.likes!=null||eng.comments!=null||eng.views!=null;
+      const views=eng.views!=null?Number(eng.views):null;
+      const likes=eng.likes!=null?Number(eng.likes):null;
+      const comments=eng.comments!=null?Number(eng.comments):null;
+      const shares=eng.shares!=null?Number(eng.shares):null;
+      const saves=eng.saves!=null?Number(eng.saves):null;
+      const downloads=eng.downloads!=null?Number(eng.downloads):null;
+      const likeRate=views>0&&likes!=null?(likes/views*100):null;
+      const commentRate=views>0&&comments!=null?(comments/views*100):null;
+      const shareRate=views>0&&shares!=null?(shares/views*100):null;
+      const saveRate=views>0&&saves!=null?(saves/views*100):null;
+
+      $('engStats').innerHTML=`
+        <div class="stat-box"><div class="num">${fmtNum(views)}</div><div class="lbl">Views</div></div>
+        <div class="stat-box"><div class="num">${fmtNum(likes)}</div><div class="lbl">Likes</div></div>
+        <div class="stat-box"><div class="num">${fmtNum(comments)}</div><div class="lbl">Comments</div></div>
+        <div class="stat-box"><div class="num">${fmtNum(shares)}</div><div class="lbl">Shares</div></div>
+        <div class="stat-box"><div class="num">${fmtNum(saves)}</div><div class="lbl">Saves</div></div>
+        <div class="stat-box"><div class="num">${fmtNum(downloads)}</div><div class="lbl">Downloads</div></div>`;
+
+      // hashtags from caption
+      const tags=(String(displayTitle).match(/#[\w\u00C0-\u024F]+/g)||[]).slice(0,12);
+      const musicInfo=tw&&tw.music_info?tw.music_info:null;
+      const created=tw&&tw.create_time?new Date(Number(tw.create_time)*1000).toLocaleString():dateStr;
+      const isAd=tw&&tw.is_ad!=null?!!tw.is_ad:null;
+      const isNff=tw&&tw.is_nff_or_nr!=null?!!tw.is_nff_or_nr:null;
+
+      $('engList').innerHTML=hasEng
+        ? `<div class="list-item"><span class="k">Like rate</span><span class="v">${likeRate!=null?likeRate.toFixed(2)+'% of views':'—'}</span></div>
+           <div class="list-item"><span class="k">Comment rate</span><span class="v">${commentRate!=null?commentRate.toFixed(2)+'% of views':'—'}</span></div>
+           <div class="list-item"><span class="k">Share rate</span><span class="v">${shareRate!=null?shareRate.toFixed(2)+'% of views':'—'}</span></div>
+           <div class="list-item"><span class="k">Save rate</span><span class="v">${saveRate!=null?saveRate.toFixed(2)+'% of views':'—'}</span></div>
+           <div class="list-item"><span class="k">Posted</span><span class="v">${esc(created||'—')}</span></div>
+           <div class="list-item"><span class="k">Marked as ad</span><span class="v">${isAd==null?'—':(isAd?'Yes':'No')}</span></div>
+           <div class="list-item"><span class="k">Hashtags</span><span class="v">${tags.length?esc(tags.join(' ')):'—'}</span></div>
+           <div class="list-item"><span class="k">Music</span><span class="v">${musicInfo?esc((musicInfo.title||'')+(musicInfo.author?' · '+musicInfo.author:'')):'—'}</span></div>
+           <div class="list-item"><span class="k">Source</span><span class="v">Live public video data</span></div>`
+        : `<div class="list-item"><span class="k">Status</span><span class="v">Stats unavailable — wait 2s and Analyse again</span></div>`;
+      $('engNote').innerHTML=hasEng
+        ? 'Live public counters at analysis time. Rates help judge reach health (not a shadowban detector).'
+        : 'Stats API timed out or rate-limited. Wait ~2 seconds and tap Analyse again.';
+
+      // Shadowban health signal (honest — no private FYP flag)
+      const sb=$('shadowBadge');
+      const sn=$('shadowNote');
+      if(sb&&sn){
+        let health='Unknown', cls='badge-muted', note='Not enough data for a health signal.';
+        if(hasEng && views!=null){
+          if(isNff){ health='Low distribution signal'; cls='badge-warn'; note='API flag <code>is_nff_or_nr</code> is set. This is a weak public signal, not official shadowban status.'; }
+          else if(views<50 && likes!=null && likes>0){ health='Too early to tell'; cls='badge-info'; note='Very low views — wait for more distribution before judging reach.'; }
+          else if(likeRate!=null && likeRate>=3){ health='Healthy engagement'; cls='badge-ok'; note='Like rate ≥3% of views is generally strong. Not a guarantee of FYP push.'; }
+          else if(likeRate!=null && likeRate<0.5 && views>1000){ health='Weak engagement'; cls='badge-warn'; note='Low like rate on a higher-view video can mean broad but cold reach. Only Creator Analytics shows true FYP / shadowban status.'; }
+          else { health='Normal range'; cls='badge-info'; note='Engagement sits in a typical range. TikTok does not publish shadowban flags on public video data.'; }
+        }
+        sb.className='badge '+cls;
+        sb.textContent=health;
+        sn.innerHTML=note+' <strong>Shadowban is only visible in the TikTok app (Creator tools).</strong>';
+      }
+
+      // Region / upload origin
+      const rb=$('regionBadge');
+      if(rb){
+        if(region){ rb.className='badge badge-ok'; rb.textContent='Uploaded region · '+region; }
+        else { rb.className='badge badge-muted'; rb.textContent='No region in response'; }
+      }
+      const rn=$('regionNote');
+      if(rn){
+        rn.innerHTML=region
+          ? 'Public region code: <strong>'+esc(region)+'</strong> (from video metadata). Same idea as <code>uploaded_from</code> / <code>locationCreated</code> in page JSON — not GPS of the uploader.'
+          : 'Region not returned for this video.';
+      }
+
+      $('openLink').href=info.canonical||expanded||info.href;
+
+      // —— Sound (Shazam-style) + Download no-WM ——
+      window.__revanceLast= { info, tw, oe, q };
+      renderSoundAndDownload(tw, info);
+
+      setTimeout(()=>results.scrollIntoView({behavior:'smooth',block:'start'}),60);
+    }
+
+    function renderSoundAndDownload(tw, info){
+      const soundList=$('soundList');
+      const soundActions=$('soundActions');
+      const dlList=$('dlList');
+      const dlActions=$('dlActions');
+      if(!soundList||!dlList) return;
+
+      const mi=tw&&tw.music_info?tw.music_info:null;
+      const musicUrl=(mi&&mi.play)||(tw&&tw.music)||null;
+      const musicTitle=mi&&mi.title?mi.title:(tw&&typeof tw.music==='string'?null:'Original sound');
+      const musicAuthor=mi&&(mi.author||mi.authorName)?(mi.author||mi.authorName):null;
+      const musicId=mi&&mi.id?String(mi.id):null;
+      const isOriginal=mi&&(mi.original===true||mi.original===1);
+
+      if(mi||musicUrl){
+        soundList.innerHTML=`
+          <div class="list-item"><span class="k">Title</span><span class="v">${esc(musicTitle||'—')}</span></div>
+          <div class="list-item"><span class="k">Artist</span><span class="v">${esc(musicAuthor||'—')}</span></div>
+          <div class="list-item"><span class="k">Sound ID</span><span class="v">${esc(musicId||'—')}</span></div>
+          <div class="list-item"><span class="k">Type</span><span class="v">${isOriginal?'Original sound':'Music / effect'}</span></div>
+          <div class="list-item"><span class="k">Duration</span><span class="v">${mi&&mi.duration?mi.duration+'s':'—'}</span></div>`;
+        let acts='';
+        if(musicUrl){
+          acts+=`<button type="button" class="btn btn-primary btn-sm" id="playInAppBtn">🎵 Play in app</button>`;
+          acts+=`<a class="btn btn-ghost btn-sm" href="${esc(musicUrl)}" target="_blank" rel="noopener">▶ Open stream</a>`;
+          acts+=`<a class="btn btn-ghost btn-sm" href="${esc(musicUrl)}" download="tiktok-sound.mp3" target="_blank" rel="noopener">⬇ Save audio</a>`;
+          // load mini player
+          try{
+            const cover=(tw&&(tw.cover||tw.origin_cover))||(mi&&mi.cover)||null;
+            musicPlayer.load({ url:musicUrl, title:musicTitle||'Original sound', artist:musicAuthor||'TikTok', cover });
+          }catch(_){}
+        }
+        const q=encodeURIComponent((musicTitle||'')+' '+(musicAuthor||'')+' tiktok');
+        acts+=`<a class="btn btn-primary btn-sm" href="https://www.tiktok.com/search?q=${q}" target="_blank" rel="noopener">🔎 Find on TikTok</a>`;
+        acts+=`<a class="btn btn-ghost btn-sm" href="https://www.youtube.com/results?search_query=${q}" target="_blank" rel="noopener">YouTube</a>`;
+        if(musicId){
+          acts+=`<a class="btn btn-ghost btn-sm" href="https://www.tiktok.com/music/sound-${encodeURIComponent(musicId)}" target="_blank" rel="noopener">Open sound page</a>`;
+        }
+        soundActions.innerHTML=acts;
+        const inApp=$('playInAppBtn');
+        if(inApp && musicUrl){
+          inApp.addEventListener('click',()=>{
+            sound.play('click');
+            try{
+              const cover=(tw&&(tw.cover||tw.origin_cover))||(mi&&mi.cover)||null;
+              musicPlayer.load({ url:musicUrl, title:musicTitle||'Original sound', artist:musicAuthor||'TikTok', cover });
+              musicPlayer.toggle();
+            }catch(_){}
+          });
+        }
+      } else {
+        soundList.innerHTML=`<div class="list-item"><span class="k">Status</span><span class="v">No music metadata — need successful stats fetch</span></div>`;
+        soundActions.innerHTML=`<a class="btn btn-ghost btn-sm" href="https://www.tiktok.com/search?q=${encodeURIComponent((info&&info.user)||'')}" target="_blank" rel="noopener">Search TikTok</a>`;
+      }
+
+      // Downloads — prefer no-watermark HD
+      const hd=tw&&tw.hdplay?tw.hdplay:null;
+      const play=tw&&tw.play?tw.play:null;
+      const wm=tw&&tw.wmplay?tw.wmplay:null;
+      const cover=tw&&(tw.cover||tw.origin_cover)?(tw.cover||tw.origin_cover):null;
+      const vidName='tiktok_'+(info&&info.id?info.id:'video')+'.mp4';
+
+      if(hd||play){
+        dlList.innerHTML=`
+          <div class="list-item"><span class="k">HD (no WM)</span><span class="v">${hd?'Available · best quality':'—'}</span></div>
+          <div class="list-item"><span class="k">Standard (no WM)</span><span class="v">${play?'Available':'—'}</span></div>
+          <div class="list-item"><span class="k">With watermark</span><span class="v">${wm?'Available':'—'}</span></div>
+          <div class="list-item"><span class="k">HD size</span><span class="v">${fmtBytes(tw&&tw.hd_size)}</span></div>
+          <div class="list-item"><span class="k">Std size</span><span class="v">${fmtBytes(tw&&tw.size)}</span></div>`;
+        let dacts='';
+        if(hd) dacts+=`<a class="btn btn-primary btn-sm" href="${esc(hd)}" target="_blank" rel="noopener" download="${esc(vidName)}">⬇️ HD no watermark</a>`;
+        if(play) dacts+=`<a class="btn btn-ghost btn-sm" href="${esc(play)}" target="_blank" rel="noopener" download="${esc(vidName)}">⬇️ Standard no WM</a>`;
+        if(wm) dacts+=`<a class="btn btn-ghost btn-sm" href="${esc(wm)}" target="_blank" rel="noopener">WM version</a>`;
+        if(cover) dacts+=`<a class="btn btn-ghost btn-sm" href="${esc(cover)}" target="_blank" rel="noopener">Cover image</a>`;
+        dacts+=`<a class="btn btn-ghost btn-sm" href="https://compressbase.com/upload-method" target="_blank" rel="noopener">🎬 CompressBase</a>`;
+        dlActions.innerHTML=dacts;
+      } else {
+        dlList.innerHTML=`<div class="list-item"><span class="k">Status</span><span class="v">No stream URLs — analyse again when stats API is not blocked (403)</span></div>`;
+        dlActions.innerHTML=`<a class="btn btn-primary btn-sm" href="https://compressbase.com/upload-method" target="_blank" rel="noopener">🎬 CompressBase</a>`;
+      }
+    }
+
+
+    async function runAnalyse(info){
+      const status=$('scanStatus');
+      status.classList.add('active');
+      $('results').classList.remove('visible');
+      $('scanLog').innerHTML='';
+      const ring=$('scanRing'); if(ring) ring.style.display='';
+      $('scanTitle').textContent='Fetching real data…';
+      const actions=$('scanActions'); if(actions) actions.style.display='none';
+      window.__revanceLastRaw='';
+
+      setPhase('Validating URL…');
+      logLine('Host: '+info.host, 'ok');
+      if(info.isShort) logLine('Short link detected (vm/vt)', 'warn');
+      if(info.user) logLine('Username in path: @'+info.user, 'ok');
+      if(info.id) logLine('Video ID in path: '+info.id, 'ok');
+      sound.play('scan');
+      await sleep(150);
+
+      // 1) Expand short links first (critical for vm.tiktok.com)
+      let workUrl=info.href;
+      if(info.isShort || (!info.id && !info.user)){
+        setPhase('Expanding short link…');
+        logLine('Resolving redirect to full TikTok URL…', 'ok');
+        sound.play('scan');
+        const exp=await expandShortUrl(info.href);
+        if(exp.ok){
+          logLine('Expanded: '+exp.url.split('?')[0], 'ok');
+          workUrl=exp.url;
+          const p=parseFromFullUrl(exp.url);
+          if(p.user){ info.user=p.user; logLine('Username: @'+p.user, 'ok'); }
+          if(p.id){ info.id=p.id; logLine('Video ID: '+p.id, 'ok'); }
+          if(p.canonical) info.canonical=p.canonical;
+          info.isShort=true;
+        } else {
+          logLine(exp.error||'Expand failed — trying metadata on short URL anyway', 'warn');
+        }
+        await sleep(100);
+      }
+
+      // Prefer clean canonical for APIs
+      const apiUrl=info.canonical && info.id ? info.canonical : workUrl.split('?')[0];
+
+      // 2) Real stats (tikwm direct — no proxy)
+      setPhase('Fetching stats & quality…');
+      logLine('Requesting video details (direct, no proxy)…', 'ok');
+      sound.play('scan');
+      await sleep(500);
+      let tikwm=await fetchTikwm(apiUrl);
+      if(tikwm.ok){
+        const d=tikwm.data;
+        logLine('Stats OK — views '+fmtNum(d.play_count)+' · likes '+fmtNum(d.digg_count), 'ok');
+        if(d.region) logLine('Region: '+d.region, 'ok');
+        if(d.duration) logLine('Duration: '+d.duration+'s · size '+fmtBytes(d.hd_size||d.size), 'ok');
+        if(d.author && d.author.unique_id && !info.user) info.user=d.author.unique_id;
+        if(d.id && !info.id) info.id=String(d.id);
+      } else {
+        logLine('tikwm: '+(tikwm.error||'failed')+' — trying page data…', 'warn');
+        // analyzer.js approach: page rehydration JSON
+        const page=await fetchPageStats(apiUrl);
+        if(page.ok){
+          logLine('Page JSON OK (rehydration)', 'ok');
+          tikwm=page; // same shape for render
+          const d=page.data;
+          if(d.play_count!=null) logLine('Views '+fmtNum(d.play_count)+' · likes '+fmtNum(d.digg_count), 'ok');
+          if(d.width&&d.height) logLine('Resolution '+d.width+'×'+d.height, 'ok');
+          if(d.region) logLine('Region: '+d.region, 'ok');
+          if(d.author&&d.author.unique_id&&!info.user) info.user=d.author.unique_id;
+          if(d.id&&!info.id) info.id=String(d.id);
+        } else {
+          logLine('Page data unavailable ('+(page.error||'')+')', 'warn');
+        }
+      }
+
+      // 3) Light fallbacks for title/thumb only
+      setPhase('Extra metadata…');
+      const [oembed, microlink]=await Promise.all([fetchOEmbed(apiUrl), fetchMicrolink(apiUrl)]);
+      if(oembed.ok){
+        logLine('oEmbed OK', 'ok');
+        if(!info.user && oembed.data.author_url){
+          const m=String(oembed.data.author_url).match(/@([\w.\-]+)/);
+          if(m) info.user=m[1];
+        }
+      }
+      if(microlink.ok && microlink.data.url){
+        const p=parseFromFullUrl(microlink.data.url);
+        if(p.user&&!info.user) info.user=p.user;
+        if(p.id&&!info.id) info.id=p.id;
+        if(p.canonical) info.canonical=p.canonical;
+      }
+      if(info.user&&info.id) info.canonical='https://www.tiktok.com/@'+info.user+'/video/'+info.id;
+
+      await sleep(40);
+      setPhase('Network quality probe…');
+      const twData=tikwm.ok?tikwm.data:null;
+      let streamProbe=null;
+      const streamUrl=twData && (twData.hdplay || twData.play || twData.wmplay);
+      if(streamUrl){
+        logLine('Probing stream on your network…', 'ok');
+        streamProbe=await probeStream(streamUrl);
+        if(streamProbe&&streamProbe.bytes) logLine('Stream '+fmtBytes(streamProbe.bytes), 'ok');
+      }
+
+      setPhase('Thumbnail…');
+      const thumbUrl=(twData&&twData.cover)||(oembed.ok&&oembed.data.thumbnail_url)||(microlink.ok&&microlink.data.image&&microlink.data.image.url)||null;
+      let thumbSize=null;
+      if(thumbUrl){
+        thumbSize=await loadImageSize(thumbUrl);
+        if(thumbSize) logLine('Thumbnail '+thumbSize.w+'×'+thumbSize.h, 'ok');
+      }
+
+      setPhase('Building report…');
+      if(!tikwm.ok){
+        logLine('No stats yet — wait 2s and Analyse again', 'err');
+        if(window.__revanceLastRaw) logLine('Debug: '+window.__revanceLastRaw, 'warn');
+      } else logLine('Report ready', 'ok');
+      await sleep(60);
+
+      // Keep log panel open so you can copy it
+      const ringEl=$('scanRing');
+      if(ringEl) ringEl.style.display='none';
+      $('scanTitle').textContent=tikwm.ok?'Analysis complete':'Analysis finished (limited data)';
+      setPhase(tikwm.ok?'Stats loaded':'Check log below · tap Copy log');
+      status.classList.add('active'); // stay visible
+      const actEl=$('scanActions');
+      if(actEl) actEl.style.display='flex';
+
+      const ok=!!(tikwm.ok||oembed.ok||microlink.ok||info.id||info.user);
+      render(info, { microlink, oembed, tikwm, thumbSize, streamProbe });
+      sound.play(ok?'done':'warn');
+    }
+
+    // Log panel controls
+    $('copyLogBtn')&&$('copyLogBtn').addEventListener('click',()=>{
+      sound.play('click');
+      const lines=[...$('scanLog').querySelectorAll('div')].map(d=>d.textContent).join('\n');
+      const text=lines+(window.__revanceLastRaw?'\n\nRAW: '+window.__revanceLastRaw:'');
+      if(navigator.clipboard&&navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(()=>{
+          $('copyLogBtn').textContent='✓ Copied';
+          setTimeout(()=>$('copyLogBtn').textContent='📋 Copy log',1500);
+        }).catch(()=>prompt('Copy this log:', text));
+      } else prompt('Copy this log:', text);
+    });
+    $('toggleLogBtn')&&$('toggleLogBtn').addEventListener('click',()=>{
+      sound.play('click');
+      const log=$('scanLog');
+      if(!log) return;
+      const isHidden=log.classList.contains('log-hidden')||log.style.display==='none';
+      if(isHidden){
+        log.classList.remove('log-hidden');
+        log.style.display='block';
+        log.style.maxHeight='';
+        log.style.opacity='1';
+        $('toggleLogBtn').textContent='📜 Hide log';
+      } else {
+        log.classList.add('log-hidden');
+        log.style.display='none';
+        $('toggleLogBtn').textContent='📜 Show log';
+      }
+    });
+
+    $('analyseBtn').addEventListener('click',()=>{
+      sound.play('click');
+      const raw=$('urlInput').value.trim();
+      if(!raw){
+        $('urlInput').focus();
+        $('urlInput').style.borderColor='var(--danger)';
+        setTimeout(()=>$('urlInput').style.borderColor='',1200);
+        return;
+      }
+      const info=parseTikTokUrl(raw);
+      if(!info){
+        alert('Paste a valid TikTok URL (tiktok.com, vm.tiktok.com, vt.tiktok.com).');
+        return;
+      }
+      $('analyseBtn').disabled=true;
+      runAnalyse(info).finally(()=>{ $('analyseBtn').disabled=false; });
+    });
+    $('urlInput').addEventListener('keydown',e=>{ if(e.key==='Enter') $('analyseBtn').click(); });
+
+    // Reset analysis UI
+    function resetAnalyse(){
+      sound.play('click');
+      $('urlInput').value='';
+      $('results').classList.remove('visible');
+      $('scanStatus').classList.remove('active');
+      $('scanLog').innerHTML='';
+      const ring=$('scanRing'); if(ring) ring.style.display='';
+      $('scanTitle').textContent='Fetching real data…';
+      const act=$('scanActions'); if(act) act.style.display='none';
+      $('analyseBtn').disabled=false;
+      window.__revanceLastRaw='';
+      $('urlInput').focus();
+    }
+    $('resetBtn')&&$('resetBtn').addEventListener('click', resetAnalyse);
+
+    // —— My profile @urfair.aep ——
+    const MY_TT='urfair.aep';
+    // Last known public snapshot (updated whenever live fetch succeeds)
+    const PROFILE_SEED={ nickname:'𝙐𝙍𝙁𝘼𝙄𝙍', followers:5230, likes:631500, following:68, videos:132, bio:'14 y.o || app: AE 25 · presets @tturfair', source:'seed' };
+
+    function parseCompactNum(s){
+      if(s==null) return null;
+      s=String(s).replace(/,/g,'').replace(/\s/g,'').trim().toUpperCase();
+      const m=s.match(/^([\d.]+)([KMB])?$/);
+      if(!m) return null;
+      let n=parseFloat(m[1]); if(isNaN(n)) return null;
+      const u=m[2];
+      if(u==='K') n*=1e3; else if(u==='M') n*=1e6; else if(u==='B') n*=1e9;
+      return Math.round(n);
+    }
+    function parseProfileDescription(desc){
+      const out={ followers:null, likes:null, bio:null };
+      if(!desc) return out;
+      const likesM=String(desc).match(/([\d.,]+\s*[KMB]?)\s*Likes?/i);
+      const folM=String(desc).match(/([\d.,]+\s*[KMB]?)\s*Followers?/i);
+      if(likesM) out.likes=parseCompactNum(likesM[1]);
+      if(folM) out.followers=parseCompactNum(folM[1]);
+      const bioM=String(desc).match(/Followers?\.\s*(.+?)(?:\.Watch|$)/i);
+      if(bioM) out.bio=bioM[1].trim();
+      return out;
+    }
+    function applyProfileUI(p){
+      if(!p) return;
+      try{
+        if(p.nickname && $('myNickname')) $('myNickname').textContent=p.nickname;
+        if($('myAvatar')){
+          if(p.avatar){
+            $('myAvatar').innerHTML='<img src="'+esc(p.avatar)+'" alt="" referrerpolicy="no-referrer" onerror="this.remove()" />';
+          } else if(p.nickname){
+            const ch=(String(p.nickname).replace(/[^\w\u0400-\u04FF]/g,'').charAt(0)||'U').toUpperCase();
+            if(!$('myAvatar').querySelector('img')) $('myAvatar').textContent=ch;
+          }
+        }
+        if(p.followers!=null && $('myFollowers')) $('myFollowers').textContent=fmtNum(p.followers);
+        if(p.following!=null && $('myFollowing')) $('myFollowing').textContent=fmtNum(p.following);
+        if(p.likes!=null && $('myLikes')) $('myLikes').textContent=fmtNum(p.likes);
+        if(p.videos!=null && $('myVideos')) $('myVideos').textContent=fmtNum(p.videos);
+        const note=$('myProfileNote');
+        if(note){
+          const bits=['@'+MY_TT];
+          if(p.source) bits.push(p.source);
+          if(p.bio) bits.push(String(p.bio).slice(0,90));
+          note.textContent=bits.join(' · ');
+        }
+      }catch(e){ console.warn('applyProfileUI', e); }
+    }
+
+    async function fetchMyProfile(){
+      const note=$('myProfileNote');
+      if(note) note.textContent='Loading public profile…';
+      sound.play('scan');
+      let profile={ nickname:null, avatar:null, followers:null, following:null, likes:null, videos:null, bio:null, source:'' };
+      let errors=[];
+
+      // 1) Microlink via XHR (more reliable from file:// on mobile)
+      try{
+        const url='https://api.microlink.io/?url='+encodeURIComponent('https://www.tiktok.com/@'+MY_TT);
+        let text='', status=0;
+        const xr=await xhrJson(url,'GET',null,15000);
+        status=xr.status; text=xr.text||'';
+        if(!text){
+          try{
+            const r=await fetchJsonTimeout(url,{ method:'GET', credentials:'omit' },15000);
+            status=r?r.status:0;
+            text=r?await r.text():'';
+          }catch(e){ errors.push('microlink fetch: '+(e.message||e)); }
+        }
+        const j=parseLooseJson(text);
+        if(j&&(j.status==='success'||j.data)&&j.data){
+          const d=j.data;
+          profile.nickname=(d.author||d.title||'').replace(/\s*\(@.*$/,'').trim()||MY_TT;
+          if(d.image&&d.image.url) profile.avatar=d.image.url;
+          else if(typeof d.image==='string') profile.avatar=d.image;
+          const parsed=parseProfileDescription(d.description||'');
+          if(parsed.followers!=null) profile.followers=parsed.followers;
+          if(parsed.likes!=null) profile.likes=parsed.likes;
+          if(parsed.bio) profile.bio=parsed.bio;
+          profile.source='Microlink';
+        } else {
+          errors.push('microlink HTTP '+status);
+        }
+      }catch(e){ errors.push('microlink: '+(e.message||e)); }
+
+      // 2) oEmbed — nickname
+      try{
+        const r=await xhrJson('https://www.tiktok.com/oembed?url='+encodeURIComponent('https://www.tiktok.com/@'+MY_TT),'GET',null,10000);
+        const j=parseLooseJson(r.text||'');
+        if(j&&j.author_name){
+          profile.nickname=j.author_name;
+          if(!profile.source) profile.source='oEmbed';
+        }
+      }catch(e){ errors.push('oembed: '+(e.message||e)); }
+
+      // 3) tikwm user (optional)
+      try{
+        const r=await xhrJson('https://www.tikwm.com/api/user/info?unique_id='+encodeURIComponent(MY_TT),'GET',null,10000);
+        if(r.status&&r.status!==403){
+          const j=parseLooseJson(r.text||'');
+          const data=j&&j.data?j.data:null;
+          if(data){
+            const user=data.user||data;
+            const stats=data.stats||user.stats||{};
+            if(user.nickname) profile.nickname=user.nickname;
+            const av=user.avatarThumb||user.avatarMedium||user.avatar;
+            if(av) profile.avatar=av;
+            if(stats.followerCount!=null) profile.followers=Number(stats.followerCount);
+            if(stats.followingCount!=null) profile.following=Number(stats.followingCount);
+            if(stats.heartCount!=null||stats.heart!=null) profile.likes=Number(stats.heartCount??stats.heart);
+            if(stats.videoCount!=null) profile.videos=Number(stats.videoCount);
+            profile.source='tikwm';
+          }
+        }
+      }catch(_){}
+
+      const hasCounts=profile.followers!=null||profile.likes!=null;
+      const hasAny=hasCounts||profile.nickname;
+
+      if(hasCounts){
+        applyProfileUI(profile);
+        try{ localStorage.setItem('revance_profile_'+MY_TT, JSON.stringify({ ts:Date.now(), profile })); }catch(_){}
+        sound.play('done');
+        return;
+      }
+
+      // Cache
+      try{
+        const raw=localStorage.getItem('revance_profile_'+MY_TT);
+        if(raw){
+          const o=JSON.parse(raw);
+          if(o&&o.profile&&(o.profile.followers!=null||o.profile.likes!=null)){
+            applyProfileUI(Object.assign({},o.profile,{ source:(o.profile.source||'')+' (cached)' }));
+            sound.play('ok');
+            return;
+          }
+        }
+      }catch(_){}
+
+      // Seed so UI is never empty
+      applyProfileUI(Object.assign({}, PROFILE_SEED, {
+        nickname: profile.nickname||PROFILE_SEED.nickname,
+        avatar: profile.avatar||null,
+        source: 'last known public'
+      }));
+      if(note) note.textContent='@'+MY_TT+' · last known public counts (live fetch limited). Tap Refresh to retry.';
+      sound.play('warn');
+      if(errors.length) console.warn('profile errors', errors);
+    }
+    $('refreshProfileBtn')&&$('refreshProfileBtn').addEventListener('click',()=>{ sound.play('click'); fetchMyProfile(); });
+    // Instant seed, then live refresh
+    applyProfileUI(PROFILE_SEED);
+    setTimeout(()=>{ try{ fetchMyProfile(); }catch(e){ console.warn(e); } }, 500);
+
+
+    // —— Video library + News (@urfair.aep) ——
+    const SEED_VIDEOS=[{"id": "7688732580329491735", "title": "#JINX // PARTY FUNK // #jinx #jinxarcane #jinxedit #jinxarcaneedit #arcane #arcaneedit #edit #120fps #4k - Revance - @cleare.aep", "cover": "https://p16-common-sign.tiktokcdn-us.com/tos-no1a-p-0037-no/oMFgtM3wAP6Ce6kqVv7CFsL2WiIvEAizACAsfB~tplv-tiktokx-cropcenter-q:300:400:q70.jpeg?dr=8596&refresh_token=2dd88116&x-expires=1790748000&x-signature=D%2BT8kUGWjWgqWdmT5O7zs6yFq0o%3D&t=bacd0480&ps=933b5bde&shp=d05b14bd&shcp=1d1a97fc&idc=useast5&sc=cover&biz_tag=tt_video&s=AWEME_DETAIL", "create_time": 1790172560, "play_count": 2074, "digg_count": 359, "comment_count": 7, "share_count": 10, "region": "US", "url": "https://www.tiktok.com/@urfair.aep/video/7688732580329491735"}, {"id": "7688337870272220438", "title": "#JINX // Ecstacy Slowed // JINX EDIT // #jinx #jinxarcane #jinxedit #jinxarcaneedit #arcane #arcaneedit #edit #120fps #4k - Revance - @cleare.aep", "cover": "https://p19-common-sign.tiktokcdn-us.com/tos-no1a-p-0037-no/oYWynqGVZAd7LmRAQreOKrdDI4y8ICYvEeeAEM~tplv-tiktokx-cropcenter-q:300:400:q70.jpeg?dr=8596&refresh_token=55e540d3&x-expires=1790748000&x-signature=BkVF2eaI11zhq%2BSOQ7YtWpnJZAU%3D&t=bacd0480&ps=933b5bde&shp=d05b14bd&shcp=1d1a97fc&idc=useast5&biz_tag=tt_video&s=AWEME_DETAIL&sc=cover", "create_time": 1790080664, "play_count": 4935, "digg_count": 703, "comment_count": 10, "share_count": 28, "region": "US", "url": "https://www.tiktok.com/@urfair.aep/video/7688337870272220438"}, {"id": "7688026979358018838", "title": "#JINX // Love Potions X Track 10 // jinx edit // #jinx #jinxarcane #jinxedit #jinxarcaneedit #arcane #arcaneedit #edit #120fps #4k - Revance - @cleare.aep", "cover": "https://p19-common-sign.tiktokcdn-us.com/tos-no1a-p-0037-no/ogxYADvEKAFVFcSfCgexvkq9WCV9sACNEIuCAI~tplv-tiktokx-cropcenter-q:300:400:q70.jpeg?dr=8596&refresh_token=3375c5e0&x-expires=1790748000&x-signature=Qt%2FliI6lElocBEusXhWhygqkxGg%3D&t=bacd0480&ps=933b5bde&shp=d05b14bd&shcp=1d1a97fc&idc=useast5&biz_tag=tt_video&s=AWEME_DETAIL&sc=cover", "create_time": 1790008276, "play_count": 1713, "digg_count": 225, "comment_count": 10, "share_count": 5, "region": "US", "url": "https://www.tiktok.com/@urfair.aep/video/7688026979358018838"}, {"id": "7687534432198200598", "title": "#JINX // gangnam style? // rmk: @cleare.aep // JINX EDIT // #jinx #jinxarcane #jinxedit #jinxarcaneedit #arcane #arcaneedit #edit #120fps #4k - Revance - @cleare.aep", "cover": "https://p16-common-sign.tiktokcdn-us.com/tos-no1a-p-0037-no/oQeQSiBQKBC66IA3hviEbbBAmAtw98AHV1vGvC~tplv-tiktokx-cropcenter-q:300:400:q70.jpeg?dr=8596&refresh_token=1ef3d3cc&x-expires=1790748000&x-signature=GMeLzq2BnG5PkXbNlMwqNPBM0OY%3D&t=bacd0480&ps=933b5bde&shp=d05b14bd&shcp=1d1a97fc&idc=useast5&biz_tag=tt_video&s=AWEME_DETAIL&sc=cover", "create_time": 1789893601, "play_count": 3571, "digg_count": 622, "comment_count": 14, "share_count": 21, "region": "US", "url": "https://www.tiktok.com/@urfair.aep/video/7687534432198200598"}, {"id": "7687191642549374230", "title": "#JINX // ADDICTION // JINX EDIT // #jinx #jinxarcane #jinxedit #jinxarcaneedit #arcane #arcaneedit #edit #120fps #4k - Revance - @cleare.aep", "cover": "https://p16-common-sign.tiktokcdn-us.com/tos-no1a-p-0037-no/osfKAjBCz1EgEwiVZJkiPBUBBMAqVIKuIzSAAC~tplv-tiktokx-cropcenter-q:300:400:q70.jpeg?dr=8596&refresh_token=a3bbab5f&x-expires=1790748000&x-signature=jChmk5scYfIOZex02ZhqjCH24r0%3D&t=bacd0480&ps=933b5bde&shp=d05b14bd&shcp=1d1a97fc&idc=useast5&biz_tag=tt_video&s=AWEME_DETAIL&sc=cover", "create_time": 1789813785, "play_count": 4117, "digg_count": 672, "comment_count": 8, "share_count": 39, "region": "US", "url": "https://www.tiktok.com/@urfair.aep/video/7687191642549374230"}, {"id": "7687012703197465878", "title": "#JINX // LAST SOLQ REMAKE!!!!!! // rmk: @solqertt.aep // #jinx #jinxarcane #jinxedit #jinxarcaneedit #arcane #arcaneedit #edit #120fps #4k - Revance - @cleare.aep", "cover": "https://p19-common-sign.tiktokcdn-us.com/tos-no1a-p-0037-no/o0BbAi6ACIwVpiCBxSMfCDnV3SAWBKwmt1EuAC~tplv-tiktokx-cropcenter-q:300:400:q70.jpeg?dr=8596&refresh_token=edcd68ec&x-expires=1790748000&x-signature=R%2F%2BYU5Aza%2FrTLXq6btXRGP64Uz8%3D&t=bacd0480&ps=933b5bde&shp=d05b14bd&shcp=1d1a97fc&idc=useast5&biz_tag=tt_video&s=AWEME_DETAIL&sc=cover", "create_time": 1789772125, "play_count": 7727, "digg_count": 1286, "comment_count": 12, "share_count": 55, "region": "US", "url": "https://www.tiktok.com/@urfair.aep/video/7687012703197465878"}, {"id": "7686719297309232406", "title": "#JINX // Montagem Kazeo Bankai // ib: @cleare.aep // #jinx #jinxarcane #jinxedit #jinxarcaneedit #arcane #arcaneedit #edit #120fps #4k - Revance - @cleare.aep", "cover": "https://p19-common-sign.tiktokcdn-us.com/tos-no1a-p-0037-no/oMsi5A7BKIIApS3f1CEAAuB1AUYiiCOlBwgttV~tplv-tiktokx-cropcenter-q:300:400:q70.jpeg?dr=8596&refresh_token=241157f0&x-expires=1790748000&x-signature=%2BIwan8pDnEvOgIS5CtpW3PE0KME%3D&t=bacd0480&ps=933b5bde&shp=d05b14bd&shcp=1d1a97fc&idc=useast5&biz_tag=tt_video&s=AWEME_DETAIL&sc=cover", "create_time": 1789703840, "play_count": 7147, "digg_count": 922, "comment_count": 12, "share_count": 30, "region": "US", "url": "https://www.tiktok.com/@urfair.aep/video/7686719297309232406"}, {"id": "7686506999206415638", "title": "#JINX // new WM! // ib: @cleare.aep // #jinx #jinxarcane #jinxedit #jinxarcaneedit #arcane #arcaneedit #edit #120fps #4k - Revance - @cleare.aep", "cover": "https://p16-common-sign.tiktokcdn-us.com/tos-no1a-p-0037-no/okDrAIClIFaVbEEFWfr9EWmLJVvefA7dAAAAFV~tplv-tiktokx-cropcenter-q:300:400:q70.jpeg?dr=8596&refresh_token=02aa5d67&x-expires=1790748000&x-signature=prxc9DuToqcVHNSURDYSZJq3m0g%3D&t=bacd0480&ps=933b5bde&shp=d05b14bd&shcp=1d1a97fc&idc=useast5&sc=cover&biz_tag=tt_video&s=AWEME_DETAIL", "create_time": 1789654376, "play_count": 23326, "digg_count": 5359, "comment_count": 34, "share_count": 196, "region": "US", "url": "https://www.tiktok.com/@urfair.aep/video/7686506999206415638"}, {"id": "7686115125358513430", "title": "#JINX // Another remake.... // JINX EDIT // rmk: @solqertt.aep // #jinx #jinxarcane #jinxedit #jinxarcaneedit #arcane #arcaneedit #edit #120fps #4k - Revance - @cleare.aep", "cover": "https://p19-common-sign.tiktokcdn-us.com/tos-no1a-p-0037-no/owxECrYAlia7B4iaQMADAINqkB0ApmPpCAq2q~tplv-tiktokx-cropcenter-q:300:400:q70.jpeg?dr=8596&refresh_token=b29896d7&x-expires=1790748000&x-signature=bJulF%2FJ9FUwhVtFEmaRx7Qynv58%3D&t=bacd0480&ps=933b5bde&shp=d05b14bd&shcp=1d1a97fc&idc=useast5&biz_tag=tt_video&s=AWEME_DETAIL&sc=cover", "create_time": 1789563137, "play_count": 1554, "digg_count": 238, "comment_count": 15, "share_count": 13, "region": "US", "url": "https://www.tiktok.com/@urfair.aep/video/7686115125358513430"}, {"id": "7685741802204187926", "title": "#JINX // ENTITY.096 // JINX EDIT // #jinx #jinxarcane #jinxedit #jinxarcaneedit #arcane #arcaneedit #edit #120fps #4k - Revance - @cleare.aep", "cover": "https://p19-common-sign.tiktokcdn-us.com/tos-no1a-p-0037-no/okbepAAsqKWzTSRkK7LIAUGfJpAW9fAgQpedQP~tplv-tiktokx-cropcenter-q:300:400:q70.jpeg?dr=8596&refresh_token=8439ac0d&x-expires=1790748000&x-signature=aaK9R4QOFG422%2Bf%2FIFo7q1X61a0%3D&t=bacd0480&ps=933b5bde&shp=d05b14bd&shcp=1d1a97fc&idc=useast5&biz_tag=tt_video&s=AWEME_DETAIL&sc=cover", "create_time": 1789476217, "play_count": 2819, "digg_count": 449, "comment_count": 15, "share_count": 18, "region": "US", "url": "https://www.tiktok.com/@urfair.aep/video/7685741802204187926"}];
+    const LIB_KEY='revance_video_lib_'+MY_TT;
+    function loadLib(){
+      try{ return JSON.parse(localStorage.getItem(LIB_KEY)||'[]'); }catch(_){ return []; }
+    }
+    function saveLib(arr){
+      try{ localStorage.setItem(LIB_KEY, JSON.stringify(arr.slice(0,200))); }catch(_){}
+    }
+    function upsertVideo(v){
+      if(!v||!v.id) return;
+      const lib=loadLib();
+      const i=lib.findIndex(x=>String(x.id)===String(v.id));
+      if(i>=0) lib[i]=Object.assign({}, lib[i], v);
+      else lib.unshift(v);
+      lib.sort((a,b)=>(b.create_time||0)-(a.create_time||0));
+      saveLib(lib);
+      return lib;
+    }
+    function fmtDate(ts){
+      if(!ts) return '—';
+      try{ return new Date(Number(ts)*1000).toLocaleString(); }catch(_){ return '—'; }
+    }
+    function renderVideoCard(v){
+      const title=esc((v.title||'Untitled').slice(0,120));
+      const cover=v.cover?`<img class="vcard-cover" src="${esc(v.cover)}" alt="" referrerpolicy="no-referrer" loading="lazy" />`:`<div class="vcard-cover"></div>`;
+      const url=v.url||('https://www.tiktok.com/@'+MY_TT+'/video/'+v.id);
+      return `<div class="vcard" data-id="${esc(String(v.id))}" data-url="${esc(url)}">
+        ${cover}
+        <div class="vcard-body">
+          <div class="vcard-title">${title}</div>
+          <div class="vcard-meta"><span>📅 ${esc(fmtDate(v.create_time))}</span>${v.region?`<span>🌍 ${esc(v.region)}</span>`:''}</div>
+          <div class="vcard-stats">
+            <span>▶ ${fmtNum(v.play_count)}</span>
+            <span>♥ ${fmtNum(v.digg_count)}</span>
+            <span>💬 ${fmtNum(v.comment_count)}</span>
+            <span>↗ ${fmtNum(v.share_count)}</span>
+          </div>
+        </div>
+      </div>`;
+    }
+    function ensureSeedLib(){
+      // version bump clears broken old library once
+      try{
+        if(localStorage.getItem('revance_lib_ver')!=='3'){
+          localStorage.removeItem(LIB_KEY);
+          localStorage.setItem('revance_lib_ver','3');
+        }
+      }catch(_){}
+      let lib=loadLib();
+      if(typeof SEED_VIDEOS!=='undefined' && SEED_VIDEOS.length){
+        const have=new Set(lib.map(x=>String(x.id)));
+        SEED_VIDEOS.forEach(v=>{
+          if(v&&v.id&&!have.has(String(v.id))) upsertVideo(v);
+        });
+        // if lib was empty, also force full seed
+        if(!lib.length) SEED_VIDEOS.forEach(v=>upsertVideo(v));
+        lib=loadLib();
+      }
+      return lib;
+    }
+    function paintFeeds(){
+      const lib=ensureSeedLib();
+      const news=$('newsFeed'), videos=$('videosFeed');
+      const nc=$('newsCount'), vc=$('videosCount');
+      if(nc) nc.textContent=lib.length+' posts';
+      if(vc) vc.textContent=lib.length+' videos';
+      const emptyNews='<div class="feed-empty">No posts yet.<br>Tap <strong>Refresh news</strong> or Analyse your videos — new ones show up here first.</div>';
+      const emptyVid='<div class="feed-empty">No videos in library yet.<br>Tap <strong>Load feed</strong> or Analyse posts from @'+MY_TT+'.</div>';
+      if(news){
+        if(!lib.length) news.innerHTML=emptyNews;
+        else news.innerHTML=lib.slice(0,15).map(renderVideoCard).join('');
+      }
+      if(videos){
+        if(!lib.length) videos.innerHTML=emptyVid;
+        else videos.innerHTML=lib.map(renderVideoCard).join('');
+      }
+      // click → fill analyse URL
+      document.querySelectorAll('#newsFeed .vcard, #videosFeed .vcard').forEach(card=>{
+        card.addEventListener('click',()=>{
+          const url=card.getAttribute('data-url');
+          if(!url) return;
+          sound.play('click');
+          $('urlInput').value=url;
+          document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+          document.querySelector('.nav-item[data-tab="analyse"]')?.classList.add('active');
+          document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+          $('panel-analyse').classList.add('active');
+          window.scrollTo({top:0,behavior:'smooth'});
+        });
+      });
+    }
+
+    async function fetchUserPosts(){
+      const setStatus=function(msg){
+        if($('importStatus')) $('importStatus').textContent=msg;
+        if($('newsFeed') && !loadLib().length) $('newsFeed').innerHTML='<div class="feed-empty">'+msg+'</div>';
+      };
+      setStatus('Trying live feed…');
+      sound.play('scan');
+      let items=[];
+      const tries=[
+        { tag:'posts-GET', run:()=>xhrJson('https://www.tikwm.com/api/user/posts?unique_id='+encodeURIComponent(MY_TT)+'&count=30','GET',null,16000) },
+        { tag:'posts-POST', run:()=>xhrJson('https://www.tikwm.com/api/user/posts','POST','unique_id='+encodeURIComponent(MY_TT)+'&count=30',16000) },
+        { tag:'posts-www2', run:()=>xhrJson('https://tikwm.com/api/user/posts?unique_id='+encodeURIComponent(MY_TT)+'&count=20','GET',null,16000) }
+      ];
+      for(const t of tries){
+        try{
+          const r=await t.run();
+          if(r.status===403){ setStatus(t.tag+': blocked (403)'); continue; }
+          const j=parseLooseJson(r.text||'');
+          const list=(j&&j.data&&(j.data.videos||j.data.itemList||j.data.list||j.data.aweme_list))||null;
+          if(list&&list.length){ items=list; setStatus('Live feed OK via '+t.tag); break; }
+          if(j&&j.msg) setStatus(t.tag+': '+j.msg);
+        }catch(e){ setStatus(t.tag+': '+(e.message||'fail')); }
+        await sleep(900);
+      }
+      if(items.length){
+        items.forEach(it=>{
+          const id=it.video_id||it.id||it.aweme_id;
+          if(!id) return;
+          upsertVideo({
+            id:String(id),
+            title:it.title||it.desc||'',
+            cover:it.cover||(it.video&&(it.video.cover||it.video.origin_cover))||'',
+            create_time:it.create_time||it.createTime||null,
+            play_count:it.play_count??it.playCount??null,
+            digg_count:it.digg_count??it.diggCount??null,
+            comment_count:it.comment_count??it.commentCount??null,
+            share_count:it.share_count??it.shareCount??null,
+            region:it.region||null,
+            url:'https://www.tiktok.com/@'+MY_TT+'/video/'+id
+          });
+        });
+        sound.play('done');
+        paintFeeds();
+        return true;
+      }
+      sound.play('warn');
+      paintFeeds();
+      if(!loadLib().length){
+        const tip='Live “user posts” API is blocked on this network.<br><strong>Fix:</strong> open <em>Videos</em> → paste your TikTok links → <strong>Import</strong>. Or Analyse each video once.';
+        if($('newsFeed')) $('newsFeed').innerHTML='<div class="feed-empty">'+tip+'</div>';
+        if($('videosFeed')&&!loadLib().length) $('videosFeed').innerHTML='<div class="feed-empty">'+tip+'</div>';
+        if($('importStatus')) $('importStatus').textContent='Live feed blocked — use Import links (uses working video API).';
+      }
+      return false;
+    }
+
+    async function importLinksFromText(){
+      const raw=($('importLinks')&&$('importLinks').value)||'';
+      const parts=raw.split(/[\s,;\n\r]+/).map(s=>s.trim()).filter(Boolean);
+      const urls=[];
+      for(const p of parts){
+        let u=p;
+        if(!/^https?:\/\//i.test(u)) u='https://'+u;
+        if(/tiktok\.com/i.test(u)||/vm\.tiktok\.com/i.test(u)||/vt\.tiktok\.com/i.test(u)) urls.push(u);
+      }
+      if(!urls.length){
+        if($('importStatus')) $('importStatus').textContent='Paste at least one TikTok link.';
+        sound.play('warn');
+        return;
+      }
+      if($('importStatus')) $('importStatus').textContent='Importing '+urls.length+' link(s)…';
+      if($('importLinksBtn')) $('importLinksBtn').disabled=true;
+      sound.play('scan');
+      let ok=0, fail=0;
+      for(let i=0;i<urls.length;i++){
+        const url=urls[i];
+        if($('importStatus')) $('importStatus').textContent='Importing '+(i+1)+'/'+urls.length+'…';
+        try{
+          // expand short links
+          let full=url;
+          if(/vm\.tiktok\.com|vt\.tiktok\.com/i.test(url)){
+            try{
+              const er=await xhrJson('https://unshorten.me/json/'+encodeURIComponent(url),'GET',null,10000);
+              const ej=parseLooseJson(er.text||'');
+              if(ej&&(ej.resolved_url||ej.destination||ej.long_url)) full=ej.resolved_url||ej.destination||ej.long_url;
+            }catch(_){}
+          }
+          const tw=await fetchTikwm(full);
+          if(tw&&tw.ok&&tw.data){
+            const d=tw.data;
+            const id=d.id||(String(full).match(/(\d{15,25})/)||[])[1];
+            if(id){
+              upsertVideo({
+                id:String(id),
+                title:d.title||'',
+                cover:d.cover||d.origin_cover||'',
+                create_time:d.create_time||null,
+                play_count:d.play_count??null,
+                digg_count:d.digg_count??null,
+                comment_count:d.comment_count??null,
+                share_count:d.share_count??null,
+                region:d.region||null,
+                url:'https://www.tiktok.com/@'+MY_TT+'/video/'+id
+              });
+              ok++;
+            } else fail++;
+          } else fail++;
+        }catch(_){ fail++; }
+        await sleep(1200); // respect rate limit
+      }
+      if($('importLinksBtn')) $('importLinksBtn').disabled=false;
+      paintFeeds();
+      if($('importStatus')) $('importStatus').textContent='Imported '+ok+' · failed '+fail+(ok?' · library updated':'');
+      sound.play(ok?'done':'warn');
+    }
+
+    $('newsRefreshBtn')&&$('newsRefreshBtn').addEventListener('click',()=>{ sound.play('click'); fetchUserPosts(); });
+    $('importLinksBtn')&&$('importLinksBtn').addEventListener('click',()=>{ sound.play('click'); importLinksFromText(); });
+    $('videosRefreshBtn')&&$('videosRefreshBtn').addEventListener('click',()=>{ sound.play('click'); fetchUserPosts(); });
+    $('videosClearBtn')&&$('videosClearBtn').addEventListener('click',()=>{
+      sound.play('click');
+      if(confirm('Clear local video library?')){ saveLib([]); paintFeeds(); }
+    });
+    paintFeeds();
+
+    // When analysis succeeds for urfair videos, save to library
+    const _origRenderSound=typeof renderSoundAndDownload==='function'?renderSoundAndDownload:null;
+    // hook via analysing render - patch after render stores last
+    const _saveFromTw=function(tw, info){
+      if(!tw) return;
+      const uid=(tw.author&&(tw.author.unique_id||tw.author.uniqueId))||(info&&info.user)||'';
+      if(String(uid).replace(/^@/,'').toLowerCase()!==MY_TT.toLowerCase() && !(info&&info.user&&info.user.toLowerCase()===MY_TT.toLowerCase())){
+        // still save if analysing any - only auto-add for urfair
+        if(String(uid).replace(/^@/,'').toLowerCase()!==MY_TT.toLowerCase()) return;
+      }
+      const id=tw.id||(info&&info.id);
+      if(!id) return;
+      upsertVideo({
+        id:String(id),
+        title:tw.title||'',
+        cover:tw.cover||tw.origin_cover||'',
+        create_time:tw.create_time||null,
+        play_count:tw.play_count??null,
+        digg_count:tw.digg_count??null,
+        comment_count:tw.comment_count??null,
+        share_count:tw.share_count??null,
+        region:tw.region||null,
+        url:'https://www.tiktok.com/@'+MY_TT+'/video/'+id
+      });
+      paintFeeds();
+    };
+    // wrap renderSoundAndDownload
+    if(typeof renderSoundAndDownload==='function'){
+      const _rs=renderSoundAndDownload;
+      renderSoundAndDownload=function(tw, info){
+        try{ _saveFromTw(tw, info); }catch(_){}
+        return _rs(tw, info);
+      };
+    }
+
+
+    // CompressBase — use real <a href> navigation (window.open is blocked on many phones)
+    function openCompressBase(){
+      sound.play('click');
+      const url='https://compressbase.com/upload-method';
+      // Prefer same-gesture navigation
+      const a=document.createElement('a');
+      a.href=url; a.target='_blank'; a.rel='noopener noreferrer';
+      document.body.appendChild(a); a.click(); a.remove();
+    }
+    ['compressBtn','compressBtn2','compressBtn3'].forEach(id=>{
+      const el=$(id);
+      if(!el) return;
+      el.setAttribute('href','https://compressbase.com/upload-method');
+      el.setAttribute('target','_blank');
+      el.setAttribute('rel','noopener noreferrer');
+      el.addEventListener('click',()=>{ sound.play('click'); /* let default navigation run */ });
+    });
+
+
+    // Quick seed buttons + force library paint
+    (function initQuickAndFeed(){
+      try{
+        ensureSeedLib();
+        paintFeeds();
+      }catch(e){ console.warn(e); }
+      const box=$('quickSeedList');
+      if(box && typeof SEED_VIDEOS!=='undefined'){
+        box.innerHTML=SEED_VIDEOS.slice(0,8).map(v=>{
+          const t=esc((v.title||'Video').slice(0,48));
+          return '<button type="button" class="btn btn-ghost" style="width:100%;justify-content:flex-start;text-align:left" data-seed-url="'+esc(v.url)+'">▶ '+t+'</button>';
+        }).join('');
+        box.querySelectorAll('[data-seed-url]').forEach(btn=>{
+          btn.addEventListener('click',()=>{
+            sound.play('click');
+            const u=btn.getAttribute('data-seed-url');
+            $('urlInput').value=u;
+            const info=parseTikTokUrl(u);
+            if(info){
+              $('analyseBtn').disabled=true;
+              runAnalyse(info).finally(()=>{ $('analyseBtn').disabled=false; });
+            }
+          });
+        });
+      }
+    })();
+
+    document.addEventListener('pointerdown',()=>sound.init(),{once:true,passive:true});
+    console.log('Revance — offline seed + analyse hardened');
+    }catch(bootErr){
+      console.error(bootErr);
+      var b=document.getElementById('revance-error-banner');
+      if(b){ b.style.display='block'; b.textContent='Boot error: '+bootErr.message; }
+    }
+  })();
+  </script>
+</body>
+</html>
