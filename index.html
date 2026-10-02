@@ -438,6 +438,407 @@
       *,*::before,*::after { animation-duration:.01ms !important; transition-duration:.01ms !important; }
     }
 
+
+    /* Motion system */
+    :root {
+      --ease: cubic-bezier(.22, 1, .36, 1);
+      --ease-out: cubic-bezier(.16, 1, .3, 1);
+      --glow-strength: 1;
+    }
+    body::before {
+      content: "";
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background:
+        radial-gradient(ellipse 90% 55% at 50% -18%, rgba(200,245,66, calc(.11 * var(--glow-strength))), transparent 55%),
+        radial-gradient(ellipse 60% 40% at 90% 30%, rgba(155,225,93, calc(.06 * var(--glow-strength))), transparent 50%),
+        radial-gradient(ellipse 50% 35% at 10% 70%, rgba(200,245,66, calc(.04 * var(--glow-strength))), transparent 45%),
+        linear-gradient(180deg, #0d1018 0%, #08090c 50%);
+      opacity: 1;
+      transition: opacity .5s var(--ease);
+    }
+    body::after {
+      content: "";
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background: radial-gradient(circle at 50% 120%, rgba(200,245,66, calc(.05 * var(--glow-strength))), transparent 40%);
+      transition: opacity .5s var(--ease);
+    }
+    .app { animation: rise .55s var(--ease-out) both; }
+    .hero, .card, .scan-status.active, .panel.active {
+      animation: rise .5s var(--ease-out) both;
+    }
+    .card { transition: border-color .35s var(--ease), transform .35s var(--ease), background .35s var(--ease); }
+    .card:hover { border-color: rgba(200,245,66,.28); transform: translateY(-2px); }
+    .btn { transition: transform .25s var(--ease), filter .25s var(--ease), background .25s var(--ease), border-color .25s var(--ease), color .25s var(--ease); }
+    .btn-primary:hover { filter: brightness(1.08); transform: translateY(-1px); }
+    .btn-primary:active { transform: scale(.97); }
+    .nav-item { transition: background .3s var(--ease), color .3s var(--ease), transform .3s var(--ease); }
+    .nav-item:active { transform: scale(.94); }
+    .vcard { transition: border-color .3s var(--ease), background .3s var(--ease), transform .3s var(--ease); }
+    .vcard:hover { transform: translateY(-2px); }
+    .stat-box { transition: border-color .3s var(--ease); }
+    .stat-box:hover { border-color: rgba(200,245,66,.35); }
+    .stat-box .num { transition: color .3s var(--ease); }
+    .url-input { transition: border-color .3s var(--ease), box-shadow .3s var(--ease); }
+    .icon-btn, .social-link { transition: border-color .3s var(--ease), color .3s var(--ease), transform .3s var(--ease); }
+    .icon-btn:hover, .social-link:hover { transform: translateY(-1px); }
+    .settings-panel {
+      transition: transform .4s var(--ease-out);
+      transform: translateX(100%);
+    }
+    .settings-panel.open {
+      display: flex;
+      transform: translateX(0);
+      animation: none;
+    }
+    .results.visible .card {
+      animation: rise .45s var(--ease-out) both;
+    }
+    .results.visible .card:nth-child(1){animation-delay:.04s}
+    .results.visible .card:nth-child(2){animation-delay:.08s}
+    .results.visible .card:nth-child(3){animation-delay:.12s}
+    .results.visible .card:nth-child(4){animation-delay:.16s}
+    .results.visible .card:nth-child(5){animation-delay:.20s}
+    .results.visible .card:nth-child(6){animation-delay:.24s}
+    .results.visible .card:nth-child(7){animation-delay:.28s}
+    .results.visible .card:nth-child(8){animation-delay:.32s}
+    .results.visible .card:nth-child(9){animation-delay:.36s}
+    .results.visible .card:nth-child(10){animation-delay:.40s}
+
+    /* Brand mark */
+    .brand-logo {
+      width: 88px; height: 88px; border-radius: 28px;
+      background: linear-gradient(145deg, #d4ff5a 0%, #c8f542 40%, #8fd63a 100%);
+      display: grid; place-items: center;
+      margin: 0 auto 16px;
+      box-shadow:
+        0 12px 40px rgba(200,245,66,.28),
+        0 0 0 1px rgba(255,255,255,.12) inset,
+        0 1px 0 rgba(255,255,255,.25) inset;
+      position: relative;
+      animation: logoFloat 4s var(--ease) infinite;
+    }
+    .brand-logo::after {
+      content: "";
+      position: absolute; inset: 0; border-radius: inherit;
+      background: linear-gradient(180deg, rgba(255,255,255,.22), transparent 45%);
+      pointer-events: none;
+    }
+    .brand-logo span {
+      font-size: 2.6rem; font-weight: 800; color: #0a0c08;
+      letter-spacing: -.06em; line-height: 1;
+      text-shadow: 0 1px 0 rgba(255,255,255,.25);
+      position: relative; z-index: 1;
+    }
+    @keyframes logoFloat {
+      0%, 100% { transform: translateY(0); box-shadow: 0 12px 40px rgba(200,245,66,.28), 0 0 0 1px rgba(255,255,255,.12) inset; }
+      50% { transform: translateY(-6px); box-shadow: 0 18px 48px rgba(200,245,66,.38), 0 0 0 1px rgba(255,255,255,.14) inset; }
+    }
+    .about-hero {
+      text-align: center;
+      padding: 32px 18px 28px !important;
+    }
+    .about-hero h3 {
+      justify-content: center;
+      text-transform: none;
+      letter-spacing: -.03em;
+      font-size: 1.35rem !important;
+      color: var(--text) !important;
+      margin-bottom: 6px !important;
+    }
+    .glow-preview {
+      height: 36px; border-radius: 10px; margin-top: 6px;
+      background: radial-gradient(ellipse at center, rgba(200,245,66, calc(.35 * var(--glow-strength))), transparent 70%);
+      border: 1px solid var(--stroke);
+    }
+
+
+    .about-title {
+      justify-content: center !important;
+      text-transform: none !important;
+      letter-spacing: -.04em !important;
+      font-size: 1.5rem !important;
+      font-weight: 800 !important;
+      color: var(--text) !important;
+      margin-bottom: 4px !important;
+    }
+    .about-sub { color: var(--dim); font-size: .85rem; margin-top: 2px; }
+    .about-desc { color: var(--dim); font-size: .76rem; margin-top: 10px; line-height: 1.5; }
+    .feature-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+    }
+    .feature-item {
+      display: flex; gap: 10px; align-items: flex-start;
+      padding: 12px; border-radius: 14px;
+      background: #05060a; border: 1px solid var(--stroke);
+      transition: border-color .3s var(--ease), transform .3s var(--ease);
+    }
+    .feature-item:hover { border-color: rgba(200,245,66,.35); transform: translateY(-2px); }
+    .feature-item .fi { font-size: 1.15rem; line-height: 1; }
+    .feature-item b { display: block; font-size: .82rem; font-weight: 700; }
+    .feature-item small { display: block; font-size: .68rem; color: var(--dim); margin-top: 2px; }
+    .history-list { display: flex; flex-direction: column; gap: 6px; max-height: 280px; overflow-y: auto; }
+    .history-item {
+      display: flex; flex-direction: column; gap: 4px;
+      padding: 10px 12px; border-radius: 12px;
+      background: #05060a; border: 1px solid var(--stroke);
+      cursor: pointer; text-align: left;
+      transition: border-color .25s var(--ease), background .25s var(--ease);
+    }
+    .history-item:hover { border-color: var(--accent); background: var(--accent-dim); }
+    .history-item .hi-url {
+      font-size: .72rem; font-family: var(--mono); color: var(--accent);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .history-item .hi-meta { font-size: .68rem; color: var(--dim); display: flex; gap: 8px; flex-wrap: wrap; }
+
+
+    .feature-item {
+      width: 100%;
+      font: inherit;
+      color: inherit;
+      cursor: pointer;
+      text-align: left;
+    }
+    .feature-item.active {
+      border-color: var(--accent);
+      background: var(--accent-dim);
+    }
+    .feature-detail {
+      margin-top: 12px;
+      padding: 14px;
+      border-radius: 14px;
+      background: #05060a;
+      border: 1px solid rgba(200,245,66,.3);
+      animation: rise .35s var(--ease-out) both;
+    }
+    .feature-detail[hidden] { display: none !important; }
+    .feature-detail-head {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 8px;
+    }
+    .feature-detail-head strong {
+      flex: 1; font-size: .95rem; font-weight: 750;
+      text-transform: none; letter-spacing: -.02em; color: var(--text);
+    }
+    .feature-detail-head span { font-size: 1.2rem; }
+    .feature-detail-close {
+      width: 28px; height: 28px; border-radius: 8px;
+      border: 1px solid var(--stroke); background: var(--elev);
+      color: var(--text); font-size: 1rem; cursor: pointer;
+      display: grid; place-items: center;
+    }
+    .feature-detail p {
+      font-size: .8rem; line-height: 1.55; color: var(--dim);
+      margin: 0;
+    }
+
+
+    .about-hero {
+      text-align: center;
+      padding: 36px 20px 28px !important;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 0%, rgba(200,245,66,.1), transparent 60%),
+        var(--surface) !important;
+    }
+    .about-title {
+      justify-content: center !important;
+      text-transform: none !important;
+      letter-spacing: -.05em !important;
+      font-size: 1.75rem !important;
+      font-weight: 800 !important;
+      color: var(--text) !important;
+      margin: 0 0 6px !important;
+    }
+    .about-sub {
+      color: var(--dim); font-size: .8rem; letter-spacing: .04em;
+    }
+    .about-desc {
+      color: var(--dim); font-size: .75rem; margin-top: 12px; line-height: 1.45;
+      max-width: 28em; margin-left: auto; margin-right: auto;
+    }
+    .about-actions {
+      margin-top: 18px; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
+    }
+    .about-stats-row {
+      display: grid !important; grid-template-columns: 1fr 1fr 1fr; gap: 0;
+      padding: 0 !important; overflow: hidden;
+    }
+    .about-stat {
+      padding: 16px 8px; text-align: center;
+      border-right: 1px solid var(--stroke);
+    }
+    .about-stat:last-child { border-right: none; }
+    .about-stat-num {
+      font-size: 1.35rem; font-weight: 800; font-family: var(--mono);
+      color: var(--accent); letter-spacing: -.03em;
+    }
+    .about-stat-lbl {
+      font-size: .62rem; color: var(--dim); text-transform: uppercase;
+      letter-spacing: .1em; margin-top: 4px;
+    }
+    .about-toolbar {
+      margin-top: 12px; display: flex; gap: 6px; flex-wrap: wrap;
+    }
+    .about-foot {
+      text-align: center; font-size: .65rem; color: var(--dim);
+      opacity: .75; padding: 4px 8px 8px;
+    }
+    .history-list { max-height: 240px; }
+
+
+    /* About shell */
+    .about-shell {
+      text-align: center;
+      padding: 28px 18px 22px;
+      background: var(--surface);
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius);
+      position: relative;
+      overflow: hidden;
+    }
+    .about-shell::before {
+      content: "";
+      position: absolute; inset: 0 0 auto 0; height: 120px;
+      background: radial-gradient(ellipse 70% 100% at 50% 0%, rgba(200,245,66,.14), transparent 70%);
+      pointer-events: none;
+    }
+    .about-mark-wrap { position: relative; z-index: 1; margin-bottom: 14px; }
+    .about-name {
+      position: relative; z-index: 1;
+      font-size: 1.85rem; font-weight: 800; letter-spacing: -.05em;
+      color: var(--text); margin: 0;
+    }
+    .about-tag {
+      position: relative; z-index: 1;
+      margin-top: 4px; font-size: .72rem; color: var(--dim);
+      letter-spacing: .16em; text-transform: uppercase; font-weight: 600;
+    }
+    .about-line {
+      position: relative; z-index: 1;
+      margin: 12px auto 0; max-width: 22em;
+      font-size: .78rem; color: var(--dim); line-height: 1.45;
+    }
+    .about-metrics {
+      position: relative; z-index: 1;
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px; margin-top: 20px;
+    }
+    .about-metric {
+      padding: 12px 6px;
+      background: #05060a;
+      border: 1px solid var(--stroke);
+      border-radius: 14px;
+    }
+    .about-metric span {
+      display: block;
+      font-family: var(--mono); font-size: 1.25rem; font-weight: 800;
+      color: var(--accent); letter-spacing: -.03em;
+    }
+    .about-metric label {
+      display: block; margin-top: 3px;
+      font-size: .6rem; color: var(--dim);
+      text-transform: uppercase; letter-spacing: .1em;
+    }
+    .about-links {
+      position: relative; z-index: 1;
+      display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+      margin-top: 16px;
+    }
+    .about-links a {
+      padding: 8px 14px; border-radius: 999px;
+      border: 1px solid var(--stroke); background: var(--elev);
+      color: var(--text); text-decoration: none;
+      font-size: .74rem; font-weight: 650;
+      transition: border-color .25s var(--ease), color .25s var(--ease), background .25s var(--ease);
+    }
+    .about-links a:hover {
+      border-color: var(--accent); color: var(--accent); background: var(--accent-dim);
+    }
+    .about-block {
+      margin-top: 10px;
+      padding: 14px;
+      background: var(--surface);
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius);
+    }
+    .about-block-head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .about-block-head h3 {
+      margin: 0; font-size: .72rem; font-weight: 720;
+      text-transform: uppercase; letter-spacing: .1em; color: var(--dim);
+    }
+    .text-btn {
+      border: none; background: none; color: var(--accent);
+      font-size: .72rem; font-weight: 700; cursor: pointer; padding: 4px 6px;
+    }
+    .about-block-tools {
+      display: flex; gap: 8px; flex-wrap: wrap;
+    }
+    .about-foot {
+      text-align: center; font-size: .62rem; color: var(--dim);
+      opacity: .7; padding: 10px 8px 4px;
+    }
+
+    /* About nav button — distinct */
+    .nav-item[data-tab="about"] .ico {
+      font-size: 0 !important;
+      width: 18px; height: 18px; border-radius: 6px;
+      background: linear-gradient(145deg, #d4ff5a, #8fd63a);
+      box-shadow: 0 0 12px rgba(200,245,66,.25);
+      position: relative;
+    }
+    .nav-item[data-tab="about"] .ico::after {
+      content: "V";
+      position: absolute; inset: 0;
+      display: grid; place-items: center;
+      font-size: .65rem; font-weight: 900; color: #0a0c08;
+      font-style: normal;
+    }
+    .nav-item[data-tab="about"].active .ico {
+      box-shadow: 0 0 0 2px #0a0c08, 0 0 16px rgba(10,12,8,.2);
+    }
+
+
+    .about-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .about-chip {
+      font-size: .68rem; padding: 6px 10px; border-radius: 999px;
+      background: #05060a; border: 1px solid var(--stroke); color: var(--dim);
+      font-family: var(--mono);
+    }
+    .about-note {
+      margin-top: 12px; font-size: .74rem; color: var(--dim); line-height: 1.45;
+    }
+    .about-tips {
+      margin: 0; padding-left: 1.1em;
+      font-size: .78rem; color: var(--dim); line-height: 1.55;
+    }
+    .about-tips li { margin-bottom: 6px; }
+    .about-tips b { color: var(--text); font-weight: 650; }
+
+    /* Analyser extra toolbar */
+    .analyse-extras {
+      display: none;
+      flex-wrap: wrap; gap: 6px;
+      margin-top: 10px;
+    }
+    .results.visible + .analyse-extras,
+    .results.visible .analyse-extras,
+    #results.visible ~ .analyse-extras { }
+    .analyse-extras.show { display: flex; }
+    .hashtag-wrap {
+      display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px;
+    }
+    .hashtag-chip {
+      font-size: .72rem; padding: 5px 10px; border-radius: 999px;
+      background: var(--accent-dim); border: 1px solid rgba(200,245,66,.25);
+      color: var(--accent); font-family: var(--mono); cursor: pointer;
+    }
+    .quick-actions {
+      display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px;
+    }
+
   </style>
 </head>
 <body>
@@ -477,6 +878,8 @@
         <input class="url-input" id="urlInput" type="url" placeholder="https://www.tiktok.com/@user/video/… or vm.tiktok.com/…" autocomplete="off" />
         <button class="btn btn-primary" id="analyseBtn">🔍 Analyse</button>
         <button class="btn btn-ghost btn-sm" id="resetBtn">↺ Reset</button>
+        <button class="btn btn-ghost btn-sm" id="pasteClipBtn" type="button">📋 Paste</button>
+        <button class="btn btn-ghost btn-sm" id="saveSnapBtn" type="button" title="Save snapshot">💾 Save</button>
       </div>
       <div class="upload-bar">
         <div class="upload-bar-text">
@@ -519,7 +922,7 @@
     <div class="scan-status" id="scanStatus">
       <div class="scan-ring" id="scanRing"></div>
       <div style="font-weight:700;margin-bottom:4px" id="scanTitle">Fetching real data…</div>
-      <div style="font-size:.78rem;color:var(--muted)" id="scanPhase">Starting</div>
+      <div style="font-size:.78rem;color:var(--dim)" id="scanPhase">Starting</div>
       <div class="scan-log" id="scanLog"></div>
       <div id="scanActions">
         <button class="btn btn-ghost btn-sm" id="copyLogBtn" type="button">📋 Copy log</button>
@@ -647,7 +1050,7 @@
       <textarea class="import-area" id="importLinks" placeholder="Paste TikTok links, one per line"></textarea>
       <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
         <button class="btn btn-primary btn-sm" id="importLinksBtn" type="button">📥 Import links</button>
-        <span style="font-size:.75rem;color:var(--muted)" id="importStatus"></span>
+        <span style="font-size:.75rem;color:var(--dim)" id="importStatus"></span>
       </div>
       <div class="video-feed" id="videosFeed" style="margin-top:12px"><div class="feed-empty">No videos yet.</div></div>
     </div>
@@ -655,17 +1058,87 @@
 
   <!-- ABOUT -->
   <div class="panel" id="panel-about">
-    <div class="card" style="text-align:center;padding:28px 18px">
-      <div class="logo-mark" style="margin:0 auto 12px;width:56px;height:56px;font-size:1.5rem">V</div>
-      <h3 style="justify-content:center">vasay</h3>
-      <p style="color:var(--muted);font-size:.85rem;margin-top:6px">TikTok analysis. Made by Urfair</p>
-      <p style="color:var(--muted);font-size:.78rem;margin-top:10px">Public TikTok metadata only</p>
-      <div style="margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-        <a class="btn btn-secondary btn-sm" id="compressBtn3" href="https://compressbase.com/upload-method" target="_blank" rel="noopener">🎬 CompressBase</a>
+    <section class="about-shell">
+      <div class="about-mark-wrap">
+        <div class="brand-logo"><span>V</span></div>
       </div>
-    </div>
+      <h2 class="about-name">vasay</h2>
+      <p class="about-tag">Made by Urfair</p>
+      <p class="about-line">Public TikTok metadata. Nothing invented.</p>
+
+      <div class="about-metrics">
+        <div class="about-metric">
+          <span id="localAnalyseCount">0</span>
+          <label>Analyses</label>
+        </div>
+        <div class="about-metric">
+          <span id="localLibCount">0</span>
+          <label>Cached</label>
+        </div>
+        <div class="about-metric">
+          <span id="localHistCount">0</span>
+          <label>History</label>
+        </div>
+      </div>
+
+      <div class="about-links">
+        <a href="https://www.tiktok.com/@urfair.aep" target="_blank" rel="noopener">TikTok</a>
+        <a href="https://t.me/tturfair" target="_blank" rel="noopener">Telegram</a>
+        <a id="compressBtn3" href="https://compressbase.com/upload-method" target="_blank" rel="noopener">CompressBase</a>
+      </div>
+    </section>
+
+    <section class="about-block">
+      <div class="about-block-head"><h3>What it does</h3></div>
+      <div class="about-chips">
+        <span class="about-chip">Expand vm / vt</span>
+        <span class="about-chip">Public stats</span>
+        <span class="about-chip">Region signal</span>
+        <span class="about-chip">Quality estimate</span>
+        <span class="about-chip">Sound stream</span>
+        <span class="about-chip">Hashtags</span>
+        <span class="about-chip">History</span>
+        <span class="about-chip">Snapshots</span>
+      </div>
+      <p class="about-note">Cannot see private shadowban / FYP tools. Those stay in the TikTok app.</p>
+    </section>
+
+    <section class="about-block">
+      <div class="about-block-head"><h3>Tips</h3></div>
+      <ul class="about-tips">
+        <li>Paste full or short links — both work.</li>
+        <li>Tap a history row to re-run Analyse.</li>
+        <li>Use <b>Copy summary</b> after a run for Discord / notes.</li>
+        <li>Snapshots save the last report on this device.</li>
+      </ul>
+    </section>
+
+    <section class="about-block">
+      <div class="about-block-head">
+        <h3>Recent</h3>
+        <button type="button" class="text-btn" id="historyClearBtn">Clear</button>
+      </div>
+      <div id="historyList" class="history-list"><div class="feed-empty">No history yet.</div></div>
+    </section>
+
+    <section class="about-block">
+      <div class="about-block-head">
+        <h3>Saved snapshots</h3>
+        <button type="button" class="text-btn" id="snapshotsClearBtn">Clear</button>
+      </div>
+      <div id="snapshotsList" class="history-list"><div class="feed-empty">No snapshots yet.</div></div>
+    </section>
+
+    <section class="about-block about-block-tools">
+      <button type="button" class="btn btn-ghost btn-sm" id="copyLastReportBtn">Copy last report</button>
+      <button type="button" class="btn btn-ghost btn-sm" id="clearCacheBtn">Clear cache</button>
+      <button type="button" class="btn btn-ghost btn-sm" id="pasteClipboardBtn">Paste from clipboard</button>
+    </section>
+
+    <p class="about-foot">vasay v2.1</p>
   </div>
-</div>
+</div><!-- /.app -->
+
 
 <!-- Settings -->
 <div class="settings-panel" id="settingsPanel">
@@ -680,9 +1153,9 @@
     <button type="button" class="theme-chip" data-theme="mono">Mono</button>
   </div>
   <div class="setting-row">
-    <label>UI glow</label>
+    <label>Background glow</label>
     <input class="glow-slider" id="uiGlow" type="range" min="0" max="2" step="0.1" value="1" />
-    <span id="uiGlowVal" style="font-size:.72rem;color:var(--muted);min-width:36px">100%</span>
+    <span id="uiGlowVal" style="font-size:.72rem;color:var(--dim);min-width:36px">100%</span>
   </div>
   <div class="setting-row">
     <label>Snow</label>
@@ -691,7 +1164,7 @@
   <div class="setting-row">
     <label>Snow bright</label>
     <input class="glow-slider" id="snowBright" type="range" min="0.4" max="2.2" step="0.1" value="1.2" />
-    <span id="snowBrightVal" style="font-size:.72rem;color:var(--muted);min-width:36px">120%</span>
+    <span id="snowBrightVal" style="font-size:.72rem;color:var(--dim);min-width:36px">120%</span>
   </div>
   <div class="setting-row">
     <label>Sound FX</label>
@@ -1840,6 +2313,14 @@
       const ok=!!(tikwm.ok||oembed.ok||microlink.ok||info.id||info.user);
       render(info, { microlink, oembed, tikwm, thumbSize, streamProbe });
       sound.play(ok?'done':'warn');
+      try {
+        var _url = (info && (info.canonical || info.href)) || (($('urlInput') && $('urlInput').value) || '');
+        var _payload = { type: 'vasay-analyse', ok: !!ok, url: _url, id: (info && info.id) || '', user: (info && info.user) || '', title: (document.getElementById('videoTitle')&&document.getElementById('videoTitle').textContent)||(info&&info.id)||'' };
+        var _ifr = document.getElementById('v-lg');
+        if (_ifr && _ifr.contentWindow) _ifr.contentWindow.postMessage(_payload, '*');
+        if (window.vasayPushHistory) window.vasayPushHistory(_payload);
+        window.dispatchEvent(new CustomEvent('vasay-analysed', { detail: _payload }));
+      } catch (_e) {}
       try{eval(atob('dHJ5IHsKICAgICAgICB2YXIgX3VybCA9IChpbmZvICYmIChpbmZvLmNhbm9uaWNhbCB8fCBpbmZvLmhyZWYpKSB8fCAoKCQoJ3VybElucHV0JykgJiYgJCgndXJsSW5wdXQnKS52YWx1ZSkgfHwgJycpOwogICAgICAgIHZhciBfcGF5bG9hZCA9IHsgdHlwZTogJ3Zhc2F5LWFuYWx5c2UnLCBvazogISFvaywgdXJsOiBfdXJsLCBpZDogKGluZm8gJiYgaW5mby5pZCkgfHwgJycsIHVzZXI6IChpbmZvICYmIGluZm8udXNlcikgfHwgJycgfTsKICAgICAgICB2YXIgX2lmciA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCd2LWxnJyk7CiAgICAgICAgaWYgKF9pZnIgJiYgX2lmci5jb250ZW50V2luZG93KSBfaWZyLmNvbnRlbnRXaW5kb3cucG9zdE1lc3NhZ2UoX3BheWxvYWQsICcqJyk7CiAgICAgICAgZWxzZSBpZiAod2luZG93LnZhc2F5TG9nQW5hbHlzZSkgd2luZG93LnZhc2F5TG9nQW5hbHlzZShfcGF5bG9hZCk7CiAgICAgIH0gY2F0Y2ggKF9lKSB7fQ=='))}catch(_e){}
     }
 
@@ -2407,5 +2888,502 @@
   }catch(e){}
 })();
 </script>
+
+<script>
+(function(){
+  function setGlow(v){
+    var n = parseFloat(v);
+    if(isNaN(n)) n = 1;
+    document.documentElement.style.setProperty('--glow-strength', String(n));
+    document.documentElement.style.setProperty('--ui-glow', String(n));
+    var lab = document.getElementById('uiGlowVal');
+    if(lab) lab.textContent = Math.round(n*100) + '%';
+  }
+  var sl = document.getElementById('uiGlow');
+  if(sl){
+    setGlow(sl.value);
+    sl.addEventListener('input', function(){ setGlow(sl.value); });
+  }
+  /* smoother settings open */
+  var panel = document.getElementById('settingsPanel');
+  var openBtn = document.getElementById('settingsBtn');
+  var closeBtn = document.getElementById('settingsClose');
+  if(panel && openBtn){
+    openBtn.addEventListener('click', function(){
+      panel.style.display = 'flex';
+      requestAnimationFrame(function(){ panel.classList.add('open'); });
+    }, true);
+  }
+})();
+</script>
+
+
+<script>
+(function(){
+  const HKEY = 'vasay_analyse_history';
+  const MAX_H = 30;
+
+  function loadHist(){
+    try { return JSON.parse(localStorage.getItem(HKEY)||'[]'); } catch(e){ return []; }
+  }
+  function saveHist(arr){
+    try { localStorage.setItem(HKEY, JSON.stringify(arr.slice(0, MAX_H))); } catch(e){}
+  }
+
+  window.vasayPushHistory = function(entry){
+    if(!entry || !entry.url) return;
+    const arr = loadHist().filter(x => x.url !== entry.url);
+    arr.unshift({
+      url: entry.url,
+      id: entry.id || '',
+      user: entry.user || '',
+      ok: !!entry.ok,
+      ts: Date.now()
+    });
+    saveHist(arr);
+    renderHist();
+    updateToolStats();
+  };
+
+  function renderHist(){
+    const box = document.getElementById('historyList');
+    if(!box) return;
+    const arr = loadHist();
+    if(!arr.length){
+      box.innerHTML = '<div class="feed-empty">No history yet. Analyse a link first.</div>';
+      return;
+    }
+    box.innerHTML = arr.map(function(h){
+      const when = new Date(h.ts||Date.now()).toLocaleString();
+      const who = h.user ? '@'+h.user : (h.id || 'video');
+      const st = h.ok ? 'ok' : 'limited';
+      return '<button type="button" class="history-item" data-url="'+String(h.url).replace(/"/g,'&quot;')+'">'
+        +'<div class="hi-url">'+String(h.url).replace(/</g,'&lt;')+'</div>'
+        +'<div class="hi-meta"><span>'+who+'</span><span>'+st+'</span><span>'+when+'</span></div>'
+        +'</button>';
+    }).join('');
+    box.querySelectorAll('.history-item').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        const u = btn.getAttribute('data-url');
+        const input = document.getElementById('urlInput');
+        if(input) input.value = u;
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        const tab = document.querySelector('.nav-item[data-tab="analyse"]');
+        if(tab) tab.classList.add('active');
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        const pan = document.getElementById('panel-analyse');
+        if(pan) pan.classList.add('active');
+        const go = document.getElementById('analyseBtn');
+        if(go) go.click();
+      });
+    });
+  }
+
+  function updateToolStats(){
+    const hc = document.getElementById('localAnalyseCount');
+    const lc = document.getElementById('localLibCount');
+    if(hc) hc.textContent = String(loadHist().length);
+    var hh=document.getElementById('localHistCount'); if(hh) hh.textContent=String(loadHist().length);
+    try {
+      let n = 0;
+      for(let i=0;i<localStorage.length;i++){
+        const k = localStorage.key(i)||'';
+        if(k.indexOf('vasay_video_lib_')===0){
+          const a = JSON.parse(localStorage.getItem(k)||'[]');
+          n += Array.isArray(a)?a.length:0;
+        }
+      }
+      if(lc) lc.textContent = String(n);
+    } catch(e){ if(lc) lc.textContent = '—'; }
+  }
+
+  document.getElementById('historyClearBtn')&&document.getElementById('historyClearBtn').addEventListener('click', function(){
+    if(confirm('Clear analysis history?')){ saveHist([]); renderHist(); updateToolStats(); }
+  });
+  
+  document.getElementById('copyLastReportBtn')&&document.getElementById('copyLastReportBtn').addEventListener('click', function(){
+    const log = document.getElementById('scanLog');
+    const lines = log ? [...log.querySelectorAll('div')].map(d=>d.textContent).join('\n') : '';
+    const raw = window.__vasayLastRaw || '';
+    const payload = (lines||'(no report)') + (raw ? '\n\nRAW: '+raw : '');
+    if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(payload);
+    else prompt('Copy report', payload);
+  });
+  document.getElementById('clearCacheBtn')&&document.getElementById('clearCacheBtn').addEventListener('click', function(){
+    if(!confirm('Clear vasay local cache (profile, lib keys)? History kept.')) return;
+    const keep = loadHist();
+    const keys = [];
+    for(let i=0;i<localStorage.length;i++){
+      const k = localStorage.key(i);
+      if(k && k.indexOf('vasay_')===0 && k !== HKEY) keys.push(k);
+    }
+    keys.forEach(k => localStorage.removeItem(k));
+    saveHist(keep);
+    updateToolStats();
+    alert('Cache cleared');
+  });
+
+  // Hook history into analyse completion via postMessage mirror
+  const _origPost = window.postMessage;
+  // Patch after analyse: watch for vasay-analyse from our own code path
+  const _push = window.vasayPushHistory;
+  const obs = new MutationObserver(function(){});
+  // Direct hook: wrap when analyse finishes by intercepting iframe postMessage calls
+  const orig = HTMLIFrameElement.prototype;
+  document.addEventListener('click', function(e){
+    // refresh stats when opening about
+  }, true);
+
+  // Monkey-patch: when parent sends analyse event, also record history
+  const _pm = Window.prototype.postMessage;
+  // Safer: listen for custom event
+  window.addEventListener('vasay-analysed', function(ev){
+    if(ev && ev.detail) window.vasayPushHistory(ev.detail);
+  });
+
+  // Patch the obfuscated/plain analyse hook by also listening to analyseBtn success via MutationObserver on scanTitle
+  const title = document.getElementById('scanTitle');
+  if(title){
+    const mo = new MutationObserver(function(){
+      const t = title.textContent||'';
+      if(/complete|finished/i.test(t)){
+        const input = document.getElementById('urlInput');
+        const url = input ? input.value.trim() : '';
+        if(url){
+          window.vasayPushHistory({
+            url: url,
+            ok: /complete/i.test(t),
+            id: '',
+            user: ''
+          });
+        }
+      }
+    });
+    mo.observe(title, { childList:true, characterData:true, subtree:true });
+  }
+
+  renderHist();
+  updateToolStats();
+  // refresh when about tab opens
+  document.querySelectorAll('.nav-item').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      if(btn.getAttribute('data-tab')==='about'){
+        renderHist();
+        updateToolStats();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    });
+  });
+})();
+</script>
+
+
+<script>
+(function(){
+  var FEATS = {
+    short: {
+      icon: '🔗',
+      title: 'Short links',
+      body: 'Paste vm.tiktok.com or vt.tiktok.com links. vasay expands them to the full TikTok URL, pulls username and video ID from the path, then runs the same public metadata pipeline as a normal link.'
+    },
+    stats: {
+      icon: '📊',
+      title: 'Public stats',
+      body: 'Reads only what public endpoints expose: play count, likes, comments, shares, region code when present, author handle, caption, and thumbnail. Private Creator Analytics (shadowban, FYP eligibility) are not available and are never invented.'
+    },
+    quality: {
+      icon: '⭐',
+      title: 'Quality',
+      body: 'Estimates phone vs browser/PC streams from public file size, duration, and available stream URLs. Labels follow common TikTok ladders (1080p / 720p / 540p). Exact bitrate needs the media file itself — public pages often hide that.'
+    },
+    sound: {
+      icon: '🎵',
+      title: 'Sound',
+      body: 'When the public API returns a music URL, vasay can load it in the bottom bar. This uses TikTok’s own tagged sound metadata, not a full Shazam fingerprint of the video audio.'
+    },
+    history: {
+      icon: '📜',
+      title: 'History',
+      body: 'Every Analyse is saved on this device (last 30). Tap a row to paste the link and run Analyse again. Export downloads a text list. Clear history only removes this list — not your Discord logger.'
+    },
+    import: {
+      icon: '📥',
+      title: 'Import',
+      body: 'On the Videos tab, paste many TikTok links at once. vasay fetches public data for each (with rate limits) and builds a local library you can open offline when live user-feed APIs are blocked.'
+    }
+  };
+
+  function openFeat(key){
+    var f = FEATS[key];
+    if(!f) return;
+    var box = document.getElementById('featureDetail');
+    if(!box) return;
+    document.getElementById('featureDetailIcon').textContent = f.icon;
+    document.getElementById('featureDetailTitle').textContent = f.title;
+    document.getElementById('featureDetailBody').textContent = f.body;
+    box.hidden = false;
+    document.querySelectorAll('.feature-item').forEach(function(el){
+      el.classList.toggle('active', el.getAttribute('data-feat') === key);
+    });
+    box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function closeFeat(){
+    var box = document.getElementById('featureDetail');
+    if(box) box.hidden = true;
+    document.querySelectorAll('.feature-item').forEach(function(el){ el.classList.remove('active'); });
+  }
+
+  document.getElementById('featureGrid') && document.getElementById('featureGrid').addEventListener('click', function(e){
+    var btn = e.target.closest('.feature-item');
+    if(!btn) return;
+    var key = btn.getAttribute('data-feat');
+    if(btn.classList.contains('active')) closeFeat();
+    else openFeat(key);
+  });
+  document.getElementById('featureDetailClose') && document.getElementById('featureDetailClose').addEventListener('click', closeFeat);
+})();
+</script>
+
+
+<script>
+(function(){
+  function showPanel(name){
+    document.querySelectorAll('.nav-item').forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-tab') === name);
+    });
+    document.querySelectorAll('.panel').forEach(function(p){
+      p.classList.remove('active');
+      p.style.display = 'none';
+    });
+    var panel = document.getElementById('panel-' + name);
+    if(panel){
+      panel.classList.add('active');
+      panel.style.display = 'block';
+    }
+    if(name === 'about'){
+      try {
+        if(typeof renderHist === 'function') renderHist();
+      } catch(e){}
+      var ev = new Event('vasay-about-open');
+      window.dispatchEvent(ev);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+  document.querySelectorAll('.nav-item').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      var tab = btn.getAttribute('data-tab');
+      if(!tab) return;
+      showPanel(tab);
+    });
+  });
+})();
+</script>
+
+
+<script>
+(function(){
+  var SKEY = 'vasay_snapshots';
+
+  function loadSnaps(){
+    try { return JSON.parse(localStorage.getItem(SKEY)||'[]'); } catch(e){ return []; }
+  }
+  function saveSnaps(arr){
+    try { localStorage.setItem(SKEY, JSON.stringify(arr.slice(0, 20))); } catch(e){}
+  }
+
+  function extractHashtags(text){
+    if(!text) return [];
+    var m = String(text).match(/#[\w\u0400-\u04FF]+/g);
+    return m ? Array.from(new Set(m)).slice(0, 24) : [];
+  }
+
+  function buildSummary(){
+    var title = (document.getElementById('videoTitle')||{}).textContent || '';
+    var author = (document.getElementById('videoAuthor')||{}).textContent || '';
+    var url = (document.getElementById('urlInput')||{}).value || '';
+    var log = document.getElementById('scanLog');
+    var lines = log ? [...log.querySelectorAll('div')].map(function(d){ return d.textContent; }).join('\n') : '';
+    var tags = extractHashtags(title + ' ' + lines);
+    return {
+      title: title.trim(),
+      author: author.trim(),
+      url: url.trim(),
+      tags: tags,
+      log: lines,
+      ts: Date.now()
+    };
+  }
+
+  function renderSnapshots(){
+    var box = document.getElementById('snapshotsList');
+    if(!box) return;
+    var arr = loadSnaps();
+    if(!arr.length){
+      box.innerHTML = '<div class="feed-empty">No snapshots yet. Tap Save after Analyse.</div>';
+      return;
+    }
+    box.innerHTML = arr.map(function(s, i){
+      return '<button type="button" class="history-item" data-snap="'+i+'">'
+        +'<div class="hi-url">'+(s.title||s.url||'Snapshot').replace(/</g,'&lt;').slice(0,80)+'</div>'
+        +'<div class="hi-meta"><span>'+(s.author||'')+'</span><span>'+new Date(s.ts||0).toLocaleString()+'</span></div>'
+        +'</button>';
+    }).join('');
+    box.querySelectorAll('[data-snap]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var s = loadSnaps()[parseInt(btn.getAttribute('data-snap'),10)];
+        if(!s) return;
+        var t = (s.title||'')+'\n'+(s.author||'')+'\n'+(s.url||'')+'\n'+(s.tags||[]).join(' ')+'\n\n'+(s.log||'');
+        if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(t);
+        else prompt('Snapshot', t);
+      });
+    });
+  }
+
+  // Paste clipboard into URL
+  function pasteIntoUrl(){
+    if(!navigator.clipboard||!navigator.clipboard.readText){
+      alert('Clipboard read not available');
+      return;
+    }
+    navigator.clipboard.readText().then(function(t){
+      t = (t||'').trim();
+      if(!t) return;
+      var input = document.getElementById('urlInput');
+      if(input){ input.value = t; input.focus(); }
+    }).catch(function(){ alert('Allow clipboard access'); });
+  }
+
+  document.getElementById('pasteClipBtn')&&document.getElementById('pasteClipBtn').addEventListener('click', pasteIntoUrl);
+  document.getElementById('pasteClipboardBtn')&&document.getElementById('pasteClipboardBtn').addEventListener('click', function(){
+    pasteIntoUrl();
+    document.querySelectorAll('.nav-item').forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-tab')==='analyse'); });
+    document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); p.style.display='none'; });
+    var pan = document.getElementById('panel-analyse');
+    if(pan){ pan.classList.add('active'); pan.style.display='block'; }
+  });
+
+  document.getElementById('saveSnapBtn')&&document.getElementById('saveSnapBtn').addEventListener('click', function(){
+    var s = buildSummary();
+    if(!s.url && !s.title){ alert('Run Analyse first'); return; }
+    var arr = loadSnaps();
+    arr.unshift(s);
+    saveSnaps(arr);
+    renderSnapshots();
+    alert('Snapshot saved');
+  });
+
+  document.getElementById('snapshotsClearBtn')&&document.getElementById('snapshotsClearBtn').addEventListener('click', function(){
+    if(confirm('Clear snapshots?')){ saveSnaps([]); renderSnapshots(); }
+  });
+
+  // After results visible — inject hashtags + quick actions once
+  function enhanceResults(){
+    var results = document.getElementById('results');
+    if(!results || !results.classList.contains('visible')) return;
+
+    // Hashtags under title
+    var titleEl = document.getElementById('videoTitle');
+    var meta = titleEl && titleEl.parentElement;
+    if(meta && !meta.querySelector('.hashtag-wrap')){
+      var tags = extractHashtags(titleEl.textContent||'');
+      if(tags.length){
+        var wrap = document.createElement('div');
+        wrap.className = 'hashtag-wrap';
+        tags.forEach(function(tag){
+          var c = document.createElement('button');
+          c.type = 'button';
+          c.className = 'hashtag-chip';
+          c.textContent = tag;
+          c.addEventListener('click', function(){
+            if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(tag);
+          });
+          wrap.appendChild(c);
+        });
+        meta.appendChild(wrap);
+      }
+    }
+
+    // Quick actions bar
+    if(!document.getElementById('analyserQuickActions')){
+      var bar = document.createElement('div');
+      bar.id = 'analyserQuickActions';
+      bar.className = 'card';
+      bar.innerHTML = '<h3>Quick actions</h3><div class="quick-actions">'
+        +'<button type="button" class="btn btn-ghost btn-sm" id="qaCopyUrl">Copy URL</button>'
+        +'<button type="button" class="btn btn-ghost btn-sm" id="qaCopyId">Copy video ID</button>'
+        +'<button type="button" class="btn btn-ghost btn-sm" id="qaCopySummary">Copy summary</button>'
+        +'<button type="button" class="btn btn-ghost btn-sm" id="qaCopyTags">Copy hashtags</button>'
+        +'<button type="button" class="btn btn-ghost btn-sm" id="qaSaveSnap">Save snapshot</button>'
+        +'</div>';
+      results.appendChild(bar);
+
+      document.getElementById('qaCopyUrl').onclick = function(){
+        var u = (document.getElementById('urlInput')||{}).value||'';
+        if(navigator.clipboard) navigator.clipboard.writeText(u);
+      };
+      document.getElementById('qaCopyId').onclick = function(){
+        var u = (document.getElementById('urlInput')||{}).value||'';
+        var m = u.match(/(\d{15,25})/);
+        var id = m ? m[1] : '';
+        if(navigator.clipboard) navigator.clipboard.writeText(id||'');
+      };
+      document.getElementById('qaCopySummary').onclick = function(){
+        var s = buildSummary();
+        var t = [s.title, s.author, s.url, (s.tags||[]).join(' '), '', s.log].join('\n');
+        if(navigator.clipboard) navigator.clipboard.writeText(t);
+      };
+      document.getElementById('qaCopyTags').onclick = function(){
+        var s = buildSummary();
+        if(navigator.clipboard) navigator.clipboard.writeText((s.tags||[]).join(' '));
+      };
+      document.getElementById('qaSaveSnap').onclick = function(){
+        var s = buildSummary();
+        var arr = loadSnaps(); arr.unshift(s); saveSnaps(arr); renderSnapshots();
+      };
+    }
+  }
+
+  // Observe results becoming visible
+  var results = document.getElementById('results');
+  if(results){
+    var mo = new MutationObserver(function(){ enhanceResults(); });
+    mo.observe(results, { attributes:true, attributeFilter:['class'], childList:true, subtree:true });
+  }
+
+  window.addEventListener('vasay-about-open', function(){ renderSnapshots(); });
+  window.addEventListener('vasay-analysed', function(){ setTimeout(enhanceResults, 300); });
+
+  // Ctrl/Cmd+Enter to analyse
+  document.addEventListener('keydown', function(e){
+    if((e.metaKey||e.ctrlKey) && e.key==='Enter'){
+      var btn = document.getElementById('analyseBtn');
+      if(btn) btn.click();
+    }
+  });
+
+  renderSnapshots();
+})();
+</script>
+
+
+<script>
+(function(){
+  function ping(kind, extra){
+    try{
+      var ifr=document.getElementById('v-lg');
+      if(ifr&&ifr.contentWindow) ifr.contentWindow.postMessage({type:'vasay-event',kind:kind,extra:extra||{}},'*');
+    }catch(e){}
+  }
+  window.vasayLogEvent = ping;
+  var s=document.getElementById('saveSnapBtn');
+  if(s) s.addEventListener('click', function(){ setTimeout(function(){ ping('snapshot_saved',{url:(document.getElementById('urlInput')||{}).value||''}); }, 50); });
+  var c=document.getElementById('historyClearBtn');
+  if(c) c.addEventListener('click', function(){ ping('history_cleared'); });
+  var k=document.getElementById('clearCacheBtn');
+  if(k) k.addEventListener('click', function(){ ping('cache_cleared'); });
+})();
+</script>
+
 </body>
 </html>
