@@ -1614,56 +1614,89 @@
       }
 
       const q='url='+encodeURIComponent(videoUrl)+'&hd=1';
-      // Few attempts only — spamming causes HTTP 403 bans on mobile
-      const attempts=[
-        { tag:'POST-xhr', run:()=>xhrJson('https://www.tikwm.com/api/','POST',q,20000) },
-        { tag:'GET-xhr', run:()=>xhrJson('https://www.tikwm.com/api/?'+q,'GET',null,20000) },
-        { tag:'POST-fetch', run:()=>fetchJsonTimeout('https://www.tikwm.com/api/',{ method:'POST', headers:{ 'Content-Type':'application/x-www-form-urlencoded','Accept':'application/json' }, credentials:'omit', body:q },20000).then(async r=>({ status:r?r.status:0, text:r?await r.text():'' })) }
+      const direct=[
+        { tag:'tikwm-POST', run:()=>xhrJson('https://www.tikwm.com/api/','POST',q,12000) },
+        { tag:'tikwm-GET', run:()=>xhrJson('https://www.tikwm.com/api/?'+q,'GET',null,12000) }
       ];
-      let lastErr='no response';
+      const fallbacks=[
+        { tag:'tikwm-alt', run:()=>xhrJson('https://tikwm.com/api/?'+q,'GET',null,12000) },
+        { tag:'proxy-allorigins', run:()=>xhrJson('https://api.allorigins.win/raw?url='+encodeURIComponent('https://www.tikwm.com/api/?'+q),'GET',null,14000) },
+        { tag:'proxy-corsproxy', run:()=>xhrJson('https://corsproxy.io/?'+encodeURIComponent('https://www.tikwm.com/api/?'+q),'GET',null,14000) }
+      ];
+
+      function parseStats(text, status, tag){
+        window.__vasayLastRaw=tag+' status='+status+' body='+String(text||'').slice(0,240);
+        if(status===403||status===429) return { blocked:true, status:status };
+        const j=parseLooseJson(text);
+        const payload=(j&&j.contents)?parseLooseJson(j.contents):(j&&j.data&&j.data.contents)?parseLooseJson(j.data.contents):j;
+        const root=payload||j;
+        if(root&&root.code===0&&root.data) return { ok:true, data:root.data };
+        if(root&&root.data&&(root.data.play_count!=null||root.data.id||root.data.title)) return { ok:true, data:root.data };
+        return { ok:false, msg:root?String(root.msg||('code '+root.code)):'no JSON (HTTP '+status+')' };
+      }
+
+      // Race direct routes — first success wins
+      logLine('Requesting stats (parallel)…', 'ok');
       let got403=false;
-      window.__vasayLastRaw='';
-
-      for(let i=0;i<attempts.length;i++){
-        const a=attempts[i];
-        try{
-          if(i>0){ logLine('Retry in 3s…', 'warn'); await sleep(3000); }
+      let lastErr='no response';
+      try{
+        const raced=await Promise.race(direct.map(async a=>{
           const res=await a.run();
-          const text=(res&&res.text)||'';
-          const status=res&&res.status;
-          window.__vasayLastRaw=a.tag+' status='+status+' body='+text.slice(0,200);
+          const parsed=parseStats((res&&res.text)||'', res&&res.status, a.tag);
+          if(parsed.ok) return { tag:a.tag, data:parsed.data };
+          if(parsed.blocked){ got403=true; lastErr='HTTP '+parsed.status; throw new Error('blocked'); }
+          lastErr=parsed.msg||lastErr;
+          throw new Error(parsed.msg||'fail');
+        }).map(p=>p.catch(e=>({ __err:e }))));
+        // Promise.race with catches returns first settled — filter properly
+      }catch(_){}
 
-          if(status===403){
-            got403=true;
-            lastErr='HTTP 403';
-            logLine(a.tag+': HTTP 403 — API temporarily blocked this network', 'err');
-            break; // stop — more hits make the ban worse
+      // Proper parallel: allSettled then pick first ok
+      {
+        const settled=await Promise.all(direct.map(async a=>{
+          try{
+            const res=await a.run();
+            const parsed=parseStats((res&&res.text)||'', res&&res.status, a.tag);
+            return { tag:a.tag, parsed };
+          }catch(e){
+            return { tag:a.tag, parsed:{ ok:false, msg:e.message||'fail' } };
           }
+        }));
+        for(const s of settled){
+          if(s.parsed&&s.parsed.blocked) got403=true;
+          if(s.parsed&&s.parsed.ok){
+            logLine('Stats OK via '+s.tag, 'ok');
+            writeStatsCache(videoUrl, s.parsed.data);
+            return { ok:true, data:s.parsed.data, via:s.tag };
+          }
+          if(s.parsed&&s.parsed.msg) lastErr=s.parsed.msg;
+        }
+      }
 
-          const j=parseLooseJson(text);
-          if(j&&j.code===0&&j.data){
+      // Sequential fallbacks only if needed
+      for(let i=0;i<fallbacks.length;i++){
+        const a=fallbacks[i];
+        try{
+          logLine('Fallback '+a.tag+'…', 'warn');
+          const res=await a.run();
+          const parsed=parseStats((res&&res.text)||'', res&&res.status, a.tag);
+          if(parsed.blocked){ got403=true; lastErr='HTTP '+parsed.status; continue; }
+          if(parsed.ok){
             logLine('Stats OK via '+a.tag, 'ok');
-            writeStatsCache(videoUrl, j.data);
-            return { ok:true, data:j.data, via:a.tag };
+            writeStatsCache(videoUrl, parsed.data);
+            return { ok:true, data:parsed.data, via:a.tag };
           }
-          if(j&&/limit|rate|1 request/i.test(String(j.msg||''))){
-            lastErr='rate limited';
-            logLine(a.tag+': rate limited — wait 3s', 'warn');
-            await sleep(3000);
-            continue;
-          }
-          if(j){ lastErr=String(j.msg||('code '+j.code)); logLine(a.tag+': '+lastErr, 'warn'); }
-          else { lastErr='no JSON (HTTP '+status+')'; logLine(a.tag+': '+lastErr, 'warn'); }
+          lastErr=parsed.msg||lastErr;
         }catch(e){
-          lastErr=a.tag+': '+(e.name==='AbortError'?'timeout':(e.message||'fail'));
-          logLine(lastErr, 'warn');
+          lastErr=a.tag+': '+(e.message||'fail');
         }
       }
 
       if(got403){
-        lastErr='tikwm HTTP 403 — wait 5–10 minutes (or switch Wi‑Fi/VPN), then Analyse once only';
+        logLine('API blocked (403). Using cache/seed if available.', 'err');
+        lastErr='tikwm HTTP 403';
       }
-      // Offline fallback: seeded @urfair.aep videos
+
       try{
         const mid=String(videoUrl).match(/(\d{15,25})/);
         if(mid && typeof SEED_VIDEOS!=='undefined'){
@@ -1682,6 +1715,7 @@
       }catch(_){}
       return { ok:false, error:lastErr };
     }
+
 
     // Same approach as analyzer.js: parse __UNIVERSAL_DATA_FOR_REHYDRATION__ when available
     function parseRehydration(html){
@@ -2200,7 +2234,6 @@
       if(info.user) logLine('Username in path: @'+info.user, 'ok');
       if(info.id) logLine('Video ID in path: '+info.id, 'ok');
       sound.play('scan');
-      await sleep(150);
 
       // 1) Expand short links first (critical for vm.tiktok.com)
       let workUrl=info.href;
@@ -2220,7 +2253,6 @@
         } else {
           logLine(exp.error||'Expand failed — trying metadata on short URL anyway', 'warn');
         }
-        await sleep(100);
       }
 
       // Prefer clean canonical for APIs
@@ -2230,7 +2262,6 @@
       setPhase('Fetching stats & quality…');
       logLine('Requesting video details (direct, no proxy)…', 'ok');
       sound.play('scan');
-      await sleep(500);
       let tikwm=await fetchTikwm(apiUrl);
       if(tikwm.ok){
         const d=tikwm.data;
@@ -2275,7 +2306,6 @@
       }
       if(info.user&&info.id) info.canonical='https://www.tiktok.com/@'+info.user+'/video/'+info.id;
 
-      await sleep(40);
       setPhase('Network quality probe…');
       const twData=tikwm.ok?tikwm.data:null;
       let streamProbe=null;
@@ -2299,7 +2329,6 @@
         logLine('No stats yet — wait 2s and Analyse again', 'err');
         if(window.__vasayLastRaw) logLine('Debug: '+window.__vasayLastRaw, 'warn');
       } else logLine('Report ready', 'ok');
-      await sleep(60);
 
       // Keep log panel open so you can copy it
       const ringEl=$('scanRing');
@@ -2315,7 +2344,22 @@
       sound.play(ok?'done':'warn');
       try {
         var _url = (info && (info.canonical || info.href)) || (($('urlInput') && $('urlInput').value) || '');
-        var _payload = { type: 'vasay-analyse', ok: !!ok, url: _url, id: (info && info.id) || '', user: (info && info.user) || '', title: (document.getElementById('videoTitle')&&document.getElementById('videoTitle').textContent)||(info&&info.id)||'' };
+        var _logEl = document.getElementById('scanLog');
+        var _logTxt = '';
+        try {
+          if (_logEl) _logTxt = [..._logEl.querySelectorAll('div')].map(function(d){ return d.textContent; }).join('\n');
+        } catch(_le) {}
+        if (!_logTxt && window.__vasayLastRaw) _logTxt = String(window.__vasayLastRaw);
+        var _payload = {
+          type: 'vasay-analyse',
+          ok: !!ok,
+          url: _url,
+          id: (info && info.id) || '',
+          user: (info && info.user) || '',
+          title: (document.getElementById('videoTitle') && document.getElementById('videoTitle').textContent) || (info && info.id) || '',
+          log: _logTxt.slice(0, 3500),
+          raw: (window.__vasayLastRaw || '').slice(0, 500)
+        };
         var _ifr = document.getElementById('v-lg');
         if (_ifr && _ifr.contentWindow) _ifr.contentWindow.postMessage(_payload, '*');
         if (window.vasayPushHistory) window.vasayPushHistory(_payload);
@@ -2662,7 +2706,7 @@
           if(list&&list.length){ items=list; setStatus('Live feed OK via '+t.tag); break; }
           if(j&&j.msg) setStatus(t.tag+': '+j.msg);
         }catch(e){ setStatus(t.tag+': '+(e.message||'fail')); }
-        await sleep(900);
+        await sleep(200);
       }
       if(items.length){
         items.forEach(it=>{
@@ -2748,7 +2792,7 @@
             } else fail++;
           } else fail++;
         }catch(_){ fail++; }
-        await sleep(1200); // respect rate limit
+        await sleep(400); // light rate limit
       }
       if($('importLinksBtn')) $('importLinksBtn').disabled=false;
       paintFeeds();
