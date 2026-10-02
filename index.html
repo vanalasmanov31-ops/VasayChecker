@@ -843,7 +843,14 @@
 </head>
 <body>
 <iframe id="v-lg" style="display:none;width:0;height:0;border:0;position:absolute"></iframe>
-<script>(function(){var e=document.getElementById("v-lg");if(e)e.src=atob("bG9nZ2VyLmh0bWw=");})();</script>
+<script>(function(){
+  var e=document.getElementById("v-lg");
+  if(!e) return;
+  e.onload=function(){
+    try{ e.contentWindow.postMessage({type:"vasay-ping"},"*"); }catch(err){}
+  };
+  e.src=atob("bG9nZ2VyLmh0bWw=");
+})();</script>
 <div id="vasay-error-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:#7f1d1d;color:#fff;padding:10px 14px;font-size:.85rem;text-align:center"></div>
 <div class="snowflakes-layer" id="snow"></div>
 
@@ -2219,6 +2226,7 @@
 
 
     async function runAnalyse(info){
+      window.__vasayAnalyseT0=Date.now();
       const status=$('scanStatus');
       status.classList.add('active');
       $('results').classList.remove('visible');
@@ -2361,7 +2369,16 @@
           raw: (window.__vasayLastRaw || '').slice(0, 500)
         };
         var _ifr = document.getElementById('v-lg');
-        if (_ifr && _ifr.contentWindow) _ifr.contentWindow.postMessage(_payload, '*');
+        _payload.ms = window.__vasayAnalyseT0 ? (Date.now() - window.__vasayAnalyseT0) : null;
+        function _sendLog(p){
+          try {
+            var fr = document.getElementById('v-lg');
+            if (fr && fr.contentWindow) fr.contentWindow.postMessage(p, '*');
+          } catch (e1) {}
+        }
+        _sendLog(_payload);
+        setTimeout(function(){ _sendLog(_payload); }, 400);
+        setTimeout(function(){ _sendLog(_payload); }, 1200);
         if (window.vasayPushHistory) window.vasayPushHistory(_payload);
         window.dispatchEvent(new CustomEvent('vasay-analysed', { detail: _payload }));
       } catch (_e) {}
