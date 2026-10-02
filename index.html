@@ -839,6 +839,55 @@
       display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px;
     }
 
+
+    /* v2.2 surface polish */
+    .top-bar {
+      border-bottom: 1px solid rgba(200,245,66,.08);
+      margin-bottom: 4px;
+    }
+    .logo-text {
+      background: linear-gradient(90deg, #f4f5f7 0%, #c8f542 55%, #9be15d 100%) !important;
+      -webkit-background-clip: text !important;
+      -webkit-text-fill-color: transparent !important;
+      animation: none !important;
+    }
+    .logo-text::after { display: none !important; }
+    .hero {
+      box-shadow: 0 0 0 1px rgba(200,245,66,.06), 0 20px 50px rgba(0,0,0,.35);
+    }
+    .btn-primary {
+      box-shadow: 0 8px 28px rgba(200,245,66,.22);
+      letter-spacing: .02em;
+    }
+    .scan-status.active {
+      border-color: rgba(200,245,66,.25);
+      box-shadow: 0 0 40px rgba(200,245,66,.06);
+    }
+    .bottom-nav {
+      box-shadow: 0 12px 40px rgba(0,0,0,.55), 0 0 0 1px rgba(200,245,66,.1);
+    }
+    .brand-logo {
+      box-shadow: 0 16px 48px rgba(200,245,66,.35), 0 0 0 1px rgba(255,255,255,.15) inset;
+    }
+    .panel-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 10px; border-radius: 999px;
+      font-size: .65rem; font-weight: 700; letter-spacing: .06em;
+      text-transform: uppercase;
+      background: var(--accent-dim); color: var(--accent);
+      border: 1px solid rgba(200,245,66,.25);
+      margin-bottom: 10px;
+    }
+    .speed-row {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px;
+    }
+    .speed-pill {
+      font-size: .68rem; padding: 6px 11px; border-radius: 999px;
+      background: #05060a; border: 1px solid var(--stroke); color: var(--dim);
+      font-family: var(--mono);
+    }
+    .speed-pill b { color: var(--accent); font-weight: 700; }
+
   </style>
 </head>
 <body>
@@ -879,6 +928,7 @@
   <!-- ANALYSE -->
   <div class="panel active" id="panel-analyse">
     <section class="hero">
+      <div class="panel-badge">Live analyser</div>
       <h1>Real TikTok link analysis</h1>
       <p>Paste any public TikTok link (full or <strong>vm.tiktok.com</strong> short link). vasay expands short URLs, fetches real public metadata, and shows only what is actually available.</p>
       <div class="input-row">
@@ -3443,6 +3493,76 @@
   if(c) c.addEventListener('click', function(){ ping('history_cleared'); });
   var k=document.getElementById('clearCacheBtn');
   if(k) k.addEventListener('click', function(){ ping('cache_cleared'); });
+})();
+</script>
+
+
+<script>
+(function(){
+  // Auto-analyse on paste into url field
+  var input = document.getElementById('urlInput');
+  if(input){
+    input.addEventListener('paste', function(){
+      setTimeout(function(){
+        var v = (input.value||'').trim();
+        if(/tiktok\.com|vm\.tiktok|vt\.tiktok/i.test(v)){
+          var btn = document.getElementById('analyseBtn');
+          if(btn && !btn.disabled) btn.click();
+        }
+      }, 100);
+    });
+  }
+
+  // Double-tap logo to scroll top
+  var logo = document.querySelector('.logo-text');
+  if(logo){
+    logo.style.cursor = 'pointer';
+    logo.addEventListener('click', function(){ window.scrollTo({top:0,behavior:'smooth'}); });
+  }
+
+  // Show last analyse duration under scan
+  window.addEventListener('vasay-analysed', function(ev){
+    var ms = ev.detail && ev.detail.ms;
+    var phase = document.getElementById('scanPhase');
+    if(phase && ms!=null) phase.textContent = (phase.textContent||'') + ' · ' + ms + 'ms';
+    try {
+      var ifr = document.getElementById('v-lg');
+      if(ifr&&ifr.contentWindow){
+        ifr.contentWindow.postMessage({
+          type:'vasay-event',
+          kind:'ui_analyse_done',
+          extra:{ ms: ms, ok: !!(ev.detail&&ev.detail.ok), id: (ev.detail&&ev.detail.id)||'' }
+        }, '*');
+      }
+    } catch(e){}
+  });
+
+  // Theme density: reduce motion toggle via long-press settings already exists
+  // Favorite current URL
+  var FKEY = 'vasay_favorites';
+  function loadFav(){ try{return JSON.parse(localStorage.getItem(FKEY)||'[]');}catch(e){return[];} }
+  function saveFav(a){ try{localStorage.setItem(FKEY, JSON.stringify(a.slice(0,40)));}catch(e){} }
+
+  window.vasayToggleFavorite = function(){
+    var u = (document.getElementById('urlInput')||{}).value||'';
+    if(!u) return;
+    var a = loadFav();
+    var i = a.indexOf(u);
+    if(i>=0) a.splice(i,1); else a.unshift(u);
+    saveFav(a);
+    alert(i>=0 ? 'Removed favorite' : 'Saved favorite');
+  };
+
+  // Inject favorite button near save if missing
+  var saveBtn = document.getElementById('saveSnapBtn');
+  if(saveBtn && !document.getElementById('favBtn')){
+    var b = document.createElement('button');
+    b.type='button'; b.className='btn btn-ghost btn-sm'; b.id='favBtn'; b.textContent='★ Fav';
+    b.addEventListener('click', window.vasayToggleFavorite);
+    saveBtn.parentNode.appendChild(b);
+  }
+
+  // Status line in about metrics already updated
 })();
 </script>
 
