@@ -942,6 +942,12 @@
         <button class="btn btn-ghost btn-sm" id="pasteClipBtn" type="button">📋 Paste</button>
         <button class="btn btn-ghost btn-sm" id="saveSnapBtn" type="button" title="Save snapshot">💾 Save</button>
       </div>
+      <div class="upload-bar">
+        <div class="upload-bar-text">
+          <strong>Auto convert for TikTok</strong>
+          <span>Opens CompressBase → pick video → method → download</span>
+        </div>
+        <a class="btn btn-secondary btn-sm" id="compressBtn" href="https://compressbase.com/upload-method" target="_blank" rel="noopener">🎬 Convert now</a>
       </div>
       <div class="quick-tips">
         <span class="chip">Real public stats</span>
@@ -1066,6 +1072,7 @@
         <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
           <a class="btn btn-ghost btn-sm" id="openLink" href="#" target="_blank" rel="noopener">Open on TikTok</a>
           <a class="btn btn-ghost btn-sm" id="playInAppBtn" href="#" target="_blank" rel="noopener">Play</a>
+          <a class="btn btn-secondary btn-sm" id="compressBtn2" href="https://compressbase.com/upload-method" target="_blank" rel="noopener">CompressBase</a>
         </div>
       </div>
       <p class="disclaimer">vasay uses public metadata when the API allows. No invented shadowban scores.</p>
@@ -1159,6 +1166,7 @@
       <div class="about-links">
         <a href="https://www.tiktok.com/@urfair.aep" target="_blank" rel="noopener">TikTok</a>
         <a href="https://t.me/tturfair" target="_blank" rel="noopener">Telegram</a>
+        <a id="compressBtn3" href="https://compressbase.com/upload-method" target="_blank" rel="noopener">CompressBase</a>
       </div>
     </section>
 
@@ -2284,11 +2292,11 @@
         if(play) dacts+=`<a class="btn btn-ghost btn-sm" href="${esc(play)}" target="_blank" rel="noopener" download="${esc(vidName)}">⬇️ Standard no WM</a>`;
         if(wm) dacts+=`<a class="btn btn-ghost btn-sm" href="${esc(wm)}" target="_blank" rel="noopener">WM version</a>`;
         if(cover) dacts+=`<a class="btn btn-ghost btn-sm" href="${esc(cover)}" target="_blank" rel="noopener">Cover image</a>`;
-        
+        dacts+=`<a class="btn btn-ghost btn-sm" href="https://compressbase.com/upload-method" target="_blank" rel="noopener">🎬 CompressBase</a>`;
         dlActions.innerHTML=dacts;
       } else {
         dlList.innerHTML=`<div class="list-item"><span class="k">Status</span><span class="v">No stream URLs — analyse again when stats API is not blocked (403)</span></div>`;
-        dlActions.innerHTML=``;
+        dlActions.innerHTML=`<a class="btn btn-primary btn-sm" href="https://compressbase.com/upload-method" target="_blank" rel="noopener">🎬 CompressBase</a>`;
       }
     }
 
@@ -2929,6 +2937,23 @@
       };
     }
 
+
+    // CompressBase — use real <a href> navigation (window.open is blocked on many phones)
+    function openCompressBase(){
+      sound.play('click');
+      const url='https://compressbase.com/upload-method';
+      // Prefer same-gesture navigation
+      const a=document.createElement('a');
+      a.href=url; a.target='_blank'; a.rel='noopener noreferrer';
+      document.body.appendChild(a); a.click(); a.remove();
+    }
+    ['compressBtn','compressBtn2','compressBtn3'].forEach(id=>{
+      const el=$(id);
+      if(!el) return;
+      el.setAttribute('href','https://compressbase.com/upload-method');
+      el.setAttribute('target','_blank');
+      el.setAttribute('rel','noopener noreferrer');
+      el.addEventListener('click',()=>{ sound.play('click'); /* let default navigation run */ });
     });
 
 
