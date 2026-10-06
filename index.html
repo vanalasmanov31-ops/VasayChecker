@@ -912,7 +912,7 @@
       <div class="logo-mark">V</div>
       <div>
         <div class="logo-text">vasay</div>
-        <div class="logo-sub">Analyser · Made by Urfair</div>
+        <div class="logo-sub">by Urfair</div>
       </div>
     </div>
     <div class="header-actions">
@@ -932,9 +932,9 @@
   <div class="panel active" id="panel-analyse">
 
     <section class="hero">
-      <div class="panel-badge">Live analyser</div>
-      <h1>Real TikTok link analysis</h1>
-      <p>Paste any public TikTok link (full or <strong>vm.tiktok.com</strong> short link). vasay expands short URLs, fetches real public metadata, and shows only what is actually available.</p>
+      <div class="panel-badge">Live</div>
+      <h1>TikTok analysis</h1>
+      <p>Paste a public TikTok link.</p>
       <div class="input-row">
         <input class="url-input" id="urlInput" type="url" placeholder="https://www.tiktok.com/@user/video/… or vm.tiktok.com/…" autocomplete="off" />
         <button class="btn btn-primary" id="analyseBtn">🔍 Analyse</button>
@@ -1121,26 +1121,22 @@
   <div class="panel" id="panel-quality">
       <div class="card about-hero" style="margin-bottom:14px">
         <h3 style="margin:0 0 8px;font-size:1.35rem;letter-spacing:-.03em">Quality</h3>
-        <p style="margin:0;color:var(--dim);font-size:.9rem;line-height:1.45">
-          Ghost-frames MP4 до аплоада (метод tiktok-quality). Обработка в этой же вкладке, без перехода на другую страницу.
-        </p>
+
       </div>
       <div class="card" style="padding:16px">
         <div id="vq-drop" style="border:1.5px dashed rgba(200,245,66,.35);border-radius:14px;padding:28px 14px;text-align:center;cursor:pointer;margin-bottom:12px">
-          <div>Перетащи <b style="color:var(--accent)">MP4</b> или кликни</div>
-          <div id="vq-fname" style="font-size:12px;color:var(--dim);margin-top:8px">файл не выбран</div>
+          <div>Drop MP4 or click</div>
+          <div id="vq-fname" style="font-size:12px;color:var(--dim);margin-top:8px">No file</div>
         </div>
         <input type="file" id="vq-file" accept="video/mp4,video/quicktime,.mp4,.mov" hidden />
         <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px;font-size:.9rem;color:var(--dim)">
-          <span>Множитель кадров</span>
+          <span>Multiplier</span>
           <input type="number" id="vq-mult" min="2" max="50" value="10" style="width:90px;background:#05060a;border:1px solid var(--stroke);color:var(--text);border-radius:8px;padding:8px" />
         </div>
-        <button type="button" id="vq-go" disabled style="width:100%;padding:12px;border:0;border-radius:12px;background:linear-gradient(135deg,#d4ff5a,#9ad63a);color:#0a0c08;font-weight:800;cursor:pointer;font-size:.95rem;opacity:.45">Обработать и скачать</button>
-        <div id="vq-log" style="margin-top:12px;font-family:var(--mono);font-size:11px;line-height:1.5;color:var(--dim);max-height:200px;overflow:auto;white-space:pre-wrap;background:#05060a;border-radius:10px;padding:12px;border:1px solid var(--stroke)">Открой вкладку Quality — runtime подгрузится здесь.</div>
+        <button type="button" id="vq-go" disabled style="width:100%;padding:12px;border:0;border-radius:12px;background:linear-gradient(135deg,#d4ff5a,#9ad63a);color:#0a0c08;font-weight:800;cursor:pointer;font-size:.95rem;opacity:.45">Process</button>
+        <div id="vq-log" style="margin-top:12px;font-family:var(--mono);font-size:11px;line-height:1.5;color:var(--dim);max-height:200px;overflow:auto;white-space:pre-wrap;background:#05060a;border-radius:10px;padding:12px;border:1px solid var(--stroke)">Ready.</div>
       </div>
-      <p style="margin:12px 8px 0;font-size:.75rem;color:var(--dim);line-height:1.4">
-        Файлы <code style="color:var(--accent)">transform.py</code>, <code style="color:var(--accent)">parser.py</code>, <code style="color:var(--accent)">builder.py</code> в корне репо (как сейчас) — ок.
-      </p>
+
     </div>
 
   <div class="panel" id="panel-about">
@@ -3625,7 +3621,7 @@
     if(booted || booting) return;
     booting = true;
     try{
-      log('Загрузка Python runtime…');
+      log('Loading…');
       if(!window.loadPyodide){
         await new Promise(function(res, rej){
           var s = document.createElement('script');
@@ -3658,7 +3654,7 @@
         var f = files[i];
         var got = await fetchFirst(f.urls);
         var text = got ? got.text : (f.fallback || null);
-        if(text == null) throw new Error('Нет файла: '+f.urls.join(' | '));
+        if(text == null) throw new Error('Missing file: '+f.urls.join(' | '));
         pyodide.FS.writeFile('/home/pyodide/'+f.path, text);
         log('loaded '+(got ? got.url : f.path+' (fallback)'));
       }
