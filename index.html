@@ -1124,6 +1124,17 @@
 
       </div>
       <div class="card" style="padding:16px">
+        
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+          <label style="flex:1;min-width:140px;display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;border:1px solid var(--stroke);background:#05060a;cursor:pointer;font-size:.82rem">
+            <input type="radio" name="vq-method" value="ghost" checked style="accent-color:var(--accent)" />
+            <span><b>Ghost frames</b><br/><span style="color:var(--dim);font-size:.7rem">tiktok-quality</span></span>
+          </label>
+          <label style="flex:1;min-width:140px;display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;border:1px solid var(--stroke);background:#05060a;cursor:pointer;font-size:.82rem">
+            <input type="radio" name="vq-method" value="lossless" style="accent-color:var(--accent)" />
+            <span><b>Lossless patch</b><br/><span style="color:var(--dim);font-size:.7rem">buwryme · container</span></span>
+          </label>
+        </div>
         <div id="vq-drop" style="border:1.5px dashed rgba(200,245,66,.35);border-radius:14px;padding:28px 14px;text-align:center;cursor:pointer;margin-bottom:12px">
           <div>Drop MP4 or click</div>
           <div id="vq-fname" style="font-size:12px;color:var(--dim);margin-top:8px">No file</div>
@@ -3737,6 +3748,136 @@
 })();
 </script>
 
+
+
+<script>
+(function(){
+  /* Dual-method Quality: ghost (tiktok-quality) + lossless (buwryme container patch) */
+  var pyodide = null, fileBuf = null, fileName = 'video.mp4', booted = false, booting = false;
+
+  function log(msg, cls){
+    var el = document.getElementById('vq-log'); if(!el) return;
+    var line = document.createElement('div');
+    if(cls === 'ok') line.style.color = 'var(--accent)';
+    if(cls === 'err') line.style.color = '#fbbf24';
+    line.textContent = msg; el.appendChild(line); el.scrollTop = el.scrollHeight;
+  }
+  function setGo(){
+    var b = document.getElementById('vq-go'); if(!b) return;
+    var on = !!(pyodide && fileBuf);
+    b.disabled = !on; b.style.opacity = on ? '1' : '.45';
+  }
+  function method(){
+    var r = document.querySelector('input[name="vq-method"]:checked');
+    return (r && r.value) || 'ghost';
+  }
+  async function boot(){
+    if(booted || booting) return; booting = true;
+    try{
+      log('Loading…');
+      if(!window.loadPyodide){
+        await new Promise(function(res, rej){
+          var s = document.createElement('script');
+          s.src = 'https://cdn.jsdelivr.net/pyodide/v0.26.2/full/pyodide.js';
+          s.onload = res; s.onerror = rej; document.head.appendChild(s);
+        });
+      }
+      pyodide = await loadPyodide();
+      log('Pyodide OK', 'ok');
+      await pyodide.runPythonAsync("import sys,os\nos.makedirs('/home/pyodide/vasay_quality/mp4',exist_ok=True)\nsys.path.insert(0,'/home/pyodide')");
+      var files = [
+        {urls:['vasay_quality/__init__.py','__init__.py'], path:'vasay_quality/__init__.py', fallback:'#\n'},
+        {urls:['vasay_quality/mp4/__init__.py'], path:'vasay_quality/mp4/__init__.py', fallback:'#\n'},
+        {urls:['vasay_quality/mp4/parser.py','parser.py'], path:'vasay_quality/mp4/parser.py'},
+        {urls:['vasay_quality/mp4/builder.py','builder.py'], path:'vasay_quality/mp4/builder.py'},
+        {urls:['vasay_quality/transform.py','transform.py'], path:'vasay_quality/transform.py'},
+        {urls:['tiktok_lossless_patch.py'], path:'tiktok_lossless_patch.py'}
+      ];
+      async function fetchFirst(urls){
+        for(var i=0;i<urls.length;i++){
+          try{ var r=await fetch(urls[i]); if(r.ok) return {url:urls[i], text:await r.text()}; }catch(e){}
+        }
+        return null;
+      }
+      for(var i=0;i<files.length;i++){
+        var f=files[i], got=await fetchFirst(f.urls);
+        var text = got ? got.text : (f.fallback || null);
+        if(text == null) throw new Error('Missing file: '+f.urls.join(' | '));
+        pyodide.FS.writeFile('/home/pyodide/'+f.path, text);
+        log('loaded '+(got ? got.url : f.path));
+      }
+      await pyodide.runPythonAsync('from vasay_quality.transform import transform');
+      await pyodide.runPythonAsync('import tiktok_lossless_patch');
+      log('methods ready: ghost + lossless', 'ok');
+      booted = true;
+    }catch(e){ log(String(e), 'err'); }
+    booting = false; setGo();
+  }
+  async function take(f){
+    fileName = f.name || 'video.mp4';
+    var fn = document.getElementById('vq-fname');
+    if(fn) fn.textContent = fileName + ' · ' + (f.size/1e6).toFixed(2) + ' MB';
+    fileBuf = new Uint8Array(await f.arrayBuffer());
+    setGo();
+  }
+  function wire(){
+    var drop = document.getElementById('vq-drop');
+    var fin = document.getElementById('vq-file');
+    var go = document.getElementById('vq-go');
+    if(!drop || drop.dataset.vq2) return;
+    drop.dataset.vq2 = '1';
+    drop.addEventListener('click', function(){ fin && fin.click(); });
+    drop.addEventListener('dragover', function(e){ e.preventDefault(); });
+    drop.addEventListener('drop', function(e){
+      e.preventDefault();
+      if(e.dataTransfer.files[0]) take(e.dataTransfer.files[0]);
+    });
+    if(fin) fin.addEventListener('change', function(){ if(fin.files[0]) take(fin.files[0]); });
+    if(go) go.addEventListener('click', async function(){
+      if(!pyodide || !fileBuf) return;
+      go.disabled = true; go.style.opacity = '.45';
+      var mult = parseInt((document.getElementById('vq-mult')||{}).value, 10) || 10;
+      var m = method();
+      try{
+        pyodide.FS.writeFile('/tmp/in.mp4', fileBuf);
+        pyodide.globals.set('MULT', mult);
+        if(m === 'lossless'){
+          log('Lossless container patch (buwryme-style, no ffmpeg)…');
+          await pyodide.runPythonAsync(
+            "from tiktok_lossless_patch import patch_browser\n"
+            "res = patch_browser('/tmp/in.mp4','/tmp/out.mp4',{'inflation_rate': int(MULT), 'comment':'vasay lossless','name_box_payload':'vasay'})\n"
+            "assert res.get('ok'), 'patch failed'\n"
+          );
+          var out = pyodide.FS.readFile('/tmp/out.mp4');
+          log('lossless done · '+out.byteLength+' bytes', 'ok');
+          var a = document.createElement('a');
+          a.href = URL.createObjectURL(new Blob([out], {type:'video/mp4'}));
+          a.download = fileName.replace(/(\.\w+)?$/i, '_lossless.mp4');
+          a.click();
+        } else {
+          log('Ghost frames ×'+mult+'…');
+          await pyodide.runPythonAsync(
+            "from vasay_quality.transform import transform\n"
+            "transform('/tmp/in.mp4','/tmp/out.mp4',multiplier=int(MULT),comment='vasay',verbose=False)\n"
+          );
+          var out2 = pyodide.FS.readFile('/tmp/out.mp4');
+          log('ghost done · '+out2.byteLength+' bytes', 'ok');
+          var a2 = document.createElement('a');
+          a2.href = URL.createObjectURL(new Blob([out2], {type:'video/mp4'}));
+          a2.download = fileName.replace(/(\.\w+)?$/i, '_vasay.mp4');
+          a2.click();
+        }
+      }catch(e){ log(String(e), 'err'); }
+      setGo();
+    }, true);
+  }
+  document.querySelectorAll('.nav-item').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      if(btn.getAttribute('data-tab') === 'quality') setTimeout(function(){ wire(); boot(); }, 40);
+    });
+  });
+})();
+</script>
 
 </body>
 </html>
