@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>vasay · quality</title>
+<style>
+:root{--bg:#070807;--card:#0e100c;--line:rgba(200,245,66,.22);--accent:#c8f542;--text:#e8eae6;--muted:#8b9180}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:ui-sans-serif,system-ui,sans-serif;background:radial-gradient(1200px 600px at 20% -10%,rgba(200,245,66,.08),transparent),var(--bg);color:var(--text)}
+.wrap{max-width:720px;margin:0 auto;padding:28px 16px 60px}
+header{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+.logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(145deg,#d4ff5a,#8fd63a);color:#0a0c08;font-weight:900;display:grid;place-items:center}
+h1{font-size:1.25rem;margin:0;letter-spacing:-.02em}
+.sub{color:var(--muted);font-size:.85rem;margin:4px 0 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:14px}
+.drop{border:1.5px dashed rgba(200,245,66,.35);border-radius:14px;padding:36px 16px;text-align:center;cursor:pointer;transition:.15s}
+.drop:hover,.drop.on{border-color:var(--accent);background:rgba(200,245,66,.05)}
+.drop b{color:var(--accent)}
+label.row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:12px 0;font-size:.9rem;color:var(--muted)}
+input[type=number]{width:90px;background:#12140e;border:1px solid var(--line);color:var(--text);border-radius:8px;padding:8px}
+button{width:100%;margin-top:8px;padding:12px;border:0;border-radius:12px;background:linear-gradient(135deg,#d4ff5a,#9ad63a);color:#0a0c08;font-weight:800;cursor:pointer;font-size:.95rem}
+button:disabled{opacity:.45;cursor:not-allowed}
+.log{font-family:ui-monospace,monospace;font-size:12px;line-height:1.5;color:var(--muted);max-height:220px;overflow:auto;white-space:pre-wrap;background:#0a0c08;border-radius:10px;padding:12px;border:1px solid rgba(255,255,255,.04)}
+.ok{color:var(--accent)}
+.err{color:#fbbf24}
+a.back{color:var(--accent);text-decoration:none;font-size:.85rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">V</div>
+    <div>
+      <h1>vasay quality</h1>
+      <p class="sub">Ghost-frames MP4 · тот же метод, что tiktok-quality · в браузере</p>
+    </div>
+  </header>
+  <p style="margin:0 0 14px"><a class="back" href="index.html">← analyser</a></p>
+
+  <div class="card">
+    <div class="drop" id="drop">
+      <div>Перетащи <b>MP4</b> сюда или кликни</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:8px" id="fname">файл не выбран</div>
+    </div>
+    <input type="file" id="file" accept="video/mp4,video/quicktime,.mp4,.mov" hidden/>
+    <label class="row">Множитель кадров <input type="number" id="mult" min="2" max="50" value="10"/></label>
+    <button id="go" disabled>Обработать и скачать</button>
+  </div>
+
+  <div class="card">
+    <div style="font-size:12px;color:var(--muted);margin-bottom:8px">Лог</div>
+    <div class="log" id="log">Загрузка Python runtime (Pyodide)…</div>
+  </div>
+</div>
+<script type="text/javascript">
+const logEl = document.getElementById('log');
+function log(msg, cls) {
+  const line = document.createElement('div');
+  if (cls) line.className = cls;
+  line.textContent = msg;
+  logEl.appendChild(line);
+  logEl.scrollTop = logEl.scrollHeight;
+}
+
+let pyodide = null;
+let fileBuf = null;
+let fileName = 'video.mp4';
+
+async function boot() {
+  try {
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/pyodide/v0.26.2/full/pyodide.js';
+    await new Promise((res, rej) => { s.onload = res; s.onerror = rej; document.head.appendChild(s); });
+    pyodide = await loadPyodide();
+    log('Pyodide OK', 'ok');
+
+    // load package modules from same origin
+    const files = [
+      ['vasay_quality/__init__.py', 'vasay_quality/__init__.py'],
+      ['vasay_quality/mp4/__init__.py', 'vasay_quality/mp4/__init__.py'],
+      ['vasay_quality/mp4/parser.py', 'vasay_quality/mp4/parser.py'],
+      ['vasay_quality/mp4/builder.py', 'vasay_quality/mp4/builder.py'],
+      ['vasay_quality/transform.py', 'vasay_quality/transform.py'],
+    ];
+    await pyodide.runPythonAsync(`
+import sys, os
+os.makedirs('/home/pyodide/vasay_quality/mp4', exist_ok=True)
+sys.path.insert(0, '/home/pyodide')
+`);
+    for (const [url, path] of files) {
+      const r = await fetch(url);
+      if (!r.ok) throw new Error('Не найден ' + url + ' — залей папку vasay_quality на GitHub Pages рядом с quality.html');
+      const t = await r.text();
+      pyodide.FS.writeFile('/home/pyodide/' + path, t);
+      log('loaded ' + path);
+    }
+    await pyodide.runPythonAsync('from vasay_quality.transform import transform');
+    log('transform ready', 'ok');
+    document.getElementById('go').disabled = !fileBuf;
+  } catch (e) {
+    log(String(e), 'err');
+  }
+}
+
+const drop = document.getElementById('drop');
+const fin = document.getElementById('file');
+drop.onclick = () => fin.click();
+drop.ondragover = (e) => { e.preventDefault(); drop.classList.add('on'); };
+drop.ondragleave = () => drop.classList.remove('on');
+drop.ondrop = async (e) => {
+  e.preventDefault(); drop.classList.remove('on');
+  if (e.dataTransfer.files[0]) take(e.dataTransfer.files[0]);
+};
+fin.onchange = () => { if (fin.files[0]) take(fin.files[0]); };
+
+async function take(f) {
+  fileName = f.name || 'video.mp4';
+  document.getElementById('fname').textContent = fileName + ' · ' + (f.size/1e6).toFixed(2) + ' MB';
+  fileBuf = new Uint8Array(await f.arrayBuffer());
+  document.getElementById('go').disabled = !pyodide;
+  log('file in memory: ' + fileName);
+}
+
+document.getElementById('go').onclick = async () => {
+  if (!pyodide || !fileBuf) return;
+  const btn = document.getElementById('go');
+  btn.disabled = true;
+  const mult = parseInt(document.getElementById('mult').value, 10) || 10;
+  try {
+    log('writing FS…');
+    pyodide.FS.writeFile('/tmp/in.mp4', fileBuf);
+    pyodide.globals.set('MULT', mult);
+    log('transform ×' + mult + '…');
+    const stats = await pyodide.runPythonAsync(`
+from vasay_quality.transform import transform
+stats = transform('/tmp/in.mp4', '/tmp/out.mp4', multiplier=int(MULT), comment='vasay', verbose=False)
+stats
+`);
+    const out = pyodide.FS.readFile('/tmp/out.mp4');
+    log('done · out ' + out.byteLength + ' bytes', 'ok');
+    const blob = new Blob([out], { type: 'video/mp4' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = fileName.replace(/(\.\w+)?$/i, '_vasay.mp4');
+    a.click();
+    URL.revokeObjectURL(a.href);
+  } catch (e) {
+    log(String(e), 'err');
+  } finally {
+    btn.disabled = false;
+  }
+};
+
+boot();
+</script>
+</body>
+</html>
