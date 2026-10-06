@@ -3736,19 +3736,19 @@
           log('Running lossless container patch…');
           await pyodide.runPythonAsync(
             "from tiktok_lossless_patch import patch_browser\n"
-            "res = patch_browser('/tmp/in.mp4','/tmp/out.mp4',{"
-            "'inflation_rate': int(MULT),"
-            "'comment':'vasay lossless',"
-            "'name_box_payload':'vasay'"
-            "})\n"
-            "if not res.get('ok'): raise RuntimeError('lossless patch failed')\n"
+            + "res = patch_browser('/tmp/in.mp4','/tmp/out.mp4',{"
+            + "'inflation_rate': int(MULT),"
+            + "'comment':'vasay lossless',"
+            + "'name_box_payload':'vasay'"
+            + "})\n"
+            + "if not res.get('ok'): raise RuntimeError('lossless patch failed')\n"
           );
           outName = fileName.replace(/(\.\w+)?$/i, '_vasayyL.mp4');
         } else {
           log('Running ghost frames ×'+mult+'…');
           await pyodide.runPythonAsync(
             "from vasay_quality.transform import transform\n"
-            "transform('/tmp/in.mp4','/tmp/out.mp4',multiplier=int(MULT),comment='vasay',verbose=False)\n"
+            + "transform('/tmp/in.mp4','/tmp/out.mp4',multiplier=int(MULT),comment='vasay',verbose=False)\n"
           );
           outName = fileName.replace(/(\.\w+)?$/i, '_vasayyG.mp4');
         }
