@@ -931,32 +931,6 @@
   <!-- ANALYSE -->
   <div class="panel active" id="panel-analyse">
 
-    <section class="panel" id="panel-quality" style="display:none">
-      <div class="card about-hero" style="margin-bottom:14px">
-        <h3 style="margin:0 0 8px;font-size:1.35rem;letter-spacing:-.03em">Quality</h3>
-        <p style="margin:0;color:var(--dim);font-size:.9rem;line-height:1.45">
-          Ghost-frames MP4 до аплоада (метод tiktok-quality). Обработка в этой же вкладке, без перехода на другую страницу.
-        </p>
-      </div>
-      <div class="card" style="padding:16px">
-        <div id="vq-drop" style="border:1.5px dashed rgba(200,245,66,.35);border-radius:14px;padding:28px 14px;text-align:center;cursor:pointer;margin-bottom:12px">
-          <div>Перетащи <b style="color:var(--accent)">MP4</b> или кликни</div>
-          <div id="vq-fname" style="font-size:12px;color:var(--dim);margin-top:8px">файл не выбран</div>
-        </div>
-        <input type="file" id="vq-file" accept="video/mp4,video/quicktime,.mp4,.mov" hidden />
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px;font-size:.9rem;color:var(--dim)">
-          <span>Множитель кадров</span>
-          <input type="number" id="vq-mult" min="2" max="50" value="10" style="width:90px;background:#05060a;border:1px solid var(--stroke);color:var(--text);border-radius:8px;padding:8px" />
-        </div>
-        <button type="button" id="vq-go" disabled style="width:100%;padding:12px;border:0;border-radius:12px;background:linear-gradient(135deg,#d4ff5a,#9ad63a);color:#0a0c08;font-weight:800;cursor:pointer;font-size:.95rem;opacity:.45">Обработать и скачать</button>
-        <div id="vq-log" style="margin-top:12px;font-family:var(--mono);font-size:11px;line-height:1.5;color:var(--dim);max-height:200px;overflow:auto;white-space:pre-wrap;background:#05060a;border-radius:10px;padding:12px;border:1px solid var(--stroke)">Открой вкладку Quality — runtime подгрузится здесь.</div>
-      </div>
-      <p style="margin:12px 8px 0;font-size:.75rem;color:var(--dim);line-height:1.4">
-        Файлы <code style="color:var(--accent)">transform.py</code>, <code style="color:var(--accent)">parser.py</code>, <code style="color:var(--accent)">builder.py</code> в корне репо (как сейчас) — ок.
-      </p>
-    </section>
-
-
     <section class="hero">
       <div class="panel-badge">Live analyser</div>
       <h1>Real TikTok link analysis</h1>
@@ -1144,6 +1118,31 @@
   </div>
 
   <!-- ABOUT -->
+  <div class="panel" id="panel-quality">
+      <div class="card about-hero" style="margin-bottom:14px">
+        <h3 style="margin:0 0 8px;font-size:1.35rem;letter-spacing:-.03em">Quality</h3>
+        <p style="margin:0;color:var(--dim);font-size:.9rem;line-height:1.45">
+          Ghost-frames MP4 до аплоада (метод tiktok-quality). Обработка в этой же вкладке, без перехода на другую страницу.
+        </p>
+      </div>
+      <div class="card" style="padding:16px">
+        <div id="vq-drop" style="border:1.5px dashed rgba(200,245,66,.35);border-radius:14px;padding:28px 14px;text-align:center;cursor:pointer;margin-bottom:12px">
+          <div>Перетащи <b style="color:var(--accent)">MP4</b> или кликни</div>
+          <div id="vq-fname" style="font-size:12px;color:var(--dim);margin-top:8px">файл не выбран</div>
+        </div>
+        <input type="file" id="vq-file" accept="video/mp4,video/quicktime,.mp4,.mov" hidden />
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px;font-size:.9rem;color:var(--dim)">
+          <span>Множитель кадров</span>
+          <input type="number" id="vq-mult" min="2" max="50" value="10" style="width:90px;background:#05060a;border:1px solid var(--stroke);color:var(--text);border-radius:8px;padding:8px" />
+        </div>
+        <button type="button" id="vq-go" disabled style="width:100%;padding:12px;border:0;border-radius:12px;background:linear-gradient(135deg,#d4ff5a,#9ad63a);color:#0a0c08;font-weight:800;cursor:pointer;font-size:.95rem;opacity:.45">Обработать и скачать</button>
+        <div id="vq-log" style="margin-top:12px;font-family:var(--mono);font-size:11px;line-height:1.5;color:var(--dim);max-height:200px;overflow:auto;white-space:pre-wrap;background:#05060a;border-radius:10px;padding:12px;border:1px solid var(--stroke)">Открой вкладку Quality — runtime подгрузится здесь.</div>
+      </div>
+      <p style="margin:12px 8px 0;font-size:.75rem;color:var(--dim);line-height:1.4">
+        Файлы <code style="color:var(--accent)">transform.py</code>, <code style="color:var(--accent)">parser.py</code>, <code style="color:var(--accent)">builder.py</code> в корне репо (как сейчас) — ок.
+      </p>
+    </div>
+
   <div class="panel" id="panel-about">
     <section class="about-shell">
       <div class="about-mark-wrap">
@@ -3311,6 +3310,10 @@
       window.dispatchEvent(ev);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+    if(name === 'quality'){
+      window.dispatchEvent(new Event('vasay-quality-open'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
   document.querySelectorAll('.nav-item').forEach(function(btn){
     btn.addEventListener('click', function(e){
@@ -3721,6 +3724,7 @@
     });
   });
   // also hook showPanel if defined later
+  window.addEventListener('vasay-quality-open', function(){ try{ wire(); boot(); }catch(e){} });
   window.addEventListener('load', function(){
     wire();
     var orig = null;
@@ -3736,6 +3740,7 @@
   });
 })();
 </script>
+
 
 </body>
 </html>
