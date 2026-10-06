@@ -1,9 +1,0 @@
-Залей на GitHub Pages (рядом с index.html):
-  quality.html
-  vasay_quality/__init__.py
-  vasay_quality/transform.py
-  vasay_quality/mp4/__init__.py
-  vasay_quality/mp4/parser.py
-  vasay_quality/mp4/builder.py
-
-Открой: https://USER.github.io/REPO/quality.html
