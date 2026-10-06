@@ -952,7 +952,7 @@
         <div id="vq-log" style="margin-top:12px;font-family:var(--mono);font-size:11px;line-height:1.5;color:var(--dim);max-height:200px;overflow:auto;white-space:pre-wrap;background:#05060a;border-radius:10px;padding:12px;border:1px solid var(--stroke)">Открой вкладку Quality — runtime подгрузится здесь.</div>
       </div>
       <p style="margin:12px 8px 0;font-size:.75rem;color:var(--dim);line-height:1.4">
-        Нужна папка <code style="color:var(--accent)">vasay_quality/</code> в корне сайта (рядом с index.html).
+        Файлы <code style="color:var(--accent)">transform.py</code>, <code style="color:var(--accent)">parser.py</code>, <code style="color:var(--accent)">builder.py</code> в корне репо (как сейчас) — ок.
       </p>
     </section>
 
@@ -3634,19 +3634,30 @@
       pyodide = await loadPyodide();
       log('Pyodide OK', 'ok');
       await pyodide.runPythonAsync("import sys,os\nos.makedirs('/home/pyodide/vasay_quality/mp4', exist_ok=True)\nsys.path.insert(0, '/home/pyodide')");
+      // Support both nested (vasay_quality/...) and flat root (your current GitHub layout)
       var files = [
-        ['vasay_quality/__init__.py','vasay_quality/__init__.py'],
-        ['vasay_quality/mp4/__init__.py','vasay_quality/mp4/__init__.py'],
-        ['vasay_quality/mp4/parser.py','vasay_quality/mp4/parser.py'],
-        ['vasay_quality/mp4/builder.py','vasay_quality/mp4/builder.py'],
-        ['vasay_quality/transform.py','vasay_quality/transform.py']
+        {urls:['vasay_quality/__init__.py','__init__.py'], path:'vasay_quality/__init__.py', fallback:'# pkg\n'},
+        {urls:['vasay_quality/mp4/__init__.py'], path:'vasay_quality/mp4/__init__.py', fallback:'# mp4\n'},
+        {urls:['vasay_quality/mp4/parser.py','parser.py'], path:'vasay_quality/mp4/parser.py'},
+        {urls:['vasay_quality/mp4/builder.py','builder.py'], path:'vasay_quality/mp4/builder.py'},
+        {urls:['vasay_quality/transform.py','transform.py'], path:'vasay_quality/transform.py'}
       ];
+      async function fetchFirst(urls){
+        for(var i=0;i<urls.length;i++){
+          try{
+            var r = await fetch(urls[i]);
+            if(r.ok) return {url:urls[i], text: await r.text()};
+          }catch(e){}
+        }
+        return null;
+      }
       for(var i=0;i<files.length;i++){
-        var url = files[i][0], path = files[i][1];
-        var r = await fetch(url);
-        if(!r.ok) throw new Error('Нет файла '+url+' на сервере');
-        pyodide.FS.writeFile('/home/pyodide/'+path, await r.text());
-        log('loaded '+path);
+        var f = files[i];
+        var got = await fetchFirst(f.urls);
+        var text = got ? got.text : (f.fallback || null);
+        if(text == null) throw new Error('Нет файла: '+f.urls.join(' | '));
+        pyodide.FS.writeFile('/home/pyodide/'+f.path, text);
+        log('loaded '+(got ? got.url : f.path+' (fallback)'));
       }
       await pyodide.runPythonAsync('from vasay_quality.transform import transform');
       log('transform ready', 'ok');
