@@ -781,6 +781,9 @@
       opacity: .7; padding: 10px 8px 4px;
     }
 
+    
+    .nav-item[data-tab="quality"] .ico { filter: grayscale(0); }
+
     /* About nav button — distinct */
     .nav-item[data-tab="about"] .ico {
       font-size: 0 !important;
@@ -927,6 +930,33 @@
 
   <!-- ANALYSE -->
   <div class="panel active" id="panel-analyse">
+
+    <section class="panel" id="panel-quality" style="display:none">
+      <div class="card about-hero" style="margin-bottom:14px">
+        <h3 style="margin:0 0 8px;font-size:1.35rem;letter-spacing:-.03em">Quality</h3>
+        <p style="margin:0;color:var(--dim);font-size:.9rem;line-height:1.45">
+          Ghost-frames MP4 до аплоада (метод tiktok-quality). Обработка в этой же вкладке, без перехода на другую страницу.
+        </p>
+      </div>
+      <div class="card" style="padding:16px">
+        <div id="vq-drop" style="border:1.5px dashed rgba(200,245,66,.35);border-radius:14px;padding:28px 14px;text-align:center;cursor:pointer;margin-bottom:12px">
+          <div>Перетащи <b style="color:var(--accent)">MP4</b> или кликни</div>
+          <div id="vq-fname" style="font-size:12px;color:var(--dim);margin-top:8px">файл не выбран</div>
+        </div>
+        <input type="file" id="vq-file" accept="video/mp4,video/quicktime,.mp4,.mov" hidden />
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px;font-size:.9rem;color:var(--dim)">
+          <span>Множитель кадров</span>
+          <input type="number" id="vq-mult" min="2" max="50" value="10" style="width:90px;background:#05060a;border:1px solid var(--stroke);color:var(--text);border-radius:8px;padding:8px" />
+        </div>
+        <button type="button" id="vq-go" disabled style="width:100%;padding:12px;border:0;border-radius:12px;background:linear-gradient(135deg,#d4ff5a,#9ad63a);color:#0a0c08;font-weight:800;cursor:pointer;font-size:.95rem;opacity:.45">Обработать и скачать</button>
+        <div id="vq-log" style="margin-top:12px;font-family:var(--mono);font-size:11px;line-height:1.5;color:var(--dim);max-height:200px;overflow:auto;white-space:pre-wrap;background:#05060a;border-radius:10px;padding:12px;border:1px solid var(--stroke)">Открой вкладку Quality — runtime подгрузится здесь.</div>
+      </div>
+      <p style="margin:12px 8px 0;font-size:.75rem;color:var(--dim);line-height:1.4">
+        Нужна папка <code style="color:var(--accent)">vasay_quality/</code> в корне сайта (рядом с index.html).
+      </p>
+    </section>
+
+
     <section class="hero">
       <div class="panel-badge">Live analyser</div>
       <h1>Real TikTok link analysis</h1>
@@ -1250,6 +1280,7 @@
   <button class="nav-item active" data-tab="analyse" type="button"><span class="ico">🔍</span>Analyse</button>
   <button class="nav-item" data-tab="news" type="button"><span class="ico">📰</span>News</button>
   <button class="nav-item" data-tab="videos" type="button"><span class="ico">🎬</span>Videos</button>
+  <button class="nav-item" data-tab="quality" type="button"><span class="ico">⚡</span>Quality</button>
   <button class="nav-item" data-tab="about" type="button"><span class="ico">ℹ️</span>About</button>
 </nav>
 
@@ -3563,6 +3594,135 @@
   }
 
   // Status line in about metrics already updated
+})();
+</script>
+
+
+<script>
+(function(){
+  var pyodide = null, fileBuf = null, fileName = 'video.mp4', booted = false, booting = false;
+  function log(msg, cls){
+    var el = document.getElementById('vq-log');
+    if(!el) return;
+    var line = document.createElement('div');
+    if(cls === 'ok') line.style.color = 'var(--accent)';
+    if(cls === 'err') line.style.color = '#fbbf24';
+    line.textContent = msg;
+    el.appendChild(line);
+    el.scrollTop = el.scrollHeight;
+  }
+  function setGo(){
+    var b = document.getElementById('vq-go');
+    if(!b) return;
+    var on = !!(pyodide && fileBuf);
+    b.disabled = !on;
+    b.style.opacity = on ? '1' : '.45';
+  }
+  async function boot(){
+    if(booted || booting) return;
+    booting = true;
+    try{
+      log('Загрузка Python runtime…');
+      if(!window.loadPyodide){
+        await new Promise(function(res, rej){
+          var s = document.createElement('script');
+          s.src = 'https://cdn.jsdelivr.net/pyodide/v0.26.2/full/pyodide.js';
+          s.onload = res; s.onerror = rej;
+          document.head.appendChild(s);
+        });
+      }
+      pyodide = await loadPyodide();
+      log('Pyodide OK', 'ok');
+      await pyodide.runPythonAsync("import sys,os\nos.makedirs('/home/pyodide/vasay_quality/mp4', exist_ok=True)\nsys.path.insert(0, '/home/pyodide')");
+      var files = [
+        ['vasay_quality/__init__.py','vasay_quality/__init__.py'],
+        ['vasay_quality/mp4/__init__.py','vasay_quality/mp4/__init__.py'],
+        ['vasay_quality/mp4/parser.py','vasay_quality/mp4/parser.py'],
+        ['vasay_quality/mp4/builder.py','vasay_quality/mp4/builder.py'],
+        ['vasay_quality/transform.py','vasay_quality/transform.py']
+      ];
+      for(var i=0;i<files.length;i++){
+        var url = files[i][0], path = files[i][1];
+        var r = await fetch(url);
+        if(!r.ok) throw new Error('Нет файла '+url+' на сервере');
+        pyodide.FS.writeFile('/home/pyodide/'+path, await r.text());
+        log('loaded '+path);
+      }
+      await pyodide.runPythonAsync('from vasay_quality.transform import transform');
+      log('transform ready', 'ok');
+      booted = true;
+    }catch(e){
+      log(String(e), 'err');
+    }
+    booting = false;
+    setGo();
+  }
+  async function take(f){
+    fileName = f.name || 'video.mp4';
+    var fn = document.getElementById('vq-fname');
+    if(fn) fn.textContent = fileName + ' · ' + (f.size/1e6).toFixed(2) + ' MB';
+    fileBuf = new Uint8Array(await f.arrayBuffer());
+    log('file: '+fileName);
+    setGo();
+  }
+  function wire(){
+    var drop = document.getElementById('vq-drop');
+    var fin = document.getElementById('vq-file');
+    var go = document.getElementById('vq-go');
+    if(!drop || drop.dataset.vq) return;
+    drop.dataset.vq = '1';
+    drop.addEventListener('click', function(){ fin && fin.click(); });
+    drop.addEventListener('dragover', function(e){ e.preventDefault(); drop.style.borderColor = 'var(--accent)'; });
+    drop.addEventListener('dragleave', function(){ drop.style.borderColor = ''; });
+    drop.addEventListener('drop', function(e){
+      e.preventDefault(); drop.style.borderColor = '';
+      if(e.dataTransfer.files[0]) take(e.dataTransfer.files[0]);
+    });
+    if(fin) fin.addEventListener('change', function(){ if(fin.files[0]) take(fin.files[0]); });
+    if(go) go.addEventListener('click', async function(){
+      if(!pyodide || !fileBuf) return;
+      go.disabled = true; go.style.opacity = '.45';
+      var mult = parseInt((document.getElementById('vq-mult')||{}).value, 10) || 10;
+      try{
+        log('transform ×'+mult+'…');
+        pyodide.FS.writeFile('/tmp/in.mp4', fileBuf);
+        pyodide.globals.set('MULT', mult);
+        await pyodide.runPythonAsync("from vasay_quality.transform import transform\ntransform('/tmp/in.mp4','/tmp/out.mp4',multiplier=int(MULT),comment='vasay',verbose=False)");
+        var out = pyodide.FS.readFile('/tmp/out.mp4');
+        log('done · '+out.byteLength+' bytes', 'ok');
+        var blob = new Blob([out], {type:'video/mp4'});
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = fileName.replace(/(\.\w+)?$/i, '_vasay.mp4');
+        a.click();
+        URL.revokeObjectURL(a.href);
+      }catch(e){ log(String(e), 'err'); }
+      setGo();
+    });
+  }
+  // when Quality tab opens — boot runtime in same page
+  var _show = window.showPanel;
+  document.querySelectorAll('.nav-item').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      if(btn.getAttribute('data-tab') === 'quality'){
+        setTimeout(function(){ wire(); boot(); }, 30);
+      }
+    });
+  });
+  // also hook showPanel if defined later
+  window.addEventListener('load', function(){
+    wire();
+    var orig = null;
+    try {
+      // wrap after other scripts
+      setTimeout(function(){
+        var buttons = document.querySelectorAll('.nav-item[data-tab="quality"]');
+        buttons.forEach(function(b){
+          b.addEventListener('click', function(){ setTimeout(function(){ wire(); boot(); }, 50); });
+        });
+      }, 500);
+    } catch(e){}
+  });
 })();
 </script>
 
