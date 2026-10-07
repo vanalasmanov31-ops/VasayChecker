@@ -1132,7 +1132,7 @@
           </label>
           <label style="flex:1;min-width:140px;display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;border:1px solid var(--stroke);background:#05060a;cursor:pointer;font-size:.82rem">
             <input type="radio" name="vq-method" value="lossless" style="accent-color:var(--accent)" />
-            <span><b>Instant quality</b><br/><span style="color:var(--dim);font-size:.7rem">vasayyL</span></span>
+            <span><b>LeVass Method</b><br/><span style="color:var(--dim);font-size:.7rem">vasayyL</span></span>
           </label>
         </div>
         <div id="vq-drop" style="border:1.5px dashed rgba(200,245,66,.35);border-radius:14px;padding:28px 14px;text-align:center;cursor:pointer;margin-bottom:12px">
@@ -3642,7 +3642,7 @@
     var r=document.querySelector('input[name="vq-method"]:checked');
     return (r&&r.value)||'noblur';
   }
-  function methodLabel(m){ return m==='lossless' ? 'Instant quality (vasayyL)' : 'NoBlur (vasayyN)'; }
+  function methodLabel(m){ return m==='lossless' ? 'LeVass Method (vasayyL)' : 'NoBlur (vasayyN)'; }
 
   async function boot(){
     if(booted||booting) return;
@@ -3682,7 +3682,7 @@
       }
       await pyodide.runPythonAsync('from vasay_quality.transform import transform');
       await pyodide.runPythonAsync('from tiktok_lossless_patch import patch_browser');
-      log('Ready: NoBlur + Instant quality','ok');
+      log('Ready: NoBlur + LeVass Method','ok');
       booted=true;
     }catch(e){ log(String(e),'err'); }
     booting=false; setGo();
