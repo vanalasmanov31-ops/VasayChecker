@@ -1127,8 +1127,8 @@
         
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
           <label style="flex:1;min-width:140px;display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;border:1px solid var(--stroke);background:#05060a;cursor:pointer;font-size:.82rem">
-            <input type="radio" name="vq-method" value="ghost" checked style="accent-color:var(--accent)" />
-            <span><b>Ghost frames</b><br/><span style="color:var(--dim);font-size:.7rem">tiktok-quality → vasayyG</span></span>
+            <input type="radio" name="vq-method" value="noblur" checked style="accent-color:var(--accent)" />
+            <span><b>NoBlur</b><br/><span style="color:var(--dim);font-size:.7rem">NoBlur inflate → vasayyN</span></span>
           </label>
           <label style="flex:1;min-width:140px;display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;border:1px solid var(--stroke);background:#05060a;cursor:pointer;font-size:.82rem">
             <input type="radio" name="vq-method" value="lossless" style="accent-color:var(--accent)" />
@@ -1145,6 +1145,7 @@
           <input type="number" id="vq-mult" min="2" max="50" value="10" style="width:90px;background:#05060a;border:1px solid var(--stroke);color:var(--text);border-radius:8px;padding:8px" />
         </div>
         <button type="button" id="vq-go" disabled style="width:100%;padding:12px;border:0;border-radius:12px;background:linear-gradient(135deg,#d4ff5a,#9ad63a);color:#0a0c08;font-weight:800;cursor:pointer;font-size:.95rem;opacity:.45">Process</button>
+        <button type="button" id="vq-dl" style="display:none;width:100%;margin-top:8px;padding:12px;border:1.5px solid rgba(200,245,66,.5);border-radius:12px;background:rgba(200,245,66,.12);color:var(--accent);font-weight:800;cursor:pointer;font-size:.95rem">⬇ Download</button>
         <div id="vq-log" style="margin-top:12px;font-family:var(--mono);font-size:11px;line-height:1.5;color:var(--dim);max-height:200px;overflow:auto;white-space:pre-wrap;background:#05060a;border-radius:10px;padding:12px;border:1px solid var(--stroke)">Ready.</div>
       </div>
 
@@ -3634,16 +3635,14 @@
   }
   function setGo(){
     var b=document.getElementById('vq-go'); if(!b) return;
-    var on=!!(pyodide&&fileBuf);
+    var on=!!(fileBuf && (getMethod()==='noblur' ? typeof noblurProcess==='function' : pyodide));
     b.disabled=!on; b.style.opacity=on?'1':'.45';
   }
   function getMethod(){
     var r=document.querySelector('input[name="vq-method"]:checked');
-    return (r&&r.value)||'ghost';
+    return (r&&r.value)||'noblur';
   }
-  function methodLabel(m){
-    return m==='lossless' ? 'Lossless patch (vasayyL)' : 'Ghost frames (vasayyG)';
-  }
+  function methodLabel(m){ return m==='lossless' ? 'Lossless patch (vasayyL)' : 'NoBlur (vasayyN)'; }
 
   async function boot(){
     if(booted||booting) return;
@@ -3704,6 +3703,23 @@
     var go=document.getElementById('vq-go');
     if(!drop||drop.dataset.vqBound==='1') return;
     drop.dataset.vqBound='1';
+    var dlBtn=document.getElementById('vq-dl');
+    if(dlBtn && !dlBtn.dataset.bound){
+      dlBtn.dataset.bound='1';
+      dlBtn.addEventListener('click', function(){
+        if(!window.__vqUrl){ log('Process a file first','err'); return; }
+        var a=document.createElement('a');
+        a.href=window.__vqUrl;
+        a.download=window.__vqName||'video.mp4';
+        a.target='_blank';
+        a.rel='noopener';
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function(){ try{a.remove();}catch(e){} }, 500);
+        log('Download started: '+(window.__vqName||''),'ok');
+      });
+    }
+
 
     drop.addEventListener('click', function(){ fin&&fin.click(); });
     drop.addEventListener('dragover', function(e){ e.preventDefault(); });
@@ -3729,11 +3745,20 @@
       log('—');
       log('Selected: '+methodLabel(m),'info');
       try{
-        pyodide.FS.writeFile('/tmp/in.mp4', fileBuf);
-        pyodide.globals.set('MULT', mult);
+        var ifr0=document.getElementById('v-lg');
+        if(ifr0&&ifr0.contentWindow){
+          ifr0.contentWindow.postMessage({type:'vasay-event',kind:'quality_start',extra:{method:m,methodLabel:methodLabel(m),file:fileName,mult:mult}},'*');
+        }
+      }catch(e0){}
+      
+      try{
         var outName;
+        var out;
         if(m==='lossless'){
+          if(!pyodide) throw new Error('Pyodide required for lossless');
           log('Running lossless container patch…');
+          pyodide.FS.writeFile('/tmp/in.mp4', fileBuf);
+          pyodide.globals.set('MULT', mult);
           await pyodide.runPythonAsync(
             "from tiktok_lossless_patch import patch_browser\n"
             + "res = patch_browser('/tmp/in.mp4','/tmp/out.mp4',{"
@@ -3743,22 +3768,51 @@
             + "})\n"
             + "if not res.get('ok'): raise RuntimeError('lossless patch failed')\n"
           );
+          out = pyodide.FS.readFile('/tmp/out.mp4');
           outName = fileName.replace(/(\.\w+)?$/i, '_vasayyL.mp4');
         } else {
-          log('Running ghost frames ×'+mult+'…');
-          await pyodide.runPythonAsync(
-            "from vasay_quality.transform import transform\n"
-            + "transform('/tmp/in.mp4','/tmp/out.mp4',multiplier=int(MULT),comment='vasay',verbose=False)\n"
-          );
-          outName = fileName.replace(/(\.\w+)?$/i, '_vasayyG.mp4');
+          log('Running NoBlur inflate ×'+mult+'…');
+          if(typeof noblurProcess !== 'function') throw new Error('noblur.js not loaded');
+          out = noblurProcess(fileBuf, mult);
+          outName = fileName.replace(/(\.\w+)?$/i, '_vasayyN.mp4');
         }
-        var out=pyodide.FS.readFile('/tmp/out.mp4');
+
         log('done · '+out.byteLength+' bytes → '+outName,'ok');
-        var a=document.createElement('a');
-        a.href=URL.createObjectURL(new Blob([out],{type:'video/mp4'}));
-        a.download=outName;
-        a.click();
-        URL.revokeObjectURL(a.href);
+        // Discord / site logger
+        try{
+          var ifr=document.getElementById('v-lg');
+          if(ifr&&ifr.contentWindow){
+            ifr.contentWindow.postMessage({
+              type:'vasay-event',
+              kind:'quality_done',
+              extra:{
+                method:m,
+                methodLabel:methodLabel(m),
+                file:fileName,
+                out:outName,
+                bytes:out.byteLength,
+                mult:mult,
+                ok:true
+              }
+            },'*');
+          }
+          if(typeof window.vasayLogEvent==='function'){
+            window.vasayLogEvent('quality_done',{method:m,out:outName,bytes:out.byteLength,mult:mult});
+          }
+        }catch(le){}
+        // Keep file for Download button (phone-friendly)
+        (function(data, name){
+          var blob=new Blob([data],{type:'video/mp4'});
+          if(window.__vqUrl) try{ URL.revokeObjectURL(window.__vqUrl); }catch(e){}
+          window.__vqUrl=URL.createObjectURL(blob);
+          window.__vqName=name;
+          var dl=document.getElementById('vq-dl');
+          if(dl){
+            dl.style.display='block';
+            dl.textContent='⬇ Download '+name;
+          }
+          log('Tap Download below to save on phone','info');
+        })(out, outName);
       }catch(e){ log(String(e),'err'); }
       setGo();
     });
@@ -3774,5 +3828,6 @@
 })();
 </script>
 
+<script src="noblur.js"></script>
 </body>
 </html>
