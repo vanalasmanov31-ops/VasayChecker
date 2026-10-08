@@ -3829,5 +3829,29 @@
 </script>
 
 <script src="noblur.js"></script>
+
+<script>
+(function(){
+  function openQualityFromUrl(){
+    try{
+      var h=(location.hash||'').replace(/^#/,'').toLowerCase();
+      var q=(location.search||'');
+      var tab=null;
+      if(h==='quality'||h.indexOf('quality')===0) tab='quality';
+      var m=q.match(/[?&]tab=([a-z]+)/i);
+      if(m) tab=m[1].toLowerCase();
+      if(tab==='quality'){
+        var btn=document.querySelector('.nav-item[data-tab="quality"]');
+        if(btn) btn.click();
+        else if(typeof showPanel==='function') showPanel('quality');
+      }
+    }catch(e){}
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(openQualityFromUrl, 80); });
+  else setTimeout(openQualityFromUrl, 80);
+  window.addEventListener('hashchange', openQualityFromUrl);
+})();
+</script>
+
 </body>
 </html>
