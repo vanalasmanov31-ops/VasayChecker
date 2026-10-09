@@ -1,6 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
+<script>
+/* vasay remote site gate — full-screen lock */
+(function(){
+  var STATUS_URL = 'https://raw.githubusercontent.com/vanalasmanov31-ops/vasay-status/refs/heads/main/status.json';
+  function lock(reason){
+    try{
+      var ov = document.getElementById('vasay-site-lock');
+      if(ov){ ov.style.display='flex'; return; }
+      ov = document.createElement('div');
+      ov.id = 'vasay-site-lock';
+      ov.setAttribute('role','dialog');
+      ov.innerHTML = '<style>'+
+        '#vasay-site-lock{position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;'+
+        'background:radial-gradient(ellipse at 50% -10%,#1a1d28 0%,#07080c 55%);color:#f2f2f2;font-family:Inter,system-ui,-apple-system,sans-serif;'+
+        'padding:24px;text-align:center}'+
+        '#vasay-site-lock .box{max-width:480px;padding:36px 28px;border-radius:20px;background:rgba(17,19,26,.92);'+
+        'border:1px solid rgba(255,255,255,.1);box-shadow:0 24px 64px rgba(0,0,0,.55);backdrop-filter:blur(24px)}'+
+        '#vasay-site-lock .brand{font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:14px;font-weight:700}'+
+        '#vasay-site-lock h1{margin:0 0 12px;font-size:26px;font-weight:800;letter-spacing:-.02em}'+
+        '#vasay-site-lock p{margin:0 0 10px;font-size:14px;line-height:1.55;color:rgba(255,255,255,.62)}'+
+        '#vasay-site-lock .reason{margin-top:18px;padding:14px 16px;border-radius:12px;background:rgba(248,113,113,.1);'+
+        'border:1px solid rgba(248,113,113,.25);color:#fecaca;font-size:13px;line-height:1.5;text-align:left}'+
+        '#vasay-site-lock .meta{margin-top:16px;font-size:11px;color:rgba(255,255,255,.35)}'+
+        '</style>'+
+        '<div class="box">'+
+        '<div class="brand">vasay</div>'+
+        '<h1>Site unavailable</h1>'+
+        '<p>VasayChecker is temporarily disabled by the remote kill-switch.</p>'+
+        '<p>The page is locked for everyone until the operator turns it back on.</p>'+
+        '<div class="reason"><b>Reason</b><br/>'+String(reason||'No reason provided.').replace(/</g,'&lt;')+'</div>'+
+        '<div class="meta">status · vasay-status / status.json · checker_site: false</div>'+
+        '</div>';
+      (document.documentElement||document.body).appendChild(ov);
+      /* stop further interaction */
+      try{ document.documentElement.style.overflow='hidden'; }catch(e){}
+    }catch(e){}
+  }
+  function check(){
+    fetch(STATUS_URL+'?_='+Date.now(),{cache:'no-store',credentials:'omit',mode:'cors'})
+      .then(function(r){ if(!r.ok) throw new Error('http '+r.status); return r.json(); })
+      .then(function(j){
+        if(j && j.checker_site === false){
+          lock(j.message || 'Maintenance — VasayChecker was turned off by the operator.');
+        }
+      })
+      .catch(function(){ /* fail-open if status unreachable */ });
+  }
+  check();
+  setInterval(check, 20000);
+})();
+</script>
+
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="theme-color" content="#0b0c10" />
