@@ -3645,6 +3645,7 @@
   function methodLabel(m){ return m==='lossless' ? 'LeVass Method (vasayyL)' : 'NoBlur (vasayyN)'; }
 
   async function boot(){
+    window.vasayBoot = boot;
     if(booted||booting) return;
     booting=true;
     try{
@@ -3684,8 +3685,16 @@
       await pyodide.runPythonAsync('from tiktok_lossless_patch import patch_browser');
       log('Ready: NoBlur + LeVass Method','ok');
       booted=true;
+      window.pyodide=pyodide;
+      window.booted=true;
+      window.vasayBoot=boot;
+      try{ window.parent.postMessage({type:'vasay-ext-ready'},'*'); }catch(e){}
     }catch(e){ log(String(e),'err'); }
     booting=false; setGo();
+  }
+
+  if(/[?&]vasay_ext=1/.test(location.search||'')){
+    setTimeout(function(){ try{ boot(); }catch(e){} }, 80);
   }
 
   async function take(f){
@@ -3850,6 +3859,86 @@
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(openQualityFromUrl, 80); });
   else setTimeout(openQualityFromUrl, 80);
   window.addEventListener('hashchange', openQualityFromUrl);
+})();
+</script>
+
+
+
+
+<script>
+/* vasay extension bridge */
+(function () {
+  function reply(source, origin, msg, transfer) {
+    try {
+      if (transfer && transfer.length) source.postMessage(msg, origin || "*", transfer);
+      else source.postMessage(msg, origin || "*");
+    } catch (e) {
+      try { source.postMessage(msg, "*"); } catch (e2) {}
+    }
+  }
+  async function waitBoot(timeoutMs) {
+    var t0 = Date.now();
+    while (Date.now() - t0 < (timeoutMs || 90000)) {
+      if (window.pyodide && window.booted) return;
+      var b = window.vasayBoot;
+      if (typeof b === "function") {
+        try { await b(); } catch (e) {}
+        if (window.pyodide) return;
+      }
+      await new Promise(function (r) { setTimeout(r, 200); });
+    }
+    throw new Error("Site Pyodide boot timeout");
+  }
+  window.addEventListener("message", function (ev) {
+    var d = ev.data;
+    if (!d || typeof d !== "object") return;
+    if (d.type === "vasay-ext-ping") {
+      reply(ev.source, ev.origin, { type: "vasay-ext-ready", booted: !!window.booted });
+      /* also start boot in background */
+      try { if (window.vasayBoot) window.vasayBoot(); } catch (e) {}
+      return;
+    }
+    if (d.type !== "vasay-ext-process") return;
+    (async function () {
+      try {
+        reply(ev.source, ev.origin, { type: "vasay-ext-progress", message: "Booting site engine…" });
+        await waitBoot(120000);
+        var buf = d.buffer;
+        if (!buf) throw new Error("No buffer");
+        var u8 = buf instanceof Uint8Array ? buf : new Uint8Array(buf);
+        var mult = parseInt(d.mult, 10) || 10;
+        var method = d.method || "lossless";
+        reply(ev.source, ev.origin, { type: "vasay-ext-progress", message: "Running LeVass ×" + mult + "…" });
+        var out;
+        if (method === "noblur" && typeof noblurProcess === "function") {
+          out = noblurProcess(u8, mult);
+        } else {
+          window.pyodide.FS.writeFile("/tmp/in.mp4", u8);
+          window.pyodide.globals.set("MULT", mult);
+          await window.pyodide.runPythonAsync(
+            "from tiktok_lossless_patch import patch_browser\n"
+            + "res = patch_browser('/tmp/in.mp4','/tmp/out.mp4',{"
+            + "'inflation_rate': int(MULT),"
+            + "'comment':'vasay lossless',"
+            + "'comment_short':'vasay',"
+            + "'name_box_payload':'vasay',"
+            + "'re_encode': False"
+            + "})\n"
+            + "if not res.get('ok'): raise RuntimeError('lossless patch failed')\n"
+          );
+          out = window.pyodide.FS.readFile("/tmp/out.mp4");
+        }
+        var ab = out.buffer.slice(out.byteOffset, out.byteOffset + out.byteLength);
+        reply(ev.source, ev.origin, { type: "vasay-ext-result", ok: true, bytes: ab.byteLength, buffer: ab }, [ab]);
+      } catch (err) {
+        reply(ev.source, ev.origin, {
+          type: "vasay-ext-result",
+          ok: false,
+          error: String(err && err.message ? err.message : err)
+        });
+      }
+    })();
+  });
 })();
 </script>
 
