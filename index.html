@@ -3865,8 +3865,10 @@
 
 
 
+
+
 <script>
-/* vasay extension bridge */
+/* vasay extension bridge v2 */
 (function () {
   function reply(source, origin, msg, transfer) {
     try {
@@ -3876,25 +3878,31 @@
       try { source.postMessage(msg, "*"); } catch (e2) {}
     }
   }
+  function announce() {
+    try { window.parent.postMessage({ type: "vasay-ext-ready", booted: !!window.booted }, "*"); } catch (e) {}
+  }
+  announce();
+  setInterval(announce, 2000);
+
   async function waitBoot(timeoutMs) {
     var t0 = Date.now();
-    while (Date.now() - t0 < (timeoutMs || 90000)) {
+    while (Date.now() - t0 < (timeoutMs || 120000)) {
       if (window.pyodide && window.booted) return;
       var b = window.vasayBoot;
       if (typeof b === "function") {
         try { await b(); } catch (e) {}
         if (window.pyodide) return;
       }
-      await new Promise(function (r) { setTimeout(r, 200); });
+      await new Promise(function (r) { setTimeout(r, 250); });
     }
     throw new Error("Site Pyodide boot timeout");
   }
+
   window.addEventListener("message", function (ev) {
     var d = ev.data;
     if (!d || typeof d !== "object") return;
     if (d.type === "vasay-ext-ping") {
       reply(ev.source, ev.origin, { type: "vasay-ext-ready", booted: !!window.booted });
-      /* also start boot in background */
       try { if (window.vasayBoot) window.vasayBoot(); } catch (e) {}
       return;
     }
@@ -3902,7 +3910,7 @@
     (async function () {
       try {
         reply(ev.source, ev.origin, { type: "vasay-ext-progress", message: "Booting site engine…" });
-        await waitBoot(120000);
+        await waitBoot(150000);
         var buf = d.buffer;
         if (!buf) throw new Error("No buffer");
         var u8 = buf instanceof Uint8Array ? buf : new Uint8Array(buf);
