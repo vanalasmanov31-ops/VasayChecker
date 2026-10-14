@@ -1358,146 +1358,202 @@ textarea, select, .license-input {
 
 
 
-/* ── About + Quality compact redesign ── */
-.xq-wrap { display:flex; flex-direction:column; gap:8px; padding:4px 0 8px; }
-.xq-head { text-align:center; padding:6px 0 4px; }
-.xq-title { font-size:11px; font-weight:700; letter-spacing:.28em; text-transform:uppercase; color:rgba(255,255,255,.7); }
-.xq-sub { font-size:10px; color:var(--dim); margin-top:4px; }
-.xq-mult input {
-  width:72px !important; background:rgba(0,0,0,.45) !important; border:1px solid rgba(255,255,255,.12) !important;
-  color:#fff !important; border-radius:9px !important; padding:8px 10px !important; font-size:12px !important;
-  font-weight:700 !important; text-align:center !important;
-}
-#vq-fname { font-size:10px; color:var(--dim); margin-top:6px; font-weight:400; word-break:break-all; }
-#vq-log { min-height:64px; max-height:110px; }
 
-.panel-about .about-shell,
-#panel-about .about-shell,
-#panel-about {
-  animation: none;
-}
-#panel-about .about-hero,
-#panel-about .about-shell {
-  background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03)) !important;
-  border: 1px solid rgba(255,255,255,.09) !important;
-  border-radius: 14px !important;
-  padding: 16px 14px !important;
-  text-align: center !important;
-  box-shadow: 0 4px 16px rgba(0,0,0,.25) !important;
-}
-#panel-about .about-mark-wrap,
-#panel-about .logo-mark,
-#panel-about .about-mark {
-  width: 56px !important; height: 56px !important; margin: 0 auto 10px !important;
-  border-radius: 50% !important; border: 1.5px solid rgba(255,255,255,.2) !important;
-  display: flex !important; align-items: center !important; justify-content: center !important;
-  background: radial-gradient(circle at 40% 35%, rgba(255,255,255,.1), rgba(255,255,255,.02)) !important;
-  box-shadow: 0 0 24px rgba(255,255,255,.08), inset 0 0 16px rgba(255,255,255,.04) !important;
-  font-size: 20px !important; font-weight: 800 !important; color: #fff !important;
-  animation: pulseGlow 4.2s cubic-bezier(.4,0,.2,1) infinite !important;
-}
-#panel-about .about-name,
-#panel-about .about-title {
-  font-size: 12px !important; font-weight: 700 !important; letter-spacing: .28em !important;
-  text-transform: uppercase !important; color: rgba(255,255,255,.75) !important; margin: 0 0 4px !important;
-}
-#panel-about .about-tag,
-#panel-about .about-sub {
-  font-size: 10px !important; color: var(--dim) !important; letter-spacing: .06em !important;
-}
-#panel-about .about-desc { font-size: 11px !important; color: var(--dim) !important; line-height: 1.5 !important; margin-top: 8px !important; }
-#panel-about .about-block {
-  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.025)) !important;
-  border: 1px solid rgba(255,255,255,.09) !important;
-  border-radius: 14px !important;
-  padding: 12px !important;
-  margin-bottom: 8px !important;
-  box-shadow: 0 4px 14px rgba(0,0,0,.22) !important;
-}
-#panel-about .about-block-head h3 {
-  font-size: 10px !important; letter-spacing: .14em !important; text-transform: uppercase !important;
-  color: rgba(255,255,255,.55) !important; font-weight: 700 !important; margin: 0 0 8px !important;
-}
-#panel-about .about-chip {
-  display: inline-block !important;
-  padding: 5px 10px !important;
-  border-radius: 999px !important;
-  background: rgba(255,255,255,.06) !important;
-  border: 1px solid rgba(255,255,255,.1) !important;
-  font-size: 10px !important;
-  color: rgba(255,255,255,.75) !important;
-  margin: 0 4px 6px 0 !important;
-}
-#panel-about .about-note,
-#panel-about .about-tips,
-#panel-about .about-foot {
-  font-size: 11px !important; color: var(--dim) !important; line-height: 1.5 !important;
-}
-#panel-about .about-tips { padding-left: 16px !important; }
-#panel-about .about-tips li { margin-bottom: 5px !important; }
-#panel-about .about-links a,
-#panel-about a {
-  color: #fff !important;
-  text-decoration: none !important;
-  border-bottom: 1px solid rgba(255,255,255,.2) !important;
-}
-#panel-about .about-metrics,
-#panel-about .about-stats-row {
-  display: flex !important; gap: 6px !important; margin-top: 10px !important;
-}
-#panel-about .about-metric,
-#panel-about .about-stat {
-  flex: 1 !important;
-  padding: 10px 8px !important;
-  border-radius: 12px !important;
-  background: rgba(0,0,0,.35) !important;
-  border: 1px solid rgba(255,255,255,.08) !important;
-  text-align: center !important;
-}
-#panel-about .about-metric span,
-#panel-about .about-stat-num {
-  display: block !important; font-size: 14px !important; font-weight: 800 !important; color: #fff !important;
-}
-#panel-about .about-metric label,
-#panel-about .about-stat-lbl {
-  font-size: 9px !important; color: var(--dim) !important; letter-spacing: .06em !important; text-transform: uppercase !important;
-}
 
-/* Compact global */
-.app { max-width: 400px !important; gap: 8px !important; padding: 0 12px 12px !important; }
-.top-bar { padding: 18px 0 6px !important; gap: 10px !important; }
-.logo-mark { width: 56px !important; height: 56px !important; font-size: 20px !important; }
-.hero, .card { padding: 12px !important; margin-bottom: 8px !important; }
-.hero h1 { font-size: 1.05rem !important; }
-.btn-primary, .btn-secondary, #vq-go, #vq-dl { padding: 11px !important; font-size: 11px !important; margin-bottom: 6px !important; }
-.bottom-nav { padding: 5px !important; bottom: 12px !important; }
-.nav-item { padding: 8px 2px !important; font-size: 8px !important; }
-.nav-item .ico { font-size: .95rem !important; }
-
-/* Shake + blur like extension shell */
-.app {
-  animation: shellShake 5.5s ease-in-out infinite !important;
+/* ══════ Quality (vq) ══════ */
+.vq { display:flex; flex-direction:column; gap:10px; padding:2px 0 8px; }
+.vq-hero { text-align:center; padding:8px 4px 4px; }
+.vq-kicker { font-size:9px; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:rgba(255,255,255,.35); margin-bottom:4px; }
+.vq-title { font-size:15px; font-weight:800; letter-spacing:.06em; color:#fff; }
+.vq-desc { font-size:10px; color:var(--dim); margin-top:4px; }
+.vq-section-label {
+  font-size:9px; font-weight:700; letter-spacing:.16em; text-transform:uppercase;
+  color:rgba(255,255,255,.4); padding:2px 2px 0;
 }
-body::before {
-  animation: shellBlurPulse 6s ease-in-out infinite !important;
+.vq-methods { display:flex; flex-direction:column; gap:7px; }
+.vq-m {
+  display:flex; align-items:center; gap:12px;
+  padding:13px 14px; border-radius:14px;
+  border:1px solid rgba(255,255,255,.09);
+  background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.025));
+  cursor:pointer; user-select:none;
+  transition:border-color .3s ease, background .3s ease, box-shadow .35s ease, transform .2s cubic-bezier(.16,1,.3,1);
 }
-@keyframes shellBlurPulse {
-  0%, 100% { filter: blur(0px); opacity: 1; }
-  50% { filter: blur(0.4px); opacity: .97; }
+.vq-m:active { transform:scale(.985); }
+.vq-m input { position:absolute; opacity:0; pointer-events:none; }
+.vq-m-body { flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; }
+.vq-m-name { font-size:12px; font-weight:700; color:rgba(255,255,255,.92); }
+.vq-m-hint { font-size:10px; color:var(--dim); }
+.vq-m-check {
+  width:18px; height:18px; border-radius:50%; flex-shrink:0;
+  border:1.5px solid rgba(255,255,255,.2);
+  background:transparent;
+  transition:background .25s, border-color .25s, box-shadow .25s;
 }
-@keyframes shellShake {
-  0%, 100% { transform: translate3d(0,0,0); }
-  15% { transform: translate3d(0.6px,-0.5px,0); }
-  30% { transform: translate3d(-0.7px,0.55px,0); }
-  45% { transform: translate3d(0.5px,0.4px,0); }
-  60% { transform: translate3d(-0.45px,-0.5px,0); }
-  75% { transform: translate3d(0.4px,0.35px,0); }
-  90% { transform: translate3d(-0.3px,-0.25px,0); }
+.vq-m.sel {
+  border-color:rgba(255,255,255,.38);
+  background:rgba(255,255,255,.09);
+  box-shadow:0 0 18px rgba(255,255,255,.06);
+}
+.vq-m.sel .vq-m-check {
+  background:#fff;
+  border-color:#fff;
+  box-shadow:0 0 10px rgba(255,255,255,.35);
+  background-image:radial-gradient(circle at center, #000 0 35%, #fff 40%);
+}
+.vq-drop {
+  border:1px dashed rgba(255,255,255,.16);
+  border-radius:14px; padding:22px 12px; text-align:center; cursor:pointer;
+  background:rgba(255,255,255,.02);
+  transition:border-color .3s, background .3s, box-shadow .35s;
+}
+.vq-drop:hover, .vq-drop.over {
+  border-color:rgba(255,255,255,.45);
+  background:rgba(255,255,255,.06);
+  box-shadow:0 0 20px rgba(255,255,255,.05);
+}
+.vq-drop-ico { font-size:18px; opacity:.55; margin-bottom:6px; }
+.vq-drop-t { font-size:12px; font-weight:700; color:rgba(255,255,255,.85); }
+.vq-drop-s { font-size:10px; color:var(--dim); margin-top:2px; }
+.vq-fname { font-size:10px; color:var(--dim); margin-top:10px; word-break:break-all; }
+.vq-row {
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding:12px 14px; border-radius:14px;
+  background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.025));
+  border:1px solid rgba(255,255,255,.09);
+}
+.vq-row-t { font-size:12px; font-weight:700; color:rgba(255,255,255,.9); }
+.vq-row-s { font-size:10px; color:var(--dim); margin-top:2px; }
+.vq-num {
+  width:70px; text-align:center; padding:9px 8px;
+  background:rgba(0,0,0,.5); border:1px solid rgba(255,255,255,.12);
+  border-radius:10px; color:#fff; font-size:13px; font-weight:700;
+}
+.vq-btn {
+  width:100%; padding:13px; border:0; border-radius:12px;
+  background:#fff; color:#000; font-weight:800; font-size:12px;
+  cursor:pointer; letter-spacing:.03em;
+  box-shadow:0 4px 20px rgba(255,255,255,.14);
+  transition:transform .2s cubic-bezier(.16,1,.3,1), box-shadow .35s, opacity .25s;
+}
+.vq-btn:hover { box-shadow:0 6px 28px rgba(255,255,255,.22); }
+.vq-btn:active { transform:scale(.97); }
+.vq-btn:disabled { opacity:.35; cursor:not-allowed; box-shadow:none; }
+.vq-btn-ghost {
+  background:transparent; color:#fff;
+  border:1px solid rgba(255,255,255,.22); box-shadow:none; margin-top:2px;
+}
+.vq-btn-ghost:hover { background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.4); }
+.vq-log-bar {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-top:4px;
+}
+.vq-log-bar span {
+  font-size:9px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--dim);
+}
+.vq-log-hide {
+  border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.04);
+  color:var(--dim); border-radius:999px; padding:4px 10px; font-size:9px; font-weight:700; cursor:pointer;
+}
+.vq-log-hide:hover { color:#fff; border-color:rgba(255,255,255,.25); }
+.vq-log {
+  min-height:68px; max-height:120px; overflow:auto;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:10px; line-height:1.55;
+  color:rgba(255,255,255,.5); white-space:pre-wrap;
+  background:linear-gradient(180deg,rgba(0,0,0,.45),rgba(0,0,0,.6));
+  border:1px solid rgba(255,255,255,.08); border-radius:14px; padding:10px 12px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
 }
 
-/* Soft ambient glow cards */
-.hero, .card, .row-card, .about-block, .methods label.sel {
-  transition: border-color .35s ease, box-shadow .4s ease, transform .22s cubic-bezier(.16,1,.3,1) !important;
+/* ══════ About (ab) ══════ */
+.ab { display:flex; flex-direction:column; gap:10px; padding:2px 0 10px; }
+.ab-hero {
+  text-align:center; padding:18px 14px 16px;
+  border-radius:16px;
+  background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.03));
+  border:1px solid rgba(255,255,255,.1);
+  box-shadow:0 4px 18px rgba(0,0,0,.28);
+}
+.ab-ring {
+  width:58px; height:58px; margin:0 auto 12px; border-radius:50%;
+  border:1.5px solid rgba(255,255,255,.22);
+  display:flex; align-items:center; justify-content:center;
+  background:radial-gradient(circle at 40% 35%,rgba(255,255,255,.12),rgba(255,255,255,.02));
+  box-shadow:0 0 26px rgba(255,255,255,.08), inset 0 0 16px rgba(255,255,255,.04);
+  animation:pulseGlow 4.2s cubic-bezier(.4,0,.2,1) infinite;
+}
+.ab-ring span { font-size:20px; font-weight:800; color:#fff; letter-spacing:.04em; text-shadow:0 0 16px rgba(255,255,255,.3); }
+.ab-brand {
+  font-size:12px; font-weight:700; letter-spacing:.32em; text-transform:uppercase;
+  color:rgba(255,255,255,.72);
+}
+.ab-tag { font-size:10px; color:var(--dim); margin-top:4px; letter-spacing:.06em; }
+.ab-line { font-size:11px; color:rgba(255,255,255,.45); margin:10px 0 0; line-height:1.45; }
+.ab-stats {
+  display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-top:14px;
+}
+.ab-stat {
+  padding:10px 6px; border-radius:12px;
+  background:rgba(0,0,0,.4); border:1px solid rgba(255,255,255,.08);
+}
+.ab-stat b { display:block; font-size:14px; font-weight:800; color:#fff; }
+.ab-stat span { font-size:9px; color:var(--dim); letter-spacing:.05em; text-transform:uppercase; }
+.ab-links { display:flex; gap:8px; justify-content:center; margin-top:14px; flex-wrap:wrap; }
+.ab-links a {
+  padding:8px 14px; border-radius:999px; font-size:11px; font-weight:700;
+  color:#fff; text-decoration:none;
+  background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12);
+  transition:background .25s, border-color .25s;
+}
+.ab-links a:hover { background:rgba(255,255,255,.12); border-color:rgba(255,255,255,.28); }
+
+.ab-card {
+  padding:14px; border-radius:14px;
+  background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.025));
+  border:1px solid rgba(255,255,255,.09);
+  box-shadow:0 4px 14px rgba(0,0,0,.22);
+}
+.ab-h {
+  font-size:9px; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
+  color:rgba(255,255,255,.42); margin-bottom:10px;
+}
+.ab-h-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+.ab-h-row .ab-h { margin-bottom:0; }
+.ab-text {
+  border:0; background:transparent; color:rgba(255,255,255,.45);
+  font-size:10px; font-weight:700; cursor:pointer; letter-spacing:.04em;
+}
+.ab-text:hover { color:#fff; }
+.ab-chips { display:flex; flex-wrap:wrap; gap:6px; }
+.ab-chips span {
+  padding:5px 10px; border-radius:999px; font-size:10px; font-weight:600;
+  color:rgba(255,255,255,.75);
+  background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1);
+}
+.ab-note { font-size:11px; color:var(--dim); line-height:1.5; margin:10px 0 0; }
+.ab-tips { margin:0; padding-left:16px; font-size:11px; color:var(--dim); line-height:1.55; }
+.ab-tips li { margin-bottom:5px; }
+.ab-tips b { color:rgba(255,255,255,.85); font-weight:650; }
+.ab-list { min-height:28px; }
+.ab-empty { font-size:11px; color:rgba(255,255,255,.3); padding:4px 0; }
+.ab-actions { display:flex; flex-direction:column; gap:7px; }
+.ab-btn {
+  width:100%; padding:11px; border-radius:12px; cursor:pointer; font-size:11px; font-weight:700;
+  background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.12); color:rgba(255,255,255,.85);
+  transition:background .25s, border-color .25s, transform .2s;
+}
+.ab-btn:hover { background:rgba(255,255,255,.09); border-color:rgba(255,255,255,.28); color:#fff; }
+.ab-btn:active { transform:scale(.98); }
+.ab-foot {
+  text-align:center; font-size:9px; color:rgba(255,255,255,.25);
+  letter-spacing:.12em; text-transform:uppercase; padding:4px 0 8px;
+}
+
+/* history rows inside about */
+#historyList .hist-item, #snapshotsList .hist-item, .history-list .hist-item {
+  padding:10px 12px !important; border-radius:12px !important; margin-bottom:6px !important;
+  background:rgba(0,0,0,.35) !important; border:1px solid rgba(255,255,255,.08) !important;
+  font-size:11px !important;
 }
 
 
@@ -1802,114 +1858,127 @@ body::before {
 
   <!-- ABOUT -->
   <div class="panel" id="panel-quality">
-    <div class="xq-wrap">
-      <div class="xq-head">
-        <div class="xq-title">Quality</div>
-        <div class="xq-sub">Build · process · download</div>
+    <div class="vq">
+      <div class="vq-hero">
+        <div class="vq-kicker">Tools</div>
+        <div class="vq-title">Quality</div>
+        <div class="vq-desc">Patch · process · inject to Studio</div>
       </div>
 
-      <div class="methods" id="vq-method-list">
-        <label class="sel"><input type="radio" name="vq-method" value="noblur" checked/><span><b>NoBlur</b><span class="hint">vasayyN</span></span></label>
-        <label><input type="radio" name="vq-method" value="lossless"/><span><b>LeVass Method</b><span class="hint">vasayyL</span></span></label>
+      <div class="vq-section-label">Method</div>
+      <div class="vq-methods" id="vq-method-list">
+        <label class="vq-m sel">
+          <input type="radio" name="vq-method" value="noblur" checked/>
+          <span class="vq-m-body">
+            <span class="vq-m-name">NoBlur</span>
+            <span class="vq-m-hint">Fast · suffix vasayyN</span>
+          </span>
+          <span class="vq-m-check"></span>
+        </label>
+        <label class="vq-m">
+          <input type="radio" name="vq-method" value="lossless"/>
+          <span class="vq-m-body">
+            <span class="vq-m-name">LeVass Method</span>
+            <span class="vq-m-hint">Lossless · suffix vasayyL</span>
+          </span>
+          <span class="vq-m-check"></span>
+        </label>
       </div>
 
-      <div class="drop" id="vq-drop">
-        Drop MP4 or click
-        <div id="vq-fname">No file</div>
+      <div class="vq-section-label">File</div>
+      <div class="vq-drop" id="vq-drop">
+        <div class="vq-drop-ico">⬆</div>
+        <div class="vq-drop-t">Drop MP4 here</div>
+        <div class="vq-drop-s">or tap to browse</div>
+        <div class="vq-fname" id="vq-fname">No file selected</div>
       </div>
-      <input type="file" id="vq-file" accept="video/mp4,video/quicktime,.mp4,.mov" hidden />
+      <input type="file" id="vq-file" accept="video/mp4,video/quicktime,.mp4,.mov" hidden/>
 
-      <div class="row-card xq-mult">
-        <div>Multiplier<span class="sub">inflation factor</span></div>
-        <input type="number" id="vq-mult" min="2" max="50" value="10" />
+      <div class="vq-row">
+        <div class="vq-row-l">
+          <div class="vq-row-t">Multiplier</div>
+          <div class="vq-row-s">inflation factor</div>
+        </div>
+        <input type="number" id="vq-mult" min="2" max="50" value="10" class="vq-num"/>
       </div>
 
-      <button type="button" id="vq-go" class="btn-primary" disabled>Process</button>
-      <button type="button" id="vq-dl" class="btn-secondary" style="display:none;margin-top:8px">Download</button>
+      <button type="button" id="vq-go" class="vq-btn" disabled>Process</button>
+      <button type="button" id="vq-dl" class="vq-btn vq-btn-ghost" style="display:none">Download</button>
 
-      <div class="log-head"><span>Log</span><button type="button" class="log-toggle" id="vq-log-toggle">Hide</button></div>
-      <div id="vq-log" class="log-box"></div>
+      <div class="vq-log-bar">
+        <span>Log</span>
+        <button type="button" id="vq-log-toggle" class="vq-log-hide">Hide</button>
+      </div>
+      <div id="vq-log" class="vq-log"></div>
     </div>
   </div>
   <div class="panel" id="panel-about">
-    <section class="about-shell">
-      <div class="about-mark-wrap">
-        <div class="brand-logo"><span>V</span></div>
-      </div>
-      <h2 class="about-name">vasay</h2>
-      <p class="about-tag">Made by Urfair</p>
-      <p class="about-line">Public TikTok metadata. Nothing invented.</p>
-
-      <div class="about-metrics">
-        <div class="about-metric">
-          <span id="localAnalyseCount">0</span>
-          <label>Analyses</label>
+    <div class="ab">
+      <div class="ab-hero">
+        <div class="ab-ring"><span>V</span></div>
+        <div class="ab-brand">vasay</div>
+        <div class="ab-tag">made by urfair</div>
+        <div class="ab-line">Public TikTok metadata. Nothing invented.</div>
+        <div class="ab-stats">
+          <div class="ab-stat"><b id="localAnalyseCount">0</b><span>Analyses</span></div>
+          <div class="ab-stat"><b id="localLibCount">0</b><span>Cached</span></div>
+          <div class="ab-stat"><b id="localHistCount">0</b><span>History</span></div>
         </div>
-        <div class="about-metric">
-          <span id="localLibCount">0</span>
-          <label>Cached</label>
-        </div>
-        <div class="about-metric">
-          <span id="localHistCount">0</span>
-          <label>History</label>
+        <div class="ab-links">
+          <a href="https://www.tiktok.com/@urfair.aep" target="_blank" rel="noopener">TikTok</a>
+          <a href="https://t.me/tturfair" target="_blank" rel="noopener">Telegram</a>
         </div>
       </div>
 
-      <div class="about-links">
-        <a href="https://www.tiktok.com/@urfair.aep" target="_blank" rel="noopener">TikTok</a>
-        <a href="https://t.me/tturfair" target="_blank" rel="noopener">Telegram</a>
-        <a id="compressBtn3" href="https://compressbase.com/upload-method" target="_blank" rel="noopener">CompressBase</a>
+      <div class="ab-card">
+        <div class="ab-h">What it does</div>
+        <div class="ab-chips">
+          <span>Expand vm / vt</span>
+          <span>Public stats</span>
+          <span>Region</span>
+          <span>Quality estimate</span>
+          <span>Sound</span>
+          <span>Hashtags</span>
+          <span>History</span>
+          <span>Snapshots</span>
+        </div>
+        <p class="ab-note">Cannot see private shadowban / FYP tools. Those stay in the TikTok app.</p>
       </div>
-    </section>
 
-    <section class="about-block">
-      <div class="about-block-head"><h3>What it does</h3></div>
-      <div class="about-chips">
-        <span class="about-chip">Expand vm / vt</span>
-        <span class="about-chip">Public stats</span>
-        <span class="about-chip">Region signal</span>
-        <span class="about-chip">Quality estimate</span>
-        <span class="about-chip">Sound stream</span>
-        <span class="about-chip">Hashtags</span>
-        <span class="about-chip">History</span>
-        <span class="about-chip">Snapshots</span>
+      <div class="ab-card">
+        <div class="ab-h">Tips</div>
+        <ul class="ab-tips">
+          <li>Paste full or short links — both work.</li>
+          <li>Tap a history row to re-run Analyse.</li>
+          <li>Use <b>Copy summary</b> after a run for Discord / notes.</li>
+          <li>Snapshots save the last report on this device.</li>
+        </ul>
       </div>
-      <p class="about-note">Cannot see private shadowban / FYP tools. Those stay in the TikTok app.</p>
-    </section>
 
-    <section class="about-block">
-      <div class="about-block-head"><h3>Tips</h3></div>
-      <ul class="about-tips">
-        <li>Paste full or short links — both work.</li>
-        <li>Tap a history row to re-run Analyse.</li>
-        <li>Use <b>Copy summary</b> after a run for Discord / notes.</li>
-        <li>Snapshots save the last report on this device.</li>
-      </ul>
-    </section>
-
-    <section class="about-block">
-      <div class="about-block-head">
-        <h3>Recent</h3>
-        <button type="button" class="text-btn" id="historyClearBtn">Clear</button>
+      <div class="ab-card">
+        <div class="ab-h-row">
+          <div class="ab-h">Recent</div>
+          <button type="button" class="ab-text" id="historyClearBtn">Clear</button>
+        </div>
+        <div id="historyList" class="ab-list"><div class="ab-empty">No history yet.</div></div>
       </div>
-      <div id="historyList" class="history-list"><div class="feed-empty">No history yet.</div></div>
-    </section>
 
-    <section class="about-block">
-      <div class="about-block-head">
-        <h3>Saved snapshots</h3>
-        <button type="button" class="text-btn" id="snapshotsClearBtn">Clear</button>
+      <div class="ab-card">
+        <div class="ab-h-row">
+          <div class="ab-h">Saved snapshots</div>
+          <button type="button" class="ab-text" id="snapshotsClearBtn">Clear</button>
+        </div>
+        <div id="snapshotsList" class="ab-list"><div class="ab-empty">No snapshots yet.</div></div>
       </div>
-      <div id="snapshotsList" class="history-list"><div class="feed-empty">No snapshots yet.</div></div>
-    </section>
 
-    <section class="about-block about-block-tools">
-      <button type="button" class="btn btn-ghost btn-sm" id="copyLastReportBtn">Copy last report</button>
-      <button type="button" class="btn btn-ghost btn-sm" id="clearCacheBtn">Clear cache</button>
-      <button type="button" class="btn btn-ghost btn-sm" id="pasteClipboardBtn">Paste from clipboard</button>
-    </section>
+      <div class="ab-actions">
+        <button type="button" class="ab-btn" id="copyLastReportBtn">Copy last report</button>
+        <button type="button" class="ab-btn" id="clearCacheBtn">Clear cache</button>
+        <button type="button" class="ab-btn" id="pasteClipboardBtn">Paste clipboard</button>
+      </div>
 
-    <p class="about-foot">vasay v2.1</p>
+      <div class="ab-foot">vasay v2.1</div>
+    </div>
   </div>
 </div><!-- /.app -->
 
@@ -4674,7 +4743,7 @@ body::before {
 <script>
 (function(){
   function syncVq(){
-    document.querySelectorAll('#vq-method-list label, .methods label').forEach(function(lab){
+    document.querySelectorAll('#vq-method-list label, .vq-m, .methods label').forEach(function(lab){
       var inp=lab.querySelector('input[type=radio]');
       if(!inp) return;
       lab.classList.toggle('sel', !!inp.checked);
@@ -4713,6 +4782,33 @@ body::before {
       if(window.vasaySfx) window.vasaySfx.click();
     });
   }
+})();
+</script>
+
+
+<script>
+(function(){
+  var btn=document.getElementById("vq-log-toggle");
+  var log=document.getElementById("vq-log");
+  if(btn&&log){
+    btn.addEventListener("click",function(){
+      var hide=log.style.display==="none";
+      log.style.display=hide?"":"none";
+      btn.textContent=hide?"Hide":"Show";
+      if(window.vasaySfx) window.vasaySfx.soft();
+    });
+  }
+  function sync(){
+    document.querySelectorAll("#vq-method-list .vq-m").forEach(function(lab){
+      var inp=lab.querySelector("input");
+      if(inp) lab.classList.toggle("sel", inp.checked);
+    });
+  }
+  document.addEventListener("change",function(e){
+    if(e.target&&e.target.name==="vq-method"){ sync(); if(window.vasaySfx) window.vasaySfx.soft(); }
+  });
+  document.addEventListener("DOMContentLoaded",sync);
+  sync();
 })();
 </script>
 
