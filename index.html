@@ -1668,6 +1668,35 @@ body::before {
 }
 
 
+
+.pf-avatar {
+  width: 52px !important;
+  height: 52px !important;
+  border-radius: 50% !important;
+  overflow: hidden !important;
+  flex-shrink: 0 !important;
+  display: grid !important;
+  place-items: center !important;
+  font-weight: 800 !important;
+  font-size: 16px !important;
+  color: #fff !important;
+  background: radial-gradient(circle at 40% 35%, rgba(255,255,255,.15), rgba(255,255,255,.04)) !important;
+  border: 1.5px solid rgba(255,255,255,.22) !important;
+  box-shadow: 0 0 18px rgba(255,255,255,.08) !important;
+  padding: 0 !important;
+}
+.pf-avatar img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  border-radius: 50% !important;
+  display: block !important;
+}
+.profile-avatar, .profile-avatar img {
+  border-radius: 50% !important;
+  object-fit: cover !important;
+}
+
   </style>
 </head>
 <body>
@@ -3427,8 +3456,9 @@ body::before {
 
     // —— My profile @urfair.aep ——
     const MY_TT='urfair.aep';
+    try{ localStorage.removeItem('vasay_profile_urfair.aep'); }catch(_){}
     // Last known public snapshot (updated whenever live fetch succeeds)
-    const PROFILE_SEED={ nickname:'𝙐𝙍𝙁𝘼𝙄𝙍', followers:5230, likes:631500, following:68, videos:132, bio:'14 y.o || app: AE 25 · presets @tturfair', source:'seed' };
+    const PROFILE_SEED={ nickname:'URFAIR', followers:null, likes:null, following:null, videos:null, bio:'After Effects · edits · AE', avatar:null, source:'seed' };
 
     function parseCompactNum(s){
       if(s==null) return null;
@@ -3457,12 +3487,14 @@ body::before {
         if(p.nickname && $('myNickname')) $('myNickname').textContent=p.nickname;
         if($('myAvatar')){
           if(p.avatar){
-            $('myAvatar').innerHTML='<img src="'+esc(p.avatar)+'" alt="" referrerpolicy="no-referrer" onerror="this.remove()" />';
+            var av=String(p.avatar).replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+            $('myAvatar').innerHTML='<img src="'+av+'" alt="" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.parentNode.textContent=\'U\'" />';
           } else if(p.nickname){
             const ch=(String(p.nickname).replace(/[^\w\u0400-\u04FF]/g,'').charAt(0)||'U').toUpperCase();
-            if(!$('myAvatar').querySelector('img')) $('myAvatar').textContent=ch;
+            $('myAvatar').textContent=ch;
           }
         }
+        if(p.bio && $('myBio')) $('myBio').textContent=String(p.bio).slice(0,80);
         if(p.followers!=null && $('myFollowers')) $('myFollowers').textContent=fmtNum(p.followers);
         if(p.following!=null && $('myFollowing')) $('myFollowing').textContent=fmtNum(p.following);
         if(p.likes!=null && $('myLikes')) $('myLikes').textContent=fmtNum(p.likes);
@@ -3544,19 +3576,27 @@ body::before {
         }
       }catch(_){}
 
+      
+      // 4) Avatar fallbacks (unavatar / dd)
+      if(!profile.avatar){
+        try{
+          profile.avatar='https://unavatar.io/tiktok/'+encodeURIComponent(MY_TT)+'?fallback=false';
+        }catch(_){}
+      }
+
       const hasCounts=profile.followers!=null||profile.likes!=null;
       const hasAny=hasCounts||profile.nickname;
 
       if(hasCounts){
         applyProfileUI(profile);
-        try{ localStorage.setItem('vasay_profile_'+MY_TT, JSON.stringify({ ts:Date.now(), profile })); }catch(_){}
+        try{ localStorage.setItem('vasay_profile_v2_'+MY_TT, JSON.stringify({ ts:Date.now(), profile })); }catch(_){}
         sound.play('done');
         return;
       }
 
       // Cache
       try{
-        const raw=localStorage.getItem('vasay_profile_'+MY_TT);
+        const raw=localStorage.getItem('vasay_profile_v2_'+MY_TT);
         if(raw){
           const o=JSON.parse(raw);
           if(o&&o.profile&&(o.profile.followers!=null||o.profile.likes!=null)){
@@ -3580,7 +3620,7 @@ body::before {
     $('refreshProfileBtn')&&$('refreshProfileBtn').addEventListener('click',()=>{ sound.play('click'); fetchMyProfile(); });
     // Instant seed, then live refresh
     applyProfileUI(PROFILE_SEED);
-    setTimeout(()=>{ try{ fetchMyProfile(); }catch(e){ console.warn(e); } }, 500);
+    setTimeout(function(){ try{ fetchMyProfile(); }catch(e){ console.warn(e); } }, 500);
 
 
     // —— Video library + News (@urfair.aep) ——
