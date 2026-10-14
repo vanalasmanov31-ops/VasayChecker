@@ -1557,6 +1557,117 @@ textarea, select, .license-input {
 }
 
 
+
+
+/* ══════ Universal tab shell ══════ */
+.tab-shell { display:flex; flex-direction:column; gap:10px; padding:2px 0 8px; }
+.tab-hero { text-align:center; padding:10px 4px 6px; }
+.tab-kicker { font-size:9px; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:rgba(255,255,255,.35); margin-bottom:4px; }
+.tab-title { font-size:15px; font-weight:800; letter-spacing:.05em; color:#fff; }
+.tab-desc { font-size:10px; color:var(--dim); margin-top:4px; }
+
+.an-hero { padding-bottom:8px !important; }
+.an-input-row { margin-top:12px; display:flex; flex-direction:column; gap:8px; }
+.an-input-row .url-input {
+  width:100%; padding:12px 14px !important; border-radius:12px !important;
+  background:rgba(0,0,0,.5) !important; border:1px solid rgba(255,255,255,.12) !important;
+  font-size:13px !important;
+}
+.an-btns { display:flex; gap:6px; }
+.an-btns .vq-btn { flex:1.4; }
+.an-btns .ab-btn { flex:1; padding:12px 8px !important; }
+
+.profile-card .pf-head {
+  display:flex; align-items:center; gap:12px; text-align:left;
+}
+.pf-avatar {
+  width:48px; height:48px; border-radius:50%; flex-shrink:0;
+  display:grid; place-items:center; font-weight:800; font-size:16px; color:#fff;
+  background:radial-gradient(circle at 40% 35%,rgba(255,255,255,.15),rgba(255,255,255,.04));
+  border:1.5px solid rgba(255,255,255,.2);
+  box-shadow:0 0 16px rgba(255,255,255,.06);
+}
+.pf-name { font-size:13px; font-weight:800; color:#fff; }
+.pf-handle a { font-size:11px; color:rgba(255,255,255,.55); text-decoration:none; }
+.pf-handle a:hover { color:#fff; }
+.pf-bio { font-size:10px; color:var(--dim); margin-top:2px; }
+.profile-card .ab-stats { grid-template-columns:1fr 1fr 1fr 1fr; }
+
+.news-changelog { display:flex; flex-direction:column; gap:8px; }
+.nc-item {
+  display:flex; gap:10px; padding:10px 12px; border-radius:12px;
+  background:rgba(0,0,0,.35); border:1px solid rgba(255,255,255,.07);
+}
+.nc-date {
+  flex-shrink:0; font-size:9px; font-weight:700; letter-spacing:.06em;
+  text-transform:uppercase; color:rgba(255,255,255,.4); min-width:52px; padding-top:2px;
+}
+.nc-body { font-size:11px; color:rgba(255,255,255,.7); line-height:1.45; }
+.nc-body b { color:#fff; font-weight:700; }
+
+.import-area {
+  width:100%; min-height:72px; padding:12px !important; border-radius:12px !important;
+  background:rgba(0,0,0,.45) !important; border:1px solid rgba(255,255,255,.1) !important;
+  color:#fff !important; font-size:12px !important; resize:vertical;
+  font-family:Inter,system-ui,sans-serif !important;
+}
+.video-feed { display:flex; flex-direction:column; gap:6px; }
+.video-feed .vcard, .vcard {
+  padding:12px !important; border-radius:12px !important;
+  background:rgba(0,0,0,.35) !important; border:1px solid rgba(255,255,255,.08) !important;
+  box-shadow:none !important;
+}
+.feed-empty, .ab-empty { font-size:11px; color:rgba(255,255,255,.3); padding:8px 0; text-align:center; }
+.chip {
+  display:inline-block; padding:4px 9px; border-radius:999px; font-size:10px; font-weight:600;
+  background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); color:rgba(255,255,255,.65);
+}
+.quick-list { display:flex; flex-direction:column; gap:6px; }
+
+/* Force shake+blur on all panels content */
+.panel.active {
+  animation: rise .4s cubic-bezier(.16,1,.3,1), shellShake 5.5s ease-in-out infinite !important;
+}
+.app {
+  animation: shellShake 5.5s ease-in-out infinite !important;
+  max-width: 380px !important;
+  gap: 8px !important;
+}
+body::before {
+  animation: shellBlurPulse 6s ease-in-out infinite !important;
+}
+
+/* Compact cards globally */
+.card, .ab-card, .hero, .row-card {
+  padding: 12px !important;
+  margin-bottom: 0 !important;
+  border-radius: 14px !important;
+}
+.stat-box {
+  background:rgba(0,0,0,.35) !important; border:1px solid rgba(255,255,255,.08) !important;
+  border-radius:12px !important; padding:10px 6px !important;
+}
+.stat-box .num { color:#fff !important; font-size:14px !important; }
+.stat-box .lbl { font-size:9px !important; color:var(--dim) !important; text-transform:uppercase; letter-spacing:.05em; }
+
+/* Settings panel match */
+.settings-panel {
+  background:rgba(12,12,12,.92) !important;
+  border:1px solid rgba(255,255,255,.12) !important;
+  border-radius:18px !important;
+  backdrop-filter:blur(28px) !important;
+  box-shadow:0 20px 60px rgba(0,0,0,.55) !important;
+}
+
+/* Scan status */
+.scan-status {
+  background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03)) !important;
+  border:1px solid rgba(255,255,255,.1) !important;
+  border-radius:14px !important;
+  padding:14px !important;
+}
+
+
   </style>
 </head>
 <body>
@@ -1670,53 +1781,45 @@ textarea, select, .license-input {
   <!-- ANALYSE -->
   <div class="panel active" id="panel-analyse">
 
-    <section class="hero">
-      <div class="panel-badge">Live</div>
-      <h1>TikTok analysis</h1>
-      <p>Paste a public TikTok link.</p>
-      <div class="input-row">
-        <input class="url-input" id="urlInput" type="url" placeholder="https://www.tiktok.com/@user/video/… or vm.tiktok.com/…" autocomplete="off" />
-        <button class="btn btn-primary" id="analyseBtn">🔍 Analyse</button>
-        <button class="btn btn-ghost btn-sm" id="resetBtn">↺ Reset</button>
-        <button class="btn btn-ghost btn-sm" id="pasteClipBtn" type="button">📋 Paste</button>
-        <button class="btn btn-ghost btn-sm" id="saveSnapBtn" type="button" title="Save snapshot">💾 Save</button>
-      </div>
-      <div class="upload-bar">
-        <div class="upload-bar-text">
-          <strong>Auto convert for TikTok</strong>
-          <span>Opens CompressBase → pick video → method → download</span>
+    <section class="tab-hero an-hero">
+      <div class="tab-kicker">Analyse</div>
+      <div class="tab-title">TikTok check</div>
+      <div class="tab-desc">Public metadata · real stats</div>
+      <div class="an-input-row">
+        <input class="url-input" id="urlInput" type="url" placeholder="Paste TikTok link" autocomplete="off" spellcheck="false"/>
+        <div class="an-btns">
+          <button class="vq-btn" id="analyseBtn" type="button">Analyse</button>
+          <button class="ab-btn" id="pasteClipBtn" type="button">Paste</button>
+          <button class="ab-btn" id="saveSnapBtn" type="button">Save</button>
         </div>
-        <a class="btn btn-secondary btn-sm" id="compressBtn" href="https://compressbase.com/upload-method" target="_blank" rel="noopener">🎬 Convert now</a>
       </div>
-      <div class="quick-tips">
-        <span class="chip">Real public stats</span>
-        <span class="chip">Music</span>
-        <span class="chip">Phone / PC quality</span>
-        <span class="chip">Region</span>
+      <div class="ab-chips" style="justify-content:center;margin-top:10px">
+        <span>Public stats</span><span>Music</span><span>Quality</span><span>Region</span>
       </div>
     </section>
 
-    <div class="card" style="margin-top:4px">
-      <div class="profile-head">
-        <div class="profile-avatar" id="myAvatar">U</div>
-        <div class="profile-meta">
-          <div class="profile-name" id="myNickname">urfair.aep</div>
-          <div class="profile-handle"><a href="https://www.tiktok.com/@urfair.aep" target="_blank" rel="noopener">@urfair.aep</a></div>
+    <div class="ab-card profile-card">
+      <div class="pf-head">
+        <div class="pf-avatar" id="myAvatar">U</div>
+        <div class="pf-meta">
+          <div class="pf-name" id="myNickname">urfair.aep</div>
+          <div class="pf-handle"><a href="https://www.tiktok.com/@urfair.aep" target="_blank" rel="noopener">@urfair.aep</a></div>
+          <div class="pf-bio" id="myBio">After Effects · edits · AE</div>
         </div>
-        <button class="btn btn-ghost btn-sm" id="refreshProfileBtn" type="button">↻ Refresh</button>
+        <button class="ab-text" id="refreshProfileBtn" type="button">↻</button>
       </div>
-      <div class="grid-2" style="margin-top:12px">
-        <div class="stat-box"><div class="num" id="myFollowers">—</div><div class="lbl">Followers</div></div>
-        <div class="stat-box"><div class="num" id="myLikes">—</div><div class="lbl">Total likes</div></div>
-        <div class="stat-box"><div class="num" id="myFollowing">—</div><div class="lbl">Following</div></div>
-        <div class="stat-box"><div class="num" id="myVideos">—</div><div class="lbl">Videos</div></div>
+      <div class="ab-stats" style="margin-top:12px">
+        <div class="ab-stat"><b id="myFollowers">—</b><span>Followers</span></div>
+        <div class="ab-stat"><b id="myLikes">—</b><span>Likes</span></div>
+        <div class="ab-stat"><b id="myFollowing">—</b><span>Following</span></div>
+        <div class="ab-stat"><b id="myVideos">—</b><span>Videos</span></div>
       </div>
-      <p class="note" id="myProfileNote" style="margin-top:10px">Tap <strong>Refresh</strong> to load public profile stats.</p>
+      <p class="ab-note" id="myProfileNote" style="margin-top:10px;text-align:center">Tap ↻ to load live public stats from TikTok.</p>
     </div>
 
-    <div class="card">
-      <h3>⚡ Quick analyse · your posts</h3>
-      <div id="quickSeedList" style="display:flex;flex-direction:column;gap:6px"></div>
+    <div class="ab-card">
+      <div class="ab-h">Quick analyse · your posts</div>
+      <div id="quickSeedList" class="quick-list"></div>
     </div>
 
     <div class="scan-status" id="scanStatus">
@@ -1827,36 +1930,71 @@ textarea, select, .license-input {
 
   <!-- NEWS -->
   <div class="panel" id="panel-news">
-    <div class="card">
-      <h3>📰 News · @urfair.aep</h3>
-      <div class="feed-toolbar">
-        <button class="btn btn-ghost btn-sm" id="newsRefreshBtn" type="button">↻ Try live feed</button>
-        <span class="chip" id="newsCount">0 posts</span>
+    <div class="tab-shell">
+      <div class="tab-hero">
+        <div class="tab-kicker">Feed</div>
+        <div class="tab-title">News</div>
+        <div class="tab-desc">Updates · @urfair.aep</div>
       </div>
-      <div class="video-feed" id="newsFeed"><div class="feed-empty">Loading…</div></div>
+
+      <div class="ab-card">
+        <div class="ab-h-row">
+          <div class="ab-h">Changelog</div>
+          <button class="ab-text" id="newsRefreshBtn" type="button">↻ Live</button>
+        </div>
+        <div class="news-changelog">
+          <div class="nc-item">
+            <div class="nc-date">Oct 2026</div>
+            <div class="nc-body"><b>UI 2.1</b> — glass design, Quality / About rebuild, kill-switch on site, SFX, shake+blur</div>
+          </div>
+          <div class="nc-item">
+            <div class="nc-date">Oct 2026</div>
+            <div class="nc-body"><b>Quality</b> — NoBlur + LeVass methods, compact process log</div>
+          </div>
+          <div class="nc-item">
+            <div class="nc-date">Site</div>
+            <div class="nc-body"><b>@urfair.aep</b> — After Effects edits · TikTok · Telegram @tturfair</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ab-card">
+        <div class="ab-h-row">
+          <div class="ab-h">Live posts</div>
+          <span class="chip" id="newsCount">0 posts</span>
+        </div>
+        <div class="video-feed" id="newsFeed"><div class="ab-empty">Tap Live to load public posts.</div></div>
+      </div>
     </div>
   </div>
-
-  <!-- VIDEOS -->
   <div class="panel" id="panel-videos">
-    <div class="card">
-      <h3>🎬 All my videos</h3>
-      <div class="feed-toolbar">
-        <button class="btn btn-ghost btn-sm" id="videosRefreshBtn" type="button">↻ Try live feed</button>
-        <button class="btn btn-ghost btn-sm" id="videosClearBtn" type="button">Clear library</button>
-        <span class="chip" id="videosCount">0 videos</span>
+    <div class="tab-shell">
+      <div class="tab-hero">
+        <div class="tab-kicker">Library</div>
+        <div class="tab-title">Videos</div>
+        <div class="tab-desc">Import · browse · re-analyse</div>
       </div>
-      <p class="note" style="margin-bottom:10px">Import uses the same video API as Analyse.</p>
-      <textarea class="import-area" id="importLinks" placeholder="Paste TikTok links, one per line"></textarea>
-      <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-        <button class="btn btn-primary btn-sm" id="importLinksBtn" type="button">📥 Import links</button>
-        <span style="font-size:.75rem;color:var(--dim)" id="importStatus"></span>
+
+      <div class="ab-card">
+        <div class="ab-h-row">
+          <div class="ab-h">Import links</div>
+          <span class="chip" id="videosCount">0 videos</span>
+        </div>
+        <textarea class="import-area" id="importLinks" placeholder="Paste TikTok links, one per line"></textarea>
+        <div class="ab-actions" style="margin-top:8px">
+          <button class="vq-btn" id="importLinksBtn" type="button">Import links</button>
+          <button class="ab-btn" id="videosRefreshBtn" type="button">↻ Try live feed</button>
+          <button class="ab-btn" id="videosClearBtn" type="button">Clear library</button>
+        </div>
+        <div class="ab-note" id="importStatus" style="margin-top:8px"></div>
       </div>
-      <div class="video-feed" id="videosFeed" style="margin-top:12px"><div class="feed-empty">No videos yet.</div></div>
+
+      <div class="ab-card">
+        <div class="ab-h">Library</div>
+        <div class="video-feed" id="videosFeed"><div class="ab-empty">No videos yet.</div></div>
+      </div>
     </div>
   </div>
-
-  <!-- ABOUT -->
   <div class="panel" id="panel-quality">
     <div class="vq">
       <div class="vq-hero">
