@@ -1831,17 +1831,17 @@ body::before {
       <div class="pf-head">
         <div class="pf-avatar" id="myAvatar">U</div>
         <div class="pf-meta">
-          <div class="pf-name" id="myNickname">urfair.aep</div>
+          <div class="pf-name" id="myNickname">𝙐𝙍𝙁𝘼𝙄𝙍</div>
           <div class="pf-handle"><a href="https://www.tiktok.com/@urfair.aep" target="_blank" rel="noopener">@urfair.aep</a></div>
-          <div class="pf-bio" id="myBio">After Effects · edits · AE</div>
+          <div class="pf-bio" L y.o || app: AE 25 · presets @tturfair</div>
         </div>
         <button class="ab-text" id="refreshProfileBtn" type="button">↻</button>
       </div>
       <div class="ab-stats" style="margin-top:12px">
-        <div class="ab-stat"><b id="myFollowers">—</b><span>Followers</span></div>
-        <div class="ab-stat"><b id="myLikes">—</b><span>Likes</span></div>
-        <div class="ab-stat"><b id="myFollowing">—</b><span>Following</span></div>
-        <div class="ab-stat"><b id="myVideos">—</b><span>Videos</span></div>
+        <div class="ab-stat"><b id="myFollowers">5.3K</b><span>Followers</span></div>
+        <div class="ab-stat"><b id="myLikes">642K</b><span>Likes</span></div>
+        <div class="ab-stat"><b id="myFollowing">66</b><span>Following</span></div>
+        <div class="ab-stat"><b id="myVideos">145</b><span>Videos</span></div>
       </div>
       <p class="ab-note" id="myProfileNote" style="margin-top:10px;text-align:center">Tap ↻ to load live public stats from TikTok.</p>
     </div>
@@ -3458,7 +3458,7 @@ body::before {
     const MY_TT='urfair.aep';
     try{ localStorage.removeItem('vasay_profile_urfair.aep'); }catch(_){}
     // Last known public snapshot (updated whenever live fetch succeeds)
-    const PROFILE_SEED={ nickname:'URFAIR', followers:null, likes:null, following:null, videos:null, bio:'After Effects · edits · AE', avatar:null, source:'seed' };
+    const PROFILE_SEED={ nickname:'𝙐𝙍𝙁𝘼𝙄𝙍', followers:5277, likes:641600, following:66, videos:145, bio:'14 y.o || app: AE 25 · presets @tturfair', avatar:null, source:'seed' };
 
     function parseCompactNum(s){
       if(s==null) return null;
@@ -3509,115 +3509,126 @@ body::before {
       }catch(e){ console.warn('applyProfileUI', e); }
     }
 
+    
+    function parseJinaProfile(text){
+      const out={ nickname:null, avatar:null, followers:null, following:null, likes:null, videos:null, bio:null };
+      if(!text) return out;
+      const t=String(text);
+      const av=t.match(/!\[[^\]]*\]\((https:\/\/[^)\s]+(?:avt|avatar|cropcenter)[^)\s]*)\)/i)
+            || t.match(/!\[[^\]]*Avatar[^\]]*\]\((https:\/\/[^)\s]+)\)/i);
+      if(av) out.avatar=av[1].replace(/&amp;/g,'&');
+      const nick=t.match(/^##\s+(.+)$/m);
+      if(nick) out.nickname=nick[1].trim();
+      const fol=t.match(/\*\*([\d.,]+[KMB]?)\*\*\s*Followers/i) || t.match(/([\d.,]+[KMB]?)\s*Followers/i);
+      const flw=t.match(/\*\*([\d.,]+)\*\*\s*Following/i) || t.match(/([\d.,]+)\s*Following/i);
+      const lik=t.match(/\*\*([\d.,]+[KMB]?)\*\*\s*Likes/i) || t.match(/([\d.,]+[KMB]?)\s*Likes/i);
+      if(fol) out.followers=parseCompactNum(fol[1]);
+      if(flw) out.following=parseCompactNum(flw[1]);
+      if(lik) out.likes=parseCompactNum(lik[1]);
+      const bio=t.match(/##\s+[^\n]+\n+###[^\n]+\n+(?:\*\*[^\n]+\n+)+##\s+(.+?)(?:\n\[|\n\nSuggested|\nView all|$)/s)
+            || t.match(/Likes\s*\n+##\s+(.+?)(?:\n\[|\n\nSuggested|$)/s);
+      if(bio) out.bio=bio[1].replace(/\n+/g,' · ').trim().slice(0,120);
+      return out;
+    }
+
     async function fetchMyProfile(){
       const note=$('myProfileNote');
-      if(note) note.textContent='Loading public profile…';
-      sound.play('scan');
-      let profile={ nickname:null, avatar:null, followers:null, following:null, likes:null, videos:null, bio:null, source:'' };
-      let errors=[];
+      if(note) note.textContent='Loading @'+MY_TT+'…';
+      try{ if(window.vasaySfx) window.vasaySfx.soft(); else if(sound&&sound.play) sound.play('scan'); }catch(_){}
 
-      // 1) Microlink via XHR (more reliable from file:// on mobile)
+      let profile={ nickname:null, avatar:null, followers:null, following:null, likes:null, videos:null, bio:null, source:'' };
+      const errors=[];
+
+      // 1) Jina reader — full public stats + avatar + bio (CORS ok)
       try{
-        const url='https://api.microlink.io/?url='+encodeURIComponent('https://www.tiktok.com/@'+MY_TT);
-        let text='', status=0;
-        const xr=await xhrJson(url,'GET',null,15000);
-        status=xr.status; text=xr.text||'';
-        if(!text){
-          try{
-            const r=await fetchJsonTimeout(url,{ method:'GET', credentials:'omit' },15000);
-            status=r?r.status:0;
-            text=r?await r.text():'';
-          }catch(e){ errors.push('microlink fetch: '+(e.message||e)); }
+        const jinaUrl='https://r.jina.ai/https://www.tiktok.com/@'+encodeURIComponent(MY_TT);
+        let text='';
+        try{
+          const r=await fetch(jinaUrl,{ method:'GET', mode:'cors', credentials:'omit',
+            headers:{ 'Accept':'text/plain,text/markdown,*/*' } });
+          if(r && r.ok) text=await r.text();
+          else errors.push('jina HTTP '+(r&&r.status));
+        }catch(e1){
+          const xr=await xhrJson(jinaUrl,'GET',null,20000);
+          text=xr.text||'';
+          if(!xr.ok && !text) errors.push('jina xhr '+(xr.error||xr.status));
         }
-        const j=parseLooseJson(text);
-        if(j&&(j.status==='success'||j.data)&&j.data){
+        if(text && text.length>80){
+          const p=parseJinaProfile(text);
+          if(p.nickname) profile.nickname=p.nickname;
+          if(p.avatar) profile.avatar=p.avatar;
+          if(p.followers!=null) profile.followers=p.followers;
+          if(p.following!=null) profile.following=p.following;
+          if(p.likes!=null) profile.likes=p.likes;
+          if(p.bio) profile.bio=p.bio;
+          if(p.followers!=null || p.likes!=null) profile.source='TikTok';
+        }
+      }catch(e){ errors.push('jina: '+(e.message||e)); }
+
+      // 2) Microlink — avatar + title backup
+      try{
+        const url='https://api.microlink.io/?url='+encodeURIComponent('https://www.tiktok.com/@'+MY_TT)+'&meta=true';
+        const xr=await xhrJson(url,'GET',null,15000);
+        const j=parseLooseJson(xr.text||'');
+        if(j && j.data){
           const d=j.data;
-          profile.nickname=(d.author||d.title||'').replace(/\s*\(@.*$/,'').trim()||MY_TT;
-          if(d.image&&d.image.url) profile.avatar=d.image.url;
-          else if(typeof d.image==='string') profile.avatar=d.image;
-          const parsed=parseProfileDescription(d.description||'');
-          if(parsed.followers!=null) profile.followers=parsed.followers;
-          if(parsed.likes!=null) profile.likes=parsed.likes;
-          if(parsed.bio) profile.bio=parsed.bio;
-          profile.source='Microlink';
-        } else {
-          errors.push('microlink HTTP '+status);
+          if(!profile.nickname) profile.nickname=(d.author||d.title||'').replace(/\s*\(@.*$/,'').trim()||null;
+          const img=d.image && (d.image.url||d.image);
+          if(img && !profile.avatar) profile.avatar=typeof img==='string'?img:null;
+          if(!profile.source) profile.source='Microlink';
         }
       }catch(e){ errors.push('microlink: '+(e.message||e)); }
 
-      // 2) oEmbed — nickname
+      // 3) oEmbed nickname
       try{
         const r=await xhrJson('https://www.tiktok.com/oembed?url='+encodeURIComponent('https://www.tiktok.com/@'+MY_TT),'GET',null,10000);
         const j=parseLooseJson(r.text||'');
-        if(j&&j.author_name){
-          profile.nickname=j.author_name;
-          if(!profile.source) profile.source='oEmbed';
-        }
-      }catch(e){ errors.push('oembed: '+(e.message||e)); }
-
-      // 3) tikwm user (optional)
-      try{
-        const r=await xhrJson('https://www.tikwm.com/api/user/info?unique_id='+encodeURIComponent(MY_TT),'GET',null,10000);
-        if(r.status&&r.status!==403){
-          const j=parseLooseJson(r.text||'');
-          const data=j&&j.data?j.data:null;
-          if(data){
-            const user=data.user||data;
-            const stats=data.stats||user.stats||{};
-            if(user.nickname) profile.nickname=user.nickname;
-            const av=user.avatarThumb||user.avatarMedium||user.avatar;
-            if(av) profile.avatar=av;
-            if(stats.followerCount!=null) profile.followers=Number(stats.followerCount);
-            if(stats.followingCount!=null) profile.following=Number(stats.followingCount);
-            if(stats.heartCount!=null||stats.heart!=null) profile.likes=Number(stats.heartCount??stats.heart);
-            if(stats.videoCount!=null) profile.videos=Number(stats.videoCount);
-            profile.source='tikwm';
-          }
-        }
+        if(j && j.author_name && !profile.nickname) profile.nickname=j.author_name;
       }catch(_){}
 
-      
-      // 4) Avatar fallbacks (unavatar / dd)
+      // 4) Avatar absolute fallback
       if(!profile.avatar){
+        profile.avatar='https://unavatar.io/tiktok/'+encodeURIComponent(MY_TT);
+      }
+
+      // Merge with seed for any missing counts so UI never empty
+      const merged=Object.assign({}, PROFILE_SEED, {
+        nickname: profile.nickname || PROFILE_SEED.nickname,
+        avatar: profile.avatar || PROFILE_SEED.avatar,
+        followers: profile.followers!=null ? profile.followers : PROFILE_SEED.followers,
+        following: profile.following!=null ? profile.following : PROFILE_SEED.following,
+        likes: profile.likes!=null ? profile.likes : PROFILE_SEED.likes,
+        videos: profile.videos!=null ? profile.videos : PROFILE_SEED.videos,
+        bio: profile.bio || PROFILE_SEED.bio,
+        source: profile.source || 'seed'
+      });
+
+      applyProfileUI(merged);
+
+      if(profile.followers!=null || profile.likes!=null){
+        try{ localStorage.setItem('vasay_profile_v2_'+MY_TT, JSON.stringify({ ts:Date.now(), profile:merged })); }catch(_){}
+        if(note) note.textContent='@'+MY_TT+' · live · '+merged.source;
+        try{ if(window.vasaySfx) window.vasaySfx.ok(); else if(sound&&sound.play) sound.play('done'); }catch(_){}
+      } else {
+        // try cache
         try{
-          profile.avatar='https://unavatar.io/tiktok/'+encodeURIComponent(MY_TT)+'?fallback=false';
-        }catch(_){}
-      }
-
-      const hasCounts=profile.followers!=null||profile.likes!=null;
-      const hasAny=hasCounts||profile.nickname;
-
-      if(hasCounts){
-        applyProfileUI(profile);
-        try{ localStorage.setItem('vasay_profile_v2_'+MY_TT, JSON.stringify({ ts:Date.now(), profile })); }catch(_){}
-        sound.play('done');
-        return;
-      }
-
-      // Cache
-      try{
-        const raw=localStorage.getItem('vasay_profile_v2_'+MY_TT);
-        if(raw){
-          const o=JSON.parse(raw);
-          if(o&&o.profile&&(o.profile.followers!=null||o.profile.likes!=null)){
-            applyProfileUI(Object.assign({},o.profile,{ source:(o.profile.source||'')+' (cached)' }));
-            sound.play('ok');
-            return;
+          const raw=localStorage.getItem('vasay_profile_v2_'+MY_TT);
+          if(raw){
+            const o=JSON.parse(raw);
+            if(o && o.profile && (o.profile.followers!=null||o.profile.likes!=null)){
+              applyProfileUI(Object.assign({}, o.profile, { source:(o.profile.source||'')+' (cached)' }));
+              if(note) note.textContent='@'+MY_TT+' · cached';
+              return;
+            }
           }
-        }
-      }catch(_){}
-
-      // Seed so UI is never empty
-      applyProfileUI(Object.assign({}, PROFILE_SEED, {
-        nickname: profile.nickname||PROFILE_SEED.nickname,
-        avatar: profile.avatar||null,
-        source: 'last known public'
-      }));
-      if(note) note.textContent='@'+MY_TT+' · last known public counts (live fetch limited). Tap Refresh to retry.';
-      sound.play('warn');
-      if(errors.length) console.warn('profile errors', errors);
+        }catch(_){}
+        if(note) note.textContent='@'+MY_TT+' · seed data (live blocked). Tap ↻ again.';
+        try{ if(window.vasaySfx) window.vasaySfx.err(); else if(sound&&sound.play) sound.play('warn'); }catch(_){}
+        if(errors.length) console.warn('profile errors', errors);
+      }
     }
-    $('refreshProfileBtn')&&$('refreshProfileBtn').addEventListener('click',()=>{ sound.play('click'); fetchMyProfile(); });
+
+    $('refreshProfileBtn')&&$('refreshProfileBtn').addEventListener('click',()=>{ try{ if(window.vasaySfx) window.vasaySfx.click(); else if(sound&&sound.play) sound.play('click'); }catch(_){} fetchMyProfile(); });
     // Instant seed, then live refresh
     applyProfileUI(PROFILE_SEED);
     setTimeout(function(){ try{ fetchMyProfile(); }catch(e){ console.warn(e); } }, 500);
