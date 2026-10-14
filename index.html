@@ -1625,9 +1625,7 @@ textarea, select, .license-input {
 .quick-list { display:flex; flex-direction:column; gap:6px; }
 
 /* Force shake+blur on all panels content */
-.panel.active {
-  animation: rise .4s cubic-bezier(.16,1,.3,1), shellShake 5.5s ease-in-out infinite !important;
-}
+.panel.active { display: block !important; animation: rise .35s cubic-bezier(.16,1,.3,1) !important; }
 .app {
   animation: shellShake 5.5s ease-in-out infinite !important;
   max-width: 380px !important;
@@ -1695,6 +1693,95 @@ body::before {
 .profile-avatar, .profile-avatar img {
   border-radius: 50% !important;
   object-fit: cover !important;
+}
+
+
+
+/* ══════ LAYOUT RECOVERY ══════ */
+html, body {
+  overflow-x: hidden !important;
+  width: 100% !important;
+  max-width: 100vw !important;
+}
+body {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  padding: 0 0 100px !important;
+}
+.app {
+  width: 100% !important;
+  max-width: 380px !important;
+  margin: 0 auto !important;
+  padding: 0 12px 16px !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+  z-index: 1 !important;
+  /* soft shake only — no layout shift */
+  animation: shellShake 6s ease-in-out infinite !important;
+  will-change: transform !important;
+}
+.panel {
+  display: none !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+.panel.active {
+  display: block !important;
+  animation: rise .35s cubic-bezier(.16,1,.3,1) !important;
+}
+.top-bar {
+  width: 100% !important;
+  flex-direction: column !important;
+  align-items: center !important;
+}
+.bottom-nav {
+  position: fixed !important;
+  left: 50% !important;
+  bottom: max(12px, env(safe-area-inset-bottom)) !important;
+  transform: translateX(-50%) !important;
+  width: calc(100% - 24px) !important;
+  max-width: 380px !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: stretch !important;
+  gap: 2px !important;
+  padding: 5px !important;
+  z-index: 9999 !important;
+  box-sizing: border-box !important;
+}
+.nav-item {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 2px !important;
+  padding: 8px 2px !important;
+  font-size: 8px !important;
+  line-height: 1.1 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+.nav-item .ico {
+  font-size: 14px !important;
+  line-height: 1 !important;
+}
+/* kill any absolute/float leftovers that break grid */
+.ab-stats {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 6px !important;
+}
+.profile-card .ab-stats {
+  grid-template-columns: repeat(4, 1fr) !important;
+}
+.ab-stat b, .ab-stat span {
+  display: block !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
   </style>
@@ -1833,7 +1920,7 @@ body::before {
         <div class="pf-meta">
           <div class="pf-name" id="myNickname">𝙐𝙍𝙁𝘼𝙄𝙍</div>
           <div class="pf-handle"><a href="https://www.tiktok.com/@urfair.aep" target="_blank" rel="noopener">@urfair.aep</a></div>
-          <div class="pf-bio" L y.o || app: AE 25 · presets @tturfair</div>
+          <div class="pf-bio" id="myBio">14 y.o || app: AE 25 · presets @tturfair</div>
         </div>
         <button class="ab-text" id="refreshProfileBtn" type="button">↻</button>
       </div>
@@ -2422,7 +2509,7 @@ body::before {
         document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
         const panel=$('panel-'+btn.dataset.tab);
         if(panel) panel.classList.add('active');
-        sound.play('click');
+        try{ if(window.vasaySfx) window.vasaySfx.tab(); else if(sound&&sound.play) sound.play('click'); }catch(_e){}
         if(btn.dataset.tab==='news'||btn.dataset.tab==='videos'){
           try{ paintFeeds(); }catch(_){}
           if(!loadLib().length){ try{ fetchUserPosts(); }catch(_){} }
