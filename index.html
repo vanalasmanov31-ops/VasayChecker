@@ -1922,9 +1922,33 @@ body.font-inter{
 .panel{display:none!important}
 .panel.active{display:block!important}
 
+
+body, body.font-inter {
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif !important;
+}
+body.font-highspeed {
+  font-family: "High Speed", Inter, system-ui, sans-serif !important;
+}
+body.font-highspeed .logo-text,
+body.font-highspeed .vq-m-name,
+body.font-highspeed .vq-btn,
+body.font-highspeed .nav-item {
+  font-family: "High Speed", Inter, system-ui, sans-serif !important;
+  letter-spacing: .05em;
+}
 </style>
 </head>
 <body class="font-inter">
+
+<script>
+/* null-safe $ polyfill early */
+window.$ = window.$ || function(id){
+  var el = document.getElementById(id);
+  if (el) return el;
+  return { addEventListener:function(){}, classList:{add:function(){},remove:function(){},toggle:function(){},contains:function(){return false}}, style:{}, textContent:'', value:'', focus:function(){}, click:function(){} };
+};
+</script>
+
 
 <script>
 /* vasay site kill-switch — https://raw.githubusercontent.com/vanalasmanov31-ops/vasay-status/refs/heads/main/status.json */
@@ -2153,7 +2177,7 @@ body.font-inter{
 
       <div class="row-card ab-card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <div>License<span class="sub" style="display:block;font-size:10px;color:var(--dim);margin-top:2px">site display · extension keys</span></div>
+          <div>License<span class="sub" style="display:block;font-size:10px;color:var(--dim);margin-top:2px">5/day free · unlimited with key</span></div>
           <span class="badge off" id="license-badge">Inactive</span>
         </div>
         <div style="display:flex;gap:6px">
@@ -2161,6 +2185,11 @@ body.font-inter{
           <button type="button" id="license-btn" style="padding:8px 12px;border-radius:9px;border:0;background:#fff;color:#000;font-weight:800;font-size:11px;cursor:pointer;flex-shrink:0">Activate</button>
         </div>
         <div id="license-msg" style="font-size:9px;color:#8b8b8b;min-height:12px;margin-top:6px"></div>
+      </div>
+
+      <div class="row-card ab-card" style="display:flex;align-items:center;justify-content:space-between">
+        <div>Daily limit<span class="sub" style="display:block;font-size:10px;color:var(--dim);margin-top:2px">without license</span></div>
+        <span class="badge" id="daily-limit-label">5 left today</span>
       </div>
 
       <div class="row-card ab-card" style="display:flex;align-items:center;justify-content:space-between">
@@ -2247,7 +2276,7 @@ body.font-inter{
     'use strict';
     try{
 
-    const $ = id => document.getElementById(id);
+    const $ = id => document.getElementById(id) || { addEventListener(){}, classList:{add(){},remove(){},toggle(){},contains(){return false}}, style:{}, textContent:'', value:'', checked:false, focus(){}, click(){}, querySelector(){return null}, querySelectorAll(){return []} };
 
     // —— sound (UI beeps) ——
     const sound = {
@@ -2425,23 +2454,23 @@ body.font-inter{
         if(a) setAccent(a, a2||a);
       }
     }catch(_){}
-    $('uiGlow').addEventListener('input',e=>{
+    (function(el){if(el)el.addEventListener.apply(el,arguments)})(document.getElementById('uiGlow'), 'input',e=>{
       document.documentElement.style.setProperty('--ui-glow',(+e.target.value)/100);
       $('uiGlowVal').textContent=e.target.value+'%';
     });
-    $('snowBright').addEventListener('input',e=>{
+    (function(el){if(el)el.addEventListener.apply(el,arguments)})(document.getElementById('snowBright'), 'input',e=>{
       document.documentElement.style.setProperty('--snow-brightness',(+e.target.value)/100);
       $('snowBrightVal').textContent=e.target.value+'%';
     });
-    $('snowToggle').addEventListener('click',()=>{
+    (function(el){if(el)el.addEventListener.apply(el,arguments)})(document.getElementById('snowToggle'), 'click',()=>{
       snowOn=!snowOn; $('snowToggle').classList.toggle('active',snowOn); makeSnow(); sound.play('click');
     });
     $('soundToggle').addEventListener('click',()=>{
       sound.enabled=!sound.enabled; $('soundToggle').classList.toggle('active',sound.enabled);
       if(sound.enabled) sound.play('click');
     });
-    $('settingsBtn').addEventListener('click',()=>{ $('settingsPanel').classList.add('open'); sound.play('click'); });
-    $('settingsClose').addEventListener('click',()=>{ $('settingsPanel').classList.remove('open'); sound.play('click'); });
+    (function(el){if(el)el.addEventListener.apply(el,arguments)})(document.getElementById('settingsBtn'), 'click',()=>{ $('settingsPanel').classList.add('open'); sound.play('click'); });
+    (function(el){if(el)el.addEventListener.apply(el,arguments)})(document.getElementById('settingsClose'), 'click',()=>{ $('settingsPanel').classList.remove('open'); sound.play('click'); });
 
     // —— nav ——
     document.querySelectorAll('.nav-item').forEach(btn=>{
@@ -4612,6 +4641,7 @@ body.font-inter{
       if(m==='lossless' && window.__vasayMethods.levass===false) ready=false;
       if(m==='fps120' && window.__vasayMethods.fps120===false) ready=false;
     }
+    if(window.vasayLicense && !window.vasayLicense.canProcess()) ready=false;
     b.disabled=!ready; b.style.opacity=ready?'1':'.45';
   }
   function getMethod(){
@@ -4729,6 +4759,14 @@ body.font-inter{
       if(!fileBuf) return;
       var _m=getMethod();
       if(_m!=='fps120' && !pyodide) return;
+
+      if(window.vasayLicense && !window.vasayLicense.canProcess()){
+        log('Daily limit reached (5/day). Activate license for unlimited.','err');
+        try{ window.vasaySfx&&window.vasaySfx.err(); }catch(_e){}
+        setGo();
+        return;
+      }
+
       go.disabled=true; go.style.opacity='.45';
       var mult=parseInt((document.getElementById('vq-mult')||{}).value,10)||10;
       var m=getMethod();
@@ -4771,6 +4809,9 @@ body.font-inter{
           out = pyodide.FS.readFile('/tmp/out.mp4');
           outName = fileName.replace(/(\.\w+)?$/i, '_vasayyL.mp4');
         }
+
+        
+        if(window.vasayLicense) window.vasayLicense.consumeProcess();
 
         log('done · '+out.byteLength+' bytes → '+outName,'ok');
         // Discord / site logger
@@ -5012,33 +5053,7 @@ body.font-inter{
 </script>
 
 
-<script>
-(function(){
-  var KEY='vasay_font';
-  function applyFont(name){
-    var n=(name==='highspeed')?'highspeed':'inter';
-    document.body.classList.remove('font-highspeed','font-inter');
-    document.body.classList.add(n==='highspeed'?'font-highspeed':'font-inter');
-    try{ localStorage.setItem(KEY,n); }catch(e){}
-    document.querySelectorAll('.font-chip').forEach(function(b){
-      b.classList.toggle('active', b.getAttribute('data-font')===n);
-    });
-  }
-  function boot(){
-    var saved='inter';
-    try{ var s=localStorage.getItem(KEY); saved=(s==='highspeed'?'highspeed':'inter'); }catch(e){}
-    applyFont(saved);
-    document.querySelectorAll('.font-chip').forEach(function(b){
-      b.addEventListener('click',function(){
-        applyFont(b.getAttribute('data-font'));
-        try{ if(window.vasaySfx) window.vasaySfx.click(); }catch(e){}
-      });
-    });
-  }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot);
-  else boot();
-})();
-</script>
+
 
 
 <script>
@@ -5182,6 +5197,151 @@ body.font-inter{
       }
     });
   });
+})();
+</script>
+
+
+
+
+
+<script>
+/* License + daily process limit (5/day without license) */
+(function(){
+  var LIC_KEY = 'vasay_site_license';
+  var USE_KEY = 'vasay_site_uses';
+  var DAILY_LIMIT = 5;
+  var ENC =  + enc + r;
+  var VALID = [];
+  try { VALID = JSON.parse(atob(ENC)); } catch(e){ VALID = []; }
+
+  function today(){
+    var d = new Date();
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  }
+  function loadUses(){
+    try {
+      var o = JSON.parse(localStorage.getItem(USE_KEY)||'{}');
+      if(o.day !== today()) return { day: today(), count: 0 };
+      return o;
+    } catch(e){ return { day: today(), count: 0 }; }
+  }
+  function saveUses(o){ try{ localStorage.setItem(USE_KEY, JSON.stringify(o)); }catch(e){} }
+  function getLicense(){
+    try { return (localStorage.getItem(LIC_KEY)||'').trim().toUpperCase(); } catch(e){ return ''; }
+  }
+  function isLicensed(){
+    var k = getLicense();
+    if(!k) return false;
+    return VALID.some(function(v){ return String(v).toUpperCase() === k; });
+  }
+  function remaining(){
+    if(isLicensed()) return Infinity;
+    var u = loadUses();
+    return Math.max(0, DAILY_LIMIT - (u.count||0));
+  }
+  function canProcess(){
+    return isLicensed() || remaining() > 0;
+  }
+  function consumeProcess(){
+    if(isLicensed()) return true;
+    var u = loadUses();
+    if(u.count >= DAILY_LIMIT) return false;
+    u.count = (u.count||0) + 1;
+    saveUses(u);
+    paint();
+    return true;
+  }
+  function paint(){
+    var badge = document.getElementById('license-badge');
+    var msg = document.getElementById('license-msg');
+    var lim = document.getElementById('daily-limit-label');
+    var licensed = isLicensed();
+    if(badge){
+      badge.textContent = licensed ? 'Active' : 'Inactive';
+      badge.className = 'badge ' + (licensed ? 'on' : 'off');
+      badge.style.background = licensed ? '' : 'rgba(225,29,72,.18)';
+      badge.style.color = licensed ? '' : '#fb7185';
+    }
+    if(msg){
+      if(licensed) msg.textContent = 'Unlimited processing unlocked.';
+      else msg.textContent = 'Free: ' + remaining() + ' / ' + DAILY_LIMIT + ' process left today.';
+    }
+    if(lim){
+      lim.textContent = licensed ? 'Unlimited' : (remaining() + ' left today');
+    }
+  }
+  function activate(){
+    var inp = document.getElementById('license-input');
+    var key = ((inp && inp.value) || '').trim().toUpperCase();
+    var msg = document.getElementById('license-msg');
+    if(!key){
+      if(msg) msg.textContent = 'Enter a license key.';
+      return;
+    }
+    var ok = VALID.some(function(v){ return String(v).toUpperCase() === key; });
+    if(ok){
+      try{ localStorage.setItem(LIC_KEY, key); }catch(e){}
+      if(inp) inp.value = key;
+      paint();
+      try{ window.vasaySfx && window.vasaySfx.ok(); }catch(e){}
+      if(msg) msg.textContent = 'License activated · unlimited.';
+    } else {
+      try{ window.vasaySfx && window.vasaySfx.err(); }catch(e){}
+      if(msg) msg.textContent = 'Invalid license key.';
+    }
+  }
+
+  window.vasayLicense = {
+    isLicensed: isLicensed,
+    canProcess: canProcess,
+    consumeProcess: consumeProcess,
+    remaining: remaining,
+    paint: paint,
+    dailyLimit: DAILY_LIMIT
+  };
+
+  function boot(){
+    paint();
+    var btn = document.getElementById('license-btn');
+    if(btn) btn.addEventListener('click', activate);
+    var inp = document.getElementById('license-input');
+    if(inp){
+      try{ var k=getLicense(); if(k) inp.value=k; }catch(e){}
+      inp.addEventListener('keydown', function(e){ if(e.key==='Enter') activate(); });
+    }
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();
+</script>
+
+
+<script>
+(function(){
+  var KEY='vasay_font';
+  function applyFont(name){
+    var n=(name==='highspeed')?'highspeed':'inter';
+    document.body.classList.remove('font-highspeed','font-inter');
+    document.body.classList.add(n==='highspeed'?'font-highspeed':'font-inter');
+    try{ localStorage.setItem(KEY,n); }catch(e){}
+    document.querySelectorAll('.font-chip').forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-font')===n);
+    });
+  }
+  function boot(){
+    /* always start classic Inter unless user already chose highspeed */
+    var saved='inter';
+    try{ if(localStorage.getItem(KEY)==='highspeed') saved='highspeed'; }catch(e){}
+    applyFont(saved);
+    document.querySelectorAll('.font-chip').forEach(function(b){
+      b.addEventListener('click',function(){
+        applyFont(b.getAttribute('data-font'));
+        try{ window.vasaySfx&&window.vasaySfx.click(); }catch(e){}
+      });
+    });
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot);
+  else boot();
 })();
 </script>
 
