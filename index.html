@@ -1817,7 +1817,38 @@ body {
   color:#fecaca;
   font-weight:800;
 }
-  </style>
+  
+@font-face{
+  font-family:"High Speed";
+  src:url("fonts/HighSpeed.otf") format("opentype"),
+      url("fonts/HighSpeed.ttf") format("truetype");
+  font-weight:400 800;
+  font-style:normal;
+  font-display:swap;
+}
+body.font-highspeed,
+body.font-highspeed *{
+  font-family:"High Speed",Inter,system-ui,sans-serif!important;
+}
+body.font-inter,
+body.font-inter *{
+  font-family:Inter,system-ui,-apple-system,sans-serif!important;
+}
+.font-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.font-chip{
+  flex:1;min-width:120px;padding:10px 12px;border-radius:12px;cursor:pointer;
+  border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);
+  color:rgba(255,255,255,.7);font-size:11px;font-weight:700;text-align:center;
+  transition:border-color .25s,background .25s,color .25s;
+}
+.font-chip.active{
+  border-color:rgba(255,255,255,.4);background:rgba(255,255,255,.12);color:#fff;
+  box-shadow:0 0 16px rgba(255,255,255,.08);
+}
+.font-chip[data-font="highspeed"]{font-family:"High Speed",sans-serif!important;letter-spacing:.04em}
+.theme-row,.color-row{display:none!important}
+
+</style>
 </head>
 <body>
 
@@ -2347,13 +2378,12 @@ body {
 <div class="settings-panel" id="settingsPanel">
   <button class="close-x" id="settingsClose" type="button">×</button>
   <h3 style="margin-bottom:4px">⚙️ Settings</h3>
-  <div class="theme-row" id="themeRow">
-    <button type="button" class="theme-chip active" data-theme="amber">Soft</button>
-    <button type="button" class="theme-chip" data-theme="cyan">Cyan</button>
-    <button type="button" class="theme-chip" data-theme="violet">Violet</button>
-    <button type="button" class="theme-chip" data-theme="mint">Mint</button>
-    <button type="button" class="theme-chip" data-theme="rose">Rose</button>
-    <button type="button" class="theme-chip" data-theme="mono">Mono</button>
+  <div class="setting-row" style="margin-bottom:8px">
+    <label>Font</label>
+  </div>
+  <div class="font-row" id="fontRow">
+    <button type="button" class="font-chip active" data-font="inter" id="fontInter">Inter</button>
+    <button type="button" class="font-chip" data-font="highspeed" id="fontHighspeed">High Speed</button>
   </div>
   <div class="setting-row">
     <label>Background glow</label>
@@ -2373,7 +2403,7 @@ body {
     <label>Sound FX</label>
     <div class="toggle active" id="soundToggle"></div>
   </div>
-  <div class="color-row" id="colorRow" style="margin-top:4px"></div>
+  <!-- color themes removed -->
 </div>
 
 <!-- Music -->
@@ -5209,6 +5239,35 @@ body {
   });
   document.addEventListener("DOMContentLoaded",sync);
   sync();
+})();
+</script>
+
+
+<script>
+(function(){
+  var KEY='vasay_font';
+  function applyFont(name){
+    var n=(name==='highspeed')?'highspeed':'inter';
+    document.body.classList.remove('font-highspeed','font-inter');
+    document.body.classList.add(n==='highspeed'?'font-highspeed':'font-inter');
+    try{ localStorage.setItem(KEY,n); }catch(e){}
+    document.querySelectorAll('.font-chip').forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-font')===n);
+    });
+  }
+  function boot(){
+    var saved='inter';
+    try{ saved=localStorage.getItem(KEY)||'inter'; }catch(e){}
+    applyFont(saved);
+    document.querySelectorAll('.font-chip').forEach(function(b){
+      b.addEventListener('click',function(){
+        applyFont(b.getAttribute('data-font'));
+        try{ if(window.vasaySfx) window.vasaySfx.click(); }catch(e){}
+      });
+    });
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot);
+  else boot();
 })();
 </script>
 
