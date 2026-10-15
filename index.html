@@ -70,7 +70,7 @@
     @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
     @keyframes scaleIn { from { opacity:0; transform:scale(.96); } to { opacity:1; transform:none; } }
     @keyframes slideInRight { from { opacity:0; transform:translateX(12px); } to { opacity:1; transform:none; } }
-    @keyframes pulseGlow { 0%,100% { box-shadow:0 0 0 0 transparent; } 50% { box-shadow:0 0 20px rgba(255,255,255,.12); } }
+    
     @keyframes shimmer { 0% { background-position:200% center; } 100% { background-position:-200% center; } }
     @keyframes logoPulse { 0%,100% { transform:none; } 50% { transform:scale(1.03); } }
     @keyframes bounceSoft { 0%,100% { transform:none; } 50% { transform:translateY(-2px); } }
@@ -972,23 +972,9 @@ body::after {
   filter: blur(8px) !important;
   opacity: .85 !important;
 }
-@keyframes shellSweep {
-  0% { transform: translateX(-150%) rotate(12deg); opacity: .25; }
-  20% { opacity: .7; }
-  60% { transform: translateX(150%) rotate(12deg); opacity: .55; }
-  80%, 100% { transform: translateX(150%) rotate(12deg); opacity: .2; }
-}
-@keyframes pulseGlow {
-  0%, 100% { box-shadow: 0 0 22px rgba(255,255,255,.06), inset 0 0 16px rgba(255,255,255,.03); }
-  50% { box-shadow: 0 0 36px rgba(255,255,255,.14), inset 0 0 22px rgba(255,255,255,.05); }
-}
-@keyframes shellShake {
-  0%, 100% { transform: translate3d(0,0,0); }
-  20% { transform: translate3d(0.7px,-0.55px,0); }
-  40% { transform: translate3d(-0.65px,0.6px,0); }
-  60% { transform: translate3d(0.55px,0.45px,0); }
-  80% { transform: translate3d(-0.5px,-0.4px,0); }
-}
+
+
+
 @keyframes rise {
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: none; }
@@ -1901,6 +1887,113 @@ body.font-inter{
 .pf-avatar{width:44px!important;height:44px!important}
 .settings-panel{padding:16px!important;max-width:340px!important}
 
+@keyframes shellShake{0%,100%{transform:translate3d(0,0,0)}20%{transform:translate3d(0.7px,-0.55px,0)}40%{transform:translate3d(-0.65px,0.6px,0)}60%{transform:translate3d(0.55px,0.45px,0)}80%{transform:translate3d(-0.5px,-0.4px,0)}}
+@keyframes shellBlurPulse{0%,100%{backdrop-filter:blur(40px) saturate(1.55);-webkit-backdrop-filter:blur(40px) saturate(1.55)}50%{backdrop-filter:blur(52px) saturate(1.7);-webkit-backdrop-filter:blur(52px) saturate(1.7)}}
+@keyframes shellSweep{0%{transform:translateX(-150%) rotate(12deg);opacity:.25}20%{opacity:.7}60%{transform:translateX(150%) rotate(12deg);opacity:.55}80%,100%{transform:translateX(150%) rotate(12deg);opacity:.2}}
+@keyframes pulseGlow{0%,100%{box-shadow:0 0 22px rgba(255,255,255,.06),inset 0 0 16px rgba(255,255,255,.03)}50%{box-shadow:0 0 36px rgba(255,255,255,.14),inset 0 0 22px rgba(255,255,255,.05)}}
+
+/* extension shell + compact — keep profile + scan */
+html,body{
+  margin:0!important;background:#000!important;color:#f4f4f4!important;
+  font-family:Inter,system-ui,-apple-system,sans-serif!important;
+  font-weight:600!important;-webkit-font-smoothing:antialiased!important;
+}
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse at 50% -10%,rgba(34,34,34,.92) 0%,rgba(12,12,12,.94) 40%,rgba(0,0,0,.96) 100%);
+}
+.app{
+  position:relative!important;z-index:1!important;
+  max-width:360px!important;margin:0 auto!important;
+  padding:0 12px 88px!important;
+  animation:shellBlurPulse 6s ease-in-out infinite!important;
+  background:radial-gradient(ellipse at 50% -8%,rgba(34,34,34,.5) 0%,rgba(0,0,0,.2) 55%,transparent 100%)!important;
+  backdrop-filter:blur(40px) saturate(1.55)!important;
+  -webkit-backdrop-filter:blur(40px) saturate(1.55)!important;
+}
+.top-bar,.panel.active,.logo,.tab-hero,.vq-hero,.ab-hero{
+  animation:shellShake 5.5s ease-in-out infinite!important;
+}
+.shell-sweep{
+  pointer-events:none;position:fixed;inset:-40% -60%;z-index:0;
+  background:linear-gradient(115deg,transparent 38%,rgba(255,255,255,.025) 46%,rgba(255,255,255,.09) 50%,rgba(255,255,255,.025) 54%,transparent 62%);
+  animation:shellSweep 9s ease-in-out infinite;
+}
+.logo-mark,.ab-ring{animation:pulseGlow 4.2s cubic-bezier(.4,0,.2,1) infinite!important}
+/* hide only clutter — NOT profile, NOT scan */
+#quickSeedList,
+.quick-list,
+div.ab-card:has(#quickSeedList),
+.music-player,
+#musicPlayer,
+.disclaimer{
+  display:none!important;
+}
+.nav-item[data-tab="news"],
+.nav-item[data-tab="videos"]{display:none!important}
+#panel-news,#panel-videos{display:none!important}
+.ab-card,.vq-m,.vq-row,.vq-drop,.card,.row-card,.profile-card,.scan-status{
+  padding:11px 12px!important;border-radius:13px!important;margin-bottom:8px!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.03))!important;
+  border:1px solid rgba(255,255,255,.09)!important;
+  box-shadow:0 4px 14px rgba(0,0,0,.22)!important;
+}
+.profile-card{display:block!important}
+.scan-status,#scanStatus{display:none!important}
+.scan-status.active,#scanStatus.active{display:block!important}
+.vq{gap:8px!important}
+.vq-btn{padding:12px!important;border-radius:12px!important;font-weight:800!important;font-size:12px!important}
+.bottom-nav{
+  max-width:360px!important;padding:4px!important;
+  background:rgba(0,0,0,.55)!important;
+  backdrop-filter:blur(24px) saturate(1.4)!important;
+  -webkit-backdrop-filter:blur(24px) saturate(1.4)!important;
+  border:1px solid rgba(255,255,255,.1)!important;border-radius:16px!important;
+}
+.nav-item{padding:8px 2px!important;font-size:8px!important;font-weight:600!important;border-radius:12px!important}
+.tab-title,.vq-title{font-size:13px!important;font-weight:700!important}
+.tab-kicker,.vq-kicker{font-size:8px!important}
+.tab-desc,.vq-desc{font-size:9px!important;color:#8b8b8b!important}
+.url-input{padding:10px 12px!important;font-size:12px!important;border-radius:11px!important}
+.top-bar{padding:16px 0 6px!important}
+.logo-mark{width:52px!important;height:52px!important;font-size:18px!important}
+#snow{position:fixed;inset:0;pointer-events:none;z-index:0}
+
+
+/* tab slide transition */
+.tabs-viewport{
+  position:relative;
+  width:100%;
+  overflow:hidden;
+  min-height:52vh;
+}
+.tabs-track{
+  display:flex;
+  width:100%;
+  transition:transform .5s cubic-bezier(.16,1,.3,1);
+  will-change:transform;
+}
+.tabs-track .panel{
+  display:block!important;
+  width:100%;
+  flex:0 0 100%;
+  min-width:100%;
+  box-sizing:border-box;
+  padding:0 2px;
+  opacity:.35;
+  transform:scale(.98);
+  transition:opacity .45s ease, transform .45s cubic-bezier(.16,1,.3,1);
+  pointer-events:none;
+}
+.tabs-track .panel.active{
+  opacity:1!important;
+  transform:scale(1)!important;
+  pointer-events:auto!important;
+  animation:none!important;
+}
+.panel{display:none}
+.tabs-track .panel{display:block!important}
+
 </style>
 </head>
 <body>
@@ -2123,15 +2216,12 @@ body.font-inter{
       <p class="ab-note" id="myProfileNote" style="margin-top:10px;text-align:center">Tap ↻ to load live public stats from TikTok.</p>
     </div>
 
-    <div class="ab-card">
-      <div class="ab-h">Quick analyse · your posts</div>
-      <div id="quickSeedList" class="quick-list"></div>
-    </div>
+    
 
     <div class="scan-status" id="scanStatus">
       <div class="scan-ring" id="scanRing"></div>
-      <div style="font-weight:700;margin-bottom:4px" id="scanTitle">Fetching real data…</div>
-      <div style="font-size:.78rem;color:var(--dim)" id="scanPhase">Starting</div>
+      <div style="font-weight:700;margin-bottom:4px" id="scanTitle">Ready</div>
+      <div style="font-size:.78rem;color:var(--dim)" id="scanPhase">Paste a link to analyse</div>
       <div class="scan-log" id="scanLog"></div>
       <div id="scanActions">
         <button class="btn btn-ghost btn-sm" id="copyLogBtn" type="button">📋 Copy log</button>
@@ -5343,6 +5433,80 @@ body.font-inter{
     if(t.classList.contains('nav-item')) sfxTab();
     else sfxClick();
   },true);
+})();
+</script>
+
+
+<script>
+(function(){
+  function visibleTabs(){
+    var tabs=[];
+    document.querySelectorAll('.nav-item').forEach(function(b){
+      if(window.getComputedStyle(b).display==='none') return;
+      var t=b.getAttribute('data-tab');
+      if(t) tabs.push(t);
+    });
+    return tabs;
+  }
+  function ensureTrack(){
+    var track=document.getElementById('tabs-track');
+    if(track) return track;
+    var panels=[].slice.call(document.querySelectorAll('.app > .panel'));
+    if(!panels.length) panels=[].slice.call(document.querySelectorAll('.panel'));
+    if(!panels.length) return null;
+    var viewport=document.createElement('div');
+    viewport.className='tabs-viewport';
+    track=document.createElement('div');
+    track.className='tabs-track';
+    track.id='tabs-track';
+    panels[0].parentNode.insertBefore(viewport, panels[0]);
+    viewport.appendChild(track);
+    panels.forEach(function(p){ track.appendChild(p); });
+    return track;
+  }
+  function slideTo(tab){
+    var track=ensureTrack();
+    if(!track) return;
+    var tabs=visibleTabs();
+    var order=[];
+    tabs.forEach(function(t){
+      var p=document.getElementById('panel-'+t);
+      if(p && p.parentElement===track) order.push(p);
+    });
+    if(!order.length) order=[].slice.call(track.querySelectorAll('.panel'));
+    var idx=0;
+    order.forEach(function(p,i){ if(p.id==='panel-'+tab) idx=i; });
+    var n=order.length||1;
+    track.style.width=(n*100)+'%';
+    order.forEach(function(p){
+      p.style.flex='0 0 '+(100/n)+'%';
+      p.style.minWidth=(100/n)+'%';
+      p.style.width=(100/n)+'%';
+      p.classList.remove('active');
+    });
+    var target=document.getElementById('panel-'+tab);
+    if(target) target.classList.add('active');
+    track.style.transform='translateX(-'+(idx*(100/n))+'%)';
+  }
+  function boot(){
+    ensureTrack();
+    var active=document.querySelector('.nav-item.active');
+    slideTo(active?active.getAttribute('data-tab'):'analyse');
+    document.querySelectorAll('.nav-item').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var tab=btn.getAttribute('data-tab');
+        document.querySelectorAll('.nav-item').forEach(function(b){ b.classList.remove('active'); });
+        btn.classList.add('active');
+        slideTo(tab);
+        try{ if(window.vasaySfx) window.vasaySfx.tab(); else if(window.sound&&sound.play) sound.play('tab'); }catch(e){}
+        if(tab==='quality'){
+          setTimeout(function(){ try{ if(window.vasayBoot) window.vasayBoot(); }catch(e){} }, 80);
+        }
+      });
+    });
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
 })();
 </script>
 
