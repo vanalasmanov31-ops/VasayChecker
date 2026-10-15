@@ -1633,7 +1633,7 @@ body::before {
   background:rgba(12,12,12,.92) !important;
   border:1px solid rgba(255,255,255,.12) !important;
   border-radius:18px !important;
-  backdrop-filter:blur(28px) !important;
+  backdrop-filter:blur(16px) !important;
   box-shadow:0 20px 60px rgba(0,0,0,.55) !important;
 }
 
@@ -1979,7 +1979,7 @@ div.ab-card:has(#quickSeedList),
   padding:0 2px;
   opacity:.25;
   transform:scale(.96) translateZ(0);
-  filter:blur(10px);
+  filter:blur(4px);
   transition:
     opacity .65s cubic-bezier(.22,1,.36,1),
     transform .7s cubic-bezier(.22,1,.36,1),
@@ -2026,23 +2026,23 @@ html,body{
 body::before{
   content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
   background:radial-gradient(ellipse at 50% -10%,rgba(40,40,40,.9) 0%,rgba(10,10,10,.95) 45%,#000 100%);
-  backdrop-filter:blur(48px) saturate(1.5);
-  -webkit-backdrop-filter:blur(48px) saturate(1.5);
+  backdrop-filter:blur(18px) saturate(1.5);
+  -webkit-backdrop-filter:blur(18px) saturate(1.5);
 }
 .app{
-  backdrop-filter:blur(48px) saturate(1.6)!important;
-  -webkit-backdrop-filter:blur(48px) saturate(1.6)!important;
+  backdrop-filter:blur(18px) saturate(1.6)!important;
+  -webkit-backdrop-filter:blur(18px) saturate(1.6)!important;
 }
 .ab-card,.vq-m,.vq-row,.vq-drop,.card,.row-card,.profile-card,.scan-status,
 .tab-hero,.vq-hero,.settings-panel,.bottom-nav{
-  backdrop-filter:blur(20px) saturate(1.35)!important;
-  -webkit-backdrop-filter:blur(20px) saturate(1.35)!important;
+  backdrop-filter:blur(10px) saturate(1.15)!important;
+  -webkit-backdrop-filter:blur(10px) saturate(1.15)!important;
   background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03))!important;
   border:1px solid rgba(255,255,255,.1)!important;
 }
 .bottom-nav{
-  backdrop-filter:blur(28px) saturate(1.5)!important;
-  -webkit-backdrop-filter:blur(28px) saturate(1.5)!important;
+  backdrop-filter:blur(16px) saturate(1.5)!important;
+  -webkit-backdrop-filter:blur(16px) saturate(1.5)!important;
   background:rgba(0,0,0,.4)!important;
 }
 .logo-mark,.ab-ring{
@@ -2053,6 +2053,189 @@ body::before{
 .nav-item .ico svg{display:block;margin:0 auto;width:16px;height:16px;opacity:.85}
 .nav-item.active .ico svg{opacity:1}
 .nav-item[data-tab="about"] .ico{font-size:inherit!important;width:auto!important;height:auto!important;background:none!important;border:0!important;border-radius:0!important;box-shadow:none!important}
+
+/* ═══ moderate blur + layout fix ═══ */
+body::before{
+  backdrop-filter:blur(20px) saturate(1.2)!important;
+  -webkit-backdrop-filter:blur(20px) saturate(1.2)!important;
+}
+.app{
+  backdrop-filter:blur(16px) saturate(1.2)!important;
+  -webkit-backdrop-filter:blur(16px) saturate(1.2)!important;
+  overflow:visible!important;
+}
+.ab-card,.vq-m,.vq-row,.vq-drop,.card,.row-card,.profile-card,.scan-status,
+.tab-hero,.vq-hero,.settings-panel{
+  backdrop-filter:blur(4px) saturate(1.15)!important;
+  -webkit-backdrop-filter:blur(4px) saturate(1.15)!important;
+  position:relative!important;
+  z-index:1!important;
+  transform:none!important;
+  margin-bottom:10px!important;
+  clear:both!important;
+}
+.bottom-nav{
+  backdrop-filter:blur(16px) saturate(1.2)!important;
+  -webkit-backdrop-filter:blur(16px) saturate(1.2)!important;
+}
+/* softer slide blur */
+.tabs-track .panel{
+  filter:blur(4px)!important;
+  opacity:.4!important;
+  transform:scale(.985)!important;
+  transition:
+    opacity .55s cubic-bezier(.22,1,.36,1),
+    transform .55s cubic-bezier(.22,1,.36,1),
+    filter .55s cubic-bezier(.22,1,.36,1)!important;
+}
+.tabs-track .panel.active{
+  filter:blur(0)!important;
+  opacity:1!important;
+  transform:scale(1)!important;
+}
+.tabs-track.is-sliding .panel.active{
+  filter:blur(1.5px)!important;
+}
+.tabs-track{
+  transition:transform .55s cubic-bezier(.22,1,.36,1)!important;
+}
+/* analyse stack — no overlap */
+#panel-analyse{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:10px!important;
+  align-items:stretch!important;
+  position:relative!important;
+}
+#panel-analyse > *{
+  position:relative!important;
+  z-index:auto!important;
+  float:none!important;
+  width:100%!important;
+  max-width:100%!important;
+  margin-left:0!important;
+  margin-right:0!important;
+  box-sizing:border-box!important;
+}
+#panel-analyse .tab-hero,
+#panel-analyse .an-hero{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:8px!important;
+  padding:12px!important;
+  margin:0!important;
+}
+#panel-analyse .an-input-row{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:8px!important;
+  width:100%!important;
+}
+#panel-analyse .an-btns{
+  display:flex!important;
+  flex-wrap:wrap!important;
+  gap:6px!important;
+  width:100%!important;
+}
+#panel-analyse .an-btns > *{
+  flex:1 1 auto!important;
+  min-width:0!important;
+  margin:0!important;
+}
+#panel-analyse .url-input{
+  width:100%!important;
+  box-sizing:border-box!important;
+}
+#panel-analyse .ab-chips{
+  display:flex!important;
+  flex-wrap:wrap!important;
+  gap:6px!important;
+  justify-content:center!important;
+}
+#panel-analyse .profile-card{
+  margin:0!important;
+}
+#panel-analyse .pf-head{
+  display:flex!important;
+  align-items:center!important;
+  gap:10px!important;
+}
+#panel-analyse .ab-stats{
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:6px!important;
+}
+#panel-analyse .ab-stat{
+  min-width:0!important;
+  text-align:center!important;
+  padding:8px 4px!important;
+}
+#panel-analyse .scan-status.active{
+  margin:0!important;
+}
+/* kill shake on inner cards — only shell */
+#panel-analyse .tab-hero,
+#panel-analyse .profile-card,
+#panel-analyse .ab-card,
+#panel-analyse .scan-status,
+.panel.active .ab-card,
+.panel.active .vq-m{
+  animation:none!important;
+}
+.top-bar,.logo{
+  animation:shellShake 5.5s ease-in-out infinite!important;
+}
+.app{
+  animation:shellBlurPulse 6s ease-in-out infinite!important;
+}
+
+/* nav icons aligned */
+.bottom-nav{
+  display:flex!important;
+  align-items:stretch!important;
+  justify-content:space-around!important;
+  height:58px!important;
+  padding:5px!important;
+}
+.nav-item{
+  flex:1 1 0!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:3px!important;
+  padding:6px 2px!important;
+  min-height:48px!important;
+  line-height:1!important;
+}
+.nav-item .ico{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:20px!important;
+  height:20px!important;
+  font-size:15px!important;
+  line-height:1!important;
+  margin:0!important;
+  padding:0!important;
+  flex-shrink:0!important;
+}
+.nav-item .ico svg{
+  display:block!important;
+  width:16px!important;
+  height:16px!important;
+  margin:0 auto!important;
+}
+.nav-item[data-tab="about"] .ico{
+  font-size:0!important;
+  background:none!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  width:20px!important;
+  height:20px!important;
+}
+
 </style>
 </head>
 <body>
@@ -2074,7 +2257,7 @@ body::before{
       'font-family:Inter,system-ui,sans-serif;padding:24px;text-align:center}' +
       '#vasay-site-lock .box{max-width:440px;padding:36px 28px;border-radius:22px;' +
       'background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);' +
-      'backdrop-filter:blur(28px) saturate(1.3);-webkit-backdrop-filter:blur(28px) saturate(1.3);' +
+      'backdrop-filter:blur(16px) saturate(1.3);-webkit-backdrop-filter:blur(16px) saturate(1.3);' +
       'box-shadow:0 0 0 1px rgba(255,255,255,.04),0 24px 64px rgba(0,0,0,.55)}' +
       '#vasay-site-lock .ring{width:56px;height:56px;margin:0 auto 16px;border-radius:50%;' +
       'border:1.5px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;' +
