@@ -1901,54 +1901,9 @@ body.font-inter{
 .pf-avatar{width:44px!important;height:44px!important}
 .settings-panel{padding:16px!important;max-width:340px!important}
 
-
-.link-sensor{position:absolute;top:12px;right:14px;z-index:5;display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.1);font-size:10px;font-weight:600;color:var(--dim)}
-.top-bar{position:relative}
-.link-sensor .dot{width:7px;height:7px;border-radius:50%;background:#555}
-.link-sensor.live .dot{background:#fff;box-shadow:0 0 8px rgba(255,255,255,.5)}
-.link-sensor.live{color:#fff;border-color:rgba(255,255,255,.25)}
-.link-sensor.down .dot{background:#f87171;box-shadow:0 0 8px rgba(248,113,113,.45)}
-.link-sensor.down{color:#fecaca;border-color:rgba(248,113,113,.25)}
-.link-sensor.wait .dot{background:#fbbf24}
-.badge{font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;background:rgba(255,255,255,.08);color:var(--dim)}
-.badge.on{background:rgba(255,255,255,.14);color:#fff}
-.badge.off{background:rgba(225,29,72,.18);color:#fb7185}
-.badge.ver{background:rgba(255,255,255,.08);color:#ccc}
-.toggle{width:44px;height:26px;border-radius:999px;background:rgba(255,255,255,.12);position:relative;cursor:pointer;flex-shrink:0}
-.toggle.active{background:#fff}
-.toggle::after{content:"";position:absolute;width:20px;height:20px;left:3px;top:3px;border-radius:50%;background:#fff;transition:.2s}
-.toggle.active::after{left:21px;background:#111}
-.bottom-nav .nav-item .ico svg{display:block;margin:0 auto}
-.panel{display:none!important}
-.panel.active{display:block!important}
-
-
-body, body.font-inter {
-  font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif !important;
-}
-body.font-highspeed {
-  font-family: "High Speed", Inter, system-ui, sans-serif !important;
-}
-body.font-highspeed .logo-text,
-body.font-highspeed .vq-m-name,
-body.font-highspeed .vq-btn,
-body.font-highspeed .nav-item {
-  font-family: "High Speed", Inter, system-ui, sans-serif !important;
-  letter-spacing: .05em;
-}
 </style>
 </head>
-<body class="font-inter">
-
-<script>
-/* null-safe $ polyfill early */
-window.$ = window.$ || function(id){
-  var el = document.getElementById(id);
-  if (el) return el;
-  return { addEventListener:function(){}, classList:{add:function(){},remove:function(){},toggle:function(){},contains:function(){return false}}, style:{}, textContent:'', value:'', focus:function(){}, click:function(){} };
-};
-</script>
-
+<body>
 
 <script>
 /* vasay site kill-switch — https://raw.githubusercontent.com/vanalasmanov31-ops/vasay-status/refs/heads/main/status.json */
@@ -2109,7 +2064,6 @@ window.$ = window.$ || function(id){
 <div id="vasay-error-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:#7f1d1d;color:#fff;padding:10px 14px;font-size:.85rem;text-align:center"></div>
 <div class="snowflakes-layer" id="snow"></div>
 
-
 <div class="app">
   <header class="top-bar">
     <div class="logo">
@@ -2117,13 +2071,246 @@ window.$ = window.$ || function(id){
       <div class="logo-text">vasay</div>
       <div class="logo-sub">made by urfair</div>
     </div>
-    <div class="link-sensor wait" id="link-sensor" title="Remote status"><span class="dot"></span><span id="link-sensor-label">…</span></div>
+    <div class="header-actions">
+      <a class="social-link" href="https://www.tiktok.com/@urfair.aep" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M12.53.02C13.84 0 15.14.01 16.44 0c.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.53c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
+        <span>urfair.aep</span>
+      </a>
+      <a class="social-link" href="https://t.me/tturfair" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+        <span>TG</span>
+      </a>
+      <button class="icon-btn" id="settingsBtn" type="button" aria-label="Settings">⚙️</button>
+    </div>
   </header>
 
-  <!-- MAIN = quality (extension Main layout) -->
-  <div class="panel active" id="panel-main">
+  <!-- ANALYSE -->
+  <div class="panel active" id="panel-analyse">
+
+    <section class="tab-hero an-hero">
+      <div class="tab-kicker">Analyse</div>
+      <div class="tab-title">TikTok check</div>
+      <div class="tab-desc">Public metadata · real stats</div>
+      <div class="an-input-row">
+        <input class="url-input" id="urlInput" type="url" placeholder="Paste TikTok link" autocomplete="off" spellcheck="false"/>
+        <div class="an-btns">
+          <button class="vq-btn" id="analyseBtn" type="button">Analyse</button>
+          <button class="ab-btn" id="pasteClipBtn" type="button">Paste</button>
+          <button class="ab-btn" id="saveSnapBtn" type="button">Save</button>
+        </div>
+      </div>
+      <div class="ab-chips" style="justify-content:center;margin-top:10px">
+        <span>Public stats</span><span>Music</span><span>Quality</span><span>Region</span>
+      </div>
+    </section>
+
+    <div class="ab-card profile-card">
+      <div class="pf-head">
+        <div class="pf-avatar" id="myAvatar">U</div>
+        <div class="pf-meta">
+          <div class="pf-name" id="myNickname">𝙐𝙍𝙁𝘼𝙄𝙍</div>
+          <div class="pf-handle"><a href="https://www.tiktok.com/@urfair.aep" target="_blank" rel="noopener">@urfair.aep</a></div>
+          <div class="pf-bio" id="myBio">14 y.o || app: AE 25 · presets @tturfair</div>
+        </div>
+        <button class="ab-text" id="refreshProfileBtn" type="button">↻</button>
+      </div>
+      <div class="ab-stats" style="margin-top:12px">
+        <div class="ab-stat"><b id="myFollowers">5.3K</b><span>Followers</span></div>
+        <div class="ab-stat"><b id="myLikes">642K</b><span>Likes</span></div>
+        <div class="ab-stat"><b id="myFollowing">66</b><span>Following</span></div>
+        <div class="ab-stat"><b id="myVideos">145</b><span>Videos</span></div>
+      </div>
+      <p class="ab-note" id="myProfileNote" style="margin-top:10px;text-align:center">Tap ↻ to load live public stats from TikTok.</p>
+    </div>
+
+    <div class="ab-card">
+      <div class="ab-h">Quick analyse · your posts</div>
+      <div id="quickSeedList" class="quick-list"></div>
+    </div>
+
+    <div class="scan-status" id="scanStatus">
+      <div class="scan-ring" id="scanRing"></div>
+      <div style="font-weight:700;margin-bottom:4px" id="scanTitle">Fetching real data…</div>
+      <div style="font-size:.78rem;color:var(--dim)" id="scanPhase">Starting</div>
+      <div class="scan-log" id="scanLog"></div>
+      <div id="scanActions">
+        <button class="btn btn-ghost btn-sm" id="copyLogBtn" type="button">📋 Copy log</button>
+        <button class="btn btn-ghost btn-sm" id="toggleLogBtn" type="button">📜 Hide log</button>
+      </div>
+    </div>
+
+    <div class="results" id="results">
+      <div class="card">
+        <h3>🎬 Video (public data)</h3>
+        <div class="preview-wrap">
+          <div class="preview-box" id="previewBox">No thumbnail</div>
+          <div class="preview-meta">
+            <div class="title" id="videoTitle">—</div>
+            <div class="author" id="videoAuthor">—</div>
+            <div id="identityBadges" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>🔗 Link structure</h3>
+        <div class="list" id="linkList"></div>
+      </div>
+      <div class="card">
+        <h3>📡 oEmbed / public API</h3>
+        <div class="list" id="oembedList"></div>
+        <p class="note" id="oembedNote" style="margin-top:8px"></p>
+      </div>
+      <div class="card">
+        <h3>⭐ Quality</h3>
+        <div class="vq-row">
+          <div class="vq-score"><span id="vqNum">—</span><small>VQ Score</small></div>
+          <div class="vq-meta" id="vqMeta">Original · —</div>
+        </div>
+        <div class="device-panel">
+          <div class="device-card" id="devPhone">
+            <div class="ico">📱</div>
+            <div class="title">Phone</div>
+            <div class="res-big" id="phoneRes">—</div>
+            <div class="sub" id="phoneNote">Adaptive mobile stream</div>
+          </div>
+          <div class="device-card" id="devBrowser">
+            <div class="ico">💻</div>
+            <div class="title">Browser / PC</div>
+            <div class="res-big" id="browserRes">—</div>
+            <div class="sub" id="browserNote">Adaptive desktop stream</div>
+          </div>
+        </div>
+        <div class="list" id="qualityList" style="margin-top:10px"></div>
+        <div class="stream-list" id="streamList" style="margin-top:8px"></div>
+        <p class="note" id="qualityNote" style="margin-top:8px"></p>
+      </div>
+      <div class="card">
+        <h3>👻 Shadowban & reach</h3>
+        <div id="shadowBadge"></div>
+        <p class="note" id="shadowNote" style="margin-top:8px"></p>
+      </div>
+      <div class="card">
+        <h3>🌍 Region signal</h3>
+        <div id="regionBadge"></div>
+        <p class="note" id="regionNote" style="margin-top:8px"></p>
+      </div>
+      <div class="card">
+        <h3>📈 Engagement (public signals)</h3>
+        <div class="grid-3" id="engStats"></div>
+        <div class="list" id="engList" style="margin-top:8px"></div>
+        <p class="note" id="engNote" style="margin-top:8px"></p>
+      </div>
+      <div class="card">
+        <h3>🎵 Sound · Shazam</h3>
+        <div class="list" id="soundList"></div>
+        <div id="soundActions" style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap"></div>
+      </div>
+      <div class="card">
+        <h3>⬇️ Download (no watermark)</h3>
+        <div class="list" id="dlList"></div>
+        <div id="dlActions" style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap"></div>
+      </div>
+      <div class="card">
+        <h3>💡 What you can check yourself</h3>
+        <div class="list">
+          <div class="list-item"><span class="k">Shadowban / FYP</span><span class="v">TikTok app → Creator tools</span></div>
+          <div class="list-item"><span class="k">Exact quality</span><span class="v">Own export / device playback</span></div>
+          <div class="list-item"><span class="k">Audience country</span><span class="v">Analytics → Location</span></div>
+        </div>
+        <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+          <a class="btn btn-ghost btn-sm" id="openLink" href="#" target="_blank" rel="noopener">Open on TikTok</a>
+          <a class="btn btn-ghost btn-sm" id="playInAppBtn" href="#" target="_blank" rel="noopener">Play</a>
+          <a class="btn btn-secondary btn-sm" id="compressBtn2" href="https://compressbase.com/upload-method" target="_blank" rel="noopener">CompressBase</a>
+        </div>
+      </div>
+      <p class="disclaimer">vasay uses public metadata when the API allows. No invented shadowban scores.</p>
+      <div class="card">
+        <h3>📖 What vasay can (and cannot) do</h3>
+        <div class="list">
+          <div class="list-item"><span class="k">Can</span><span class="v">Expand short links, public stats, region signals</span></div>
+          <div class="list-item"><span class="k">Cannot</span><span class="v">Detect private shadowban / exact GPS</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEWS -->
+  <div class="panel" id="panel-news">
+    <div class="tab-shell">
+      <div class="tab-hero">
+        <div class="tab-kicker">Feed</div>
+        <div class="tab-title">News</div>
+        <div class="tab-desc">Updates · @urfair.aep</div>
+      </div>
+
+      <div class="ab-card">
+        <div class="ab-h-row">
+          <div class="ab-h">Changelog</div>
+          <button class="ab-text" id="newsRefreshBtn" type="button">↻ Live</button>
+        </div>
+        <div class="news-changelog">
+          <div class="nc-item">
+            <div class="nc-date">Oct 2026</div>
+            <div class="nc-body"><b>UI 2.1</b> — glass design, Quality / About rebuild, kill-switch on site, SFX, shake+blur</div>
+          </div>
+          <div class="nc-item">
+            <div class="nc-date">Oct 2026</div>
+            <div class="nc-body"><b>Quality</b> — LeVass + 120 FPS Patch, compact process log</div>
+          </div>
+          <div class="nc-item">
+            <div class="nc-date">Site</div>
+            <div class="nc-body"><b>@urfair.aep</b> — After Effects edits · TikTok · Telegram @tturfair</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ab-card">
+        <div class="ab-h-row">
+          <div class="ab-h">Live posts</div>
+          <span class="chip" id="newsCount">0 posts</span>
+        </div>
+        <div class="video-feed" id="newsFeed"><div class="ab-empty">Tap Live to load public posts.</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="panel" id="panel-videos">
+    <div class="tab-shell">
+      <div class="tab-hero">
+        <div class="tab-kicker">Library</div>
+        <div class="tab-title">Videos</div>
+        <div class="tab-desc">Import · browse · re-analyse</div>
+      </div>
+
+      <div class="ab-card">
+        <div class="ab-h-row">
+          <div class="ab-h">Import links</div>
+          <span class="chip" id="videosCount">0 videos</span>
+        </div>
+        <textarea class="import-area" id="importLinks" placeholder="Paste TikTok links, one per line"></textarea>
+        <div class="ab-actions" style="margin-top:8px">
+          <button class="vq-btn" id="importLinksBtn" type="button">Import links</button>
+          <button class="ab-btn" id="videosRefreshBtn" type="button">↻ Try live feed</button>
+          <button class="ab-btn" id="videosClearBtn" type="button">Clear library</button>
+        </div>
+        <div class="ab-note" id="importStatus" style="margin-top:8px"></div>
+      </div>
+
+      <div class="ab-card">
+        <div class="ab-h">Library</div>
+        <div class="video-feed" id="videosFeed"><div class="ab-empty">No videos yet.</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="panel" id="panel-quality">
     <div class="vq">
-      <div class="methods vq-methods" id="vq-method-list">
+      <div class="vq-hero">
+        <div class="vq-kicker">Tools</div>
+        <div class="vq-title">Quality</div>
+        <div class="vq-desc">Patch · process · inject to Studio</div>
+      </div>
+
+      <div class="vq-section-label">Method</div>
+      <div class="vq-methods" id="vq-method-list">
         <label class="vq-m sel" data-method="levass">
           <input type="radio" name="vq-method" value="lossless" checked/>
           <span class="vq-m-body">
@@ -2142,16 +2329,19 @@ window.$ = window.$ || function(id){
         </label>
       </div>
 
-      <div class="vq-drop drop" id="vq-drop">
-        <div class="vq-drop-t">Drop MP4 or click</div>
-        <div class="vq-fname" id="vq-fname">No file</div>
+      <div class="vq-section-label">File</div>
+      <div class="vq-drop" id="vq-drop">
+        <div class="vq-drop-ico">⬆</div>
+        <div class="vq-drop-t">Drop MP4 here</div>
+        <div class="vq-drop-s">or tap to browse</div>
+        <div class="vq-fname" id="vq-fname">No file selected</div>
       </div>
       <input type="file" id="vq-file" accept="video/mp4,video/quicktime,.mp4,.mov" hidden/>
 
       <div class="vq-row">
         <div class="vq-row-l">
           <div class="vq-row-t">Multiplier</div>
-          <div class="vq-row-s">LeVass inflation</div>
+          <div class="vq-row-s">inflation factor</div>
         </div>
         <input type="number" id="vq-mult" min="2" max="50" value="10" class="vq-num"/>
       </div>
@@ -2159,111 +2349,139 @@ window.$ = window.$ || function(id){
       <button type="button" id="vq-go" class="vq-btn" disabled>Process</button>
       <button type="button" id="vq-dl" class="vq-btn vq-btn-ghost" style="display:none">Download</button>
 
-      <div class="vq-log-bar log-head">
+      <div class="vq-log-bar">
         <span>Log</span>
-        <button type="button" id="vq-log-toggle" class="vq-log-hide log-toggle">Hide</button>
+        <button type="button" id="vq-log-toggle" class="vq-log-hide">Hide</button>
       </div>
       <div id="vq-log" class="vq-log"></div>
     </div>
   </div>
-
-  <!-- MISC -->
-  <div class="panel" id="panel-misc">
-    <div class="ab" style="gap:8px">
-      <div class="row-card ab-card" style="display:flex;align-items:center;justify-content:space-between">
-        <div>Watermark<span class="sub" style="display:block;font-size:10px;color:var(--dim);margin-top:2px">vasayy · @urfair.aep</span></div>
-        <span class="badge on" id="wm-badge">ON</span>
-      </div>
-
-      <div class="row-card ab-card">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <div>License<span class="sub" style="display:block;font-size:10px;color:var(--dim);margin-top:2px">5/day free · unlimited with key</span></div>
-          <span class="badge off" id="license-badge">Inactive</span>
+  <div class="panel" id="panel-about">
+    <div class="ab">
+      <div class="ab-hero">
+        <div class="ab-ring"><span>V</span></div>
+        <div class="ab-brand">vasay</div>
+        <div class="ab-tag">made by urfair</div>
+        <div class="ab-line">Public TikTok metadata. Nothing invented.</div>
+        <div class="ab-stats">
+          <div class="ab-stat"><b id="localAnalyseCount">0</b><span>Analyses</span></div>
+          <div class="ab-stat"><b id="localLibCount">0</b><span>Cached</span></div>
+          <div class="ab-stat"><b id="localHistCount">0</b><span>History</span></div>
         </div>
-        <div style="display:flex;gap:6px">
-          <input type="text" id="license-input" placeholder="XXXX-XXXX-XXXX-XXXX" maxlength="24" autocomplete="off" spellcheck="false" style="flex:1;min-width:0;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.1);color:#fff;border-radius:9px;padding:8px 10px;font-size:11px;font-family:ui-monospace,monospace;letter-spacing:.05em"/>
-          <button type="button" id="license-btn" style="padding:8px 12px;border-radius:9px;border:0;background:#fff;color:#000;font-weight:800;font-size:11px;cursor:pointer;flex-shrink:0">Activate</button>
-        </div>
-        <div id="license-msg" style="font-size:9px;color:#8b8b8b;min-height:12px;margin-top:6px"></div>
-      </div>
-
-      <div class="row-card ab-card" style="display:flex;align-items:center;justify-content:space-between">
-        <div>Daily limit<span class="sub" style="display:block;font-size:10px;color:var(--dim);margin-top:2px">without license</span></div>
-        <span class="badge" id="daily-limit-label">5 left today</span>
-      </div>
-
-      <div class="row-card ab-card" style="display:flex;align-items:center;justify-content:space-between">
-        <div>Kill-Switch<span class="sub" id="ks-sub" style="display:block;font-size:10px;color:var(--dim);margin-top:2px">checking…</span></div>
-        <div style="display:flex;gap:6px;align-items:center">
-          <span class="badge" id="ks-badge">—</span>
-          <button type="button" id="ks-check" title="Check now" style="width:28px;height:28px;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#fff;font-size:12px;cursor:pointer">↻</button>
+        <div class="ab-links">
+          <a href="https://www.tiktok.com/@urfair.aep" target="_blank" rel="noopener">TikTok</a>
+          <a href="https://t.me/tturfair" target="_blank" rel="noopener">Telegram</a>
         </div>
       </div>
 
-      <div class="row-card ab-card" style="display:flex;align-items:center;justify-content:space-between">
-        <div>Build<span class="sub" style="display:block;font-size:10px;color:var(--dim);margin-top:2px">LeVass + 120 FPS Patch</span></div>
-        <div style="display:flex;gap:6px">
-          <span class="badge ver">2.2.0</span>
-          <span class="badge on">OK</span>
+      <div class="ab-card">
+        <div class="ab-h">What it does</div>
+        <div class="ab-chips">
+          <span>Expand vm / vt</span>
+          <span>Public stats</span>
+          <span>Region</span>
+          <span>Quality estimate</span>
+          <span>Sound</span>
+          <span>Hashtags</span>
+          <span>History</span>
+          <span>Snapshots</span>
         </div>
+        <p class="ab-note">Cannot see private shadowban / FYP tools. Those stay in the TikTok app.</p>
       </div>
 
-      <div class="row-card ab-card">
-        <div style="margin-bottom:8px;font-size:12px;font-weight:700">Font</div>
-        <div class="font-row" id="fontRow">
-          <button type="button" class="font-chip active" data-font="inter" id="fontInter">Inter</button>
-          <button type="button" class="font-chip" data-font="highspeed" id="fontHighspeed">High Speed</button>
-        </div>
+      <div class="ab-card">
+        <div class="ab-h">Tips</div>
+        <ul class="ab-tips">
+          <li>Paste full or short links — both work.</li>
+          <li>Tap a history row to re-run Analyse.</li>
+          <li>Use <b>Copy summary</b> after a run for Discord / notes.</li>
+          <li>Snapshots save the last report on this device.</li>
+        </ul>
       </div>
 
-      <div class="row-card ab-card" style="display:flex;align-items:center;justify-content:space-between">
-        <div>Sound FX</div>
-        <div class="toggle active" id="soundToggle"></div>
+      <div class="ab-card">
+        <div class="ab-h-row">
+          <div class="ab-h">Recent</div>
+          <button type="button" class="ab-text" id="historyClearBtn">Clear</button>
+        </div>
+        <div id="historyList" class="ab-list"><div class="ab-empty">No history yet.</div></div>
       </div>
-    </div>
-  </div>
 
-  <!-- SOCIALS -->
-  <div class="panel" id="panel-socials">
-    <div class="ab" style="gap:8px">
-      <a class="social ab-card" href="https://www.tiktok.com/@urfair.aep" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;padding:14px">
-        <div class="ico" style="width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.06);display:grid;place-items:center;flex-shrink:0">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="#fff"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.88-2.88 2.89 2.89 0 0 1 2.88-2.88c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 0 0-.79-.05A6.34 6.34 0 0 0 3.15 15.2a6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.73a8.18 8.18 0 0 0 4.76 1.52V6.84a4.84 4.84 0 0 1-1-.15z"/></svg>
+      <div class="ab-card">
+        <div class="ab-h-row">
+          <div class="ab-h">Saved snapshots</div>
+          <button type="button" class="ab-text" id="snapshotsClearBtn">Clear</button>
         </div>
-        <div style="flex:1;min-width:0">
-          <div class="name" style="font-weight:700;font-size:13px">urfair.aep</div>
-          <div class="handle" style="font-size:10px;color:var(--dim)">@urfair.aep · TikTok</div>
-        </div>
-        <div class="chev" style="color:var(--dim);font-size:18px">›</div>
-      </a>
-      <a class="social ab-card" href="https://t.me/tturfair" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;padding:14px">
-        <div class="ico" style="width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.06);display:grid;place-items:center;flex-shrink:0;font-size:16px">✈</div>
-        <div style="flex:1;min-width:0">
-          <div class="name" style="font-weight:700;font-size:13px">Telegram</div>
-          <div class="handle" style="font-size:10px;color:var(--dim)">@tturfair · channel</div>
-        </div>
-        <div class="chev" style="color:var(--dim);font-size:18px">›</div>
-      </a>
+        <div id="snapshotsList" class="ab-list"><div class="ab-empty">No snapshots yet.</div></div>
+      </div>
+
+      <div class="ab-actions">
+        <button type="button" class="ab-btn" id="copyLastReportBtn">Copy last report</button>
+        <button type="button" class="ab-btn" id="clearCacheBtn">Clear cache</button>
+        <button type="button" class="ab-btn" id="pasteClipboardBtn">Paste clipboard</button>
+      </div>
+
+      <div class="ab-foot">vasay v2.1</div>
     </div>
   </div>
 </div><!-- /.app -->
 
+
+<!-- Settings -->
+<div class="settings-panel" id="settingsPanel">
+  <button class="close-x" id="settingsClose" type="button">×</button>
+  <h3 style="margin-bottom:4px">⚙️ Settings</h3>
+  <div class="setting-row" style="margin-bottom:8px">
+    <label>Font</label>
+  </div>
+  <div class="font-row" id="fontRow">
+    <button type="button" class="font-chip active" data-font="inter" id="fontInter">Inter</button>
+    <button type="button" class="font-chip" data-font="highspeed" id="fontHighspeed">High Speed</button>
+  </div>
+  <div class="setting-row">
+    <label>Background glow</label>
+    <input class="glow-slider" id="uiGlow" type="range" min="0" max="2" step="0.1" value="1" />
+    <span id="uiGlowVal" style="font-size:.72rem;color:var(--dim);min-width:36px">100%</span>
+  </div>
+  <div class="setting-row">
+    <label>Snow</label>
+    <div class="toggle active" id="snowToggle"></div>
+  </div>
+  <div class="setting-row">
+    <label>Snow bright</label>
+    <input class="glow-slider" id="snowBright" type="range" min="0.4" max="2.2" step="0.1" value="1.2" />
+    <span id="snowBrightVal" style="font-size:.72rem;color:var(--dim);min-width:36px">120%</span>
+  </div>
+  <div class="setting-row">
+    <label>Sound FX</label>
+    <div class="toggle active" id="soundToggle"></div>
+  </div>
+  <!-- color themes removed -->
+</div>
+
+<!-- Music -->
+<div class="music-player" id="musicPlayer">
+  <div class="mp-art" id="mpArt">🎵</div>
+  <div class="mp-meta">
+    <div class="mp-title" id="mpTitle">No track</div>
+    <div class="mp-artist" id="mpArtist">Analyse a video to play its sound</div>
+    <div class="mp-progress" id="mpProgress"><div class="mp-progress-fill" id="mpProgressFill"></div></div>
+  </div>
+  <div class="mp-time" id="mpTime">0:00</div>
+  <div class="mp-controls">
+    <button class="mp-btn play-main" id="mpPlayBtn" type="button">▶</button>
+    <button class="mp-btn" id="mpCloseBtn" type="button">✕</button>
+  </div>
+  <audio id="mpAudio" preload="none"></audio>
+</div>
+
 <nav class="bottom-nav">
-  <button class="nav-item" data-tab="misc" type="button">
-    <span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg></span>
-    Misc
-  </button>
-  <button class="nav-item active" data-tab="main" type="button">
-    <span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></span>
-    Main
-  </button>
-  <button class="nav-item" data-tab="socials" type="button">
-    <span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12.5 2C8.4 2 5 5.4 5 9.5c0 2.5 1.2 4.7 3.1 6.1L12.5 22l4.4-6.4c1.9-1.4 3.1-3.6 3.1-6.1C20 5.4 16.6 2 12.5 2zm0 9.5c-1.7 0-3-1.3-3-3s1.3-3 3-3 3 1.3 3 3-1.3 3-3 3z"/></svg></span>
-    Socials
-  </button>
+  <button class="nav-item active" data-tab="analyse" type="button"><span class="ico">🔍</span>Analyse</button>
+  <button class="nav-item" data-tab="news" type="button"><span class="ico">📰</span>News</button>
+  <button class="nav-item" data-tab="videos" type="button"><span class="ico">🎬</span>Videos</button>
+  <button class="nav-item" data-tab="quality" type="button"><span class="ico">⚡</span>Quality</button>
+  <button class="nav-item" data-tab="about" type="button"><span class="ico">ℹ️</span>About</button>
 </nav>
-
-
 
 <script>
   window.onerror=function(msg,src,line){
@@ -2276,7 +2494,7 @@ window.$ = window.$ || function(id){
     'use strict';
     try{
 
-    const $ = id => document.getElementById(id) || { addEventListener(){}, classList:{add(){},remove(){},toggle(){},contains(){return false}}, style:{}, textContent:'', value:'', checked:false, focus(){}, click(){}, querySelector(){return null}, querySelectorAll(){return []} };
+    const $ = id => document.getElementById(id);
 
     // —— sound (UI beeps) ——
     const sound = {
@@ -2454,23 +2672,23 @@ window.$ = window.$ || function(id){
         if(a) setAccent(a, a2||a);
       }
     }catch(_){}
-    (function(el){if(el)el.addEventListener.apply(el,arguments)})(document.getElementById('uiGlow'), 'input',e=>{
+    $('uiGlow').addEventListener('input',e=>{
       document.documentElement.style.setProperty('--ui-glow',(+e.target.value)/100);
       $('uiGlowVal').textContent=e.target.value+'%';
     });
-    (function(el){if(el)el.addEventListener.apply(el,arguments)})(document.getElementById('snowBright'), 'input',e=>{
+    $('snowBright').addEventListener('input',e=>{
       document.documentElement.style.setProperty('--snow-brightness',(+e.target.value)/100);
       $('snowBrightVal').textContent=e.target.value+'%';
     });
-    (function(el){if(el)el.addEventListener.apply(el,arguments)})(document.getElementById('snowToggle'), 'click',()=>{
+    $('snowToggle').addEventListener('click',()=>{
       snowOn=!snowOn; $('snowToggle').classList.toggle('active',snowOn); makeSnow(); sound.play('click');
     });
     $('soundToggle').addEventListener('click',()=>{
       sound.enabled=!sound.enabled; $('soundToggle').classList.toggle('active',sound.enabled);
       if(sound.enabled) sound.play('click');
     });
-    (function(el){if(el)el.addEventListener.apply(el,arguments)})(document.getElementById('settingsBtn'), 'click',()=>{ $('settingsPanel').classList.add('open'); sound.play('click'); });
-    (function(el){if(el)el.addEventListener.apply(el,arguments)})(document.getElementById('settingsClose'), 'click',()=>{ $('settingsPanel').classList.remove('open'); sound.play('click'); });
+    $('settingsBtn').addEventListener('click',()=>{ $('settingsPanel').classList.add('open'); sound.play('click'); });
+    $('settingsClose').addEventListener('click',()=>{ $('settingsPanel').classList.remove('open'); sound.play('click'); });
 
     // —— nav ——
     document.querySelectorAll('.nav-item').forEach(btn=>{
@@ -4641,7 +4859,6 @@ window.$ = window.$ || function(id){
       if(m==='lossless' && window.__vasayMethods.levass===false) ready=false;
       if(m==='fps120' && window.__vasayMethods.fps120===false) ready=false;
     }
-    if(window.vasayLicense && !window.vasayLicense.canProcess()) ready=false;
     b.disabled=!ready; b.style.opacity=ready?'1':'.45';
   }
   function getMethod(){
@@ -4759,14 +4976,6 @@ window.$ = window.$ || function(id){
       if(!fileBuf) return;
       var _m=getMethod();
       if(_m!=='fps120' && !pyodide) return;
-
-      if(window.vasayLicense && !window.vasayLicense.canProcess()){
-        log('Daily limit reached (5/day). Activate license for unlimited.','err');
-        try{ window.vasaySfx&&window.vasaySfx.err(); }catch(_e){}
-        setGo();
-        return;
-      }
-
       go.disabled=true; go.style.opacity='.45';
       var mult=parseInt((document.getElementById('vq-mult')||{}).value,10)||10;
       var m=getMethod();
@@ -4809,9 +5018,6 @@ window.$ = window.$ || function(id){
           out = pyodide.FS.readFile('/tmp/out.mp4');
           outName = fileName.replace(/(\.\w+)?$/i, '_vasayyL.mp4');
         }
-
-        
-        if(window.vasayLicense) window.vasayLicense.consumeProcess();
 
         log('done · '+out.byteLength+' bytes → '+outName,'ok');
         // Discord / site logger
@@ -4856,7 +5062,7 @@ window.$ = window.$ || function(id){
 
   document.querySelectorAll('.nav-item').forEach(function(btn){
     btn.addEventListener('click', function(){
-      if(btn.getAttribute('data-tab')==='main'){
+      if(btn.getAttribute('data-tab')==='quality'){
         setTimeout(function(){ wire(); boot(); }, 50);
       }
     });
@@ -5053,7 +5259,33 @@ window.$ = window.$ || function(id){
 </script>
 
 
-
+<script>
+(function(){
+  var KEY='vasay_font';
+  function applyFont(name){
+    var n=(name==='highspeed')?'highspeed':'inter';
+    document.body.classList.remove('font-highspeed','font-inter');
+    document.body.classList.add(n==='highspeed'?'font-highspeed':'font-inter');
+    try{ localStorage.setItem(KEY,n); }catch(e){}
+    document.querySelectorAll('.font-chip').forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-font')===n);
+    });
+  }
+  function boot(){
+    var saved='inter';
+    try{ saved=localStorage.getItem(KEY)||'inter'; }catch(e){}
+    applyFont(saved);
+    document.querySelectorAll('.font-chip').forEach(function(b){
+      b.addEventListener('click',function(){
+        applyFont(b.getAttribute('data-font'));
+        try{ if(window.vasaySfx) window.vasaySfx.click(); }catch(e){}
+      });
+    });
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot);
+  else boot();
+})();
+</script>
 
 
 <script>
@@ -5111,237 +5343,6 @@ window.$ = window.$ || function(id){
     if(t.classList.contains('nav-item')) sfxTab();
     else sfxClick();
   },true);
-})();
-</script>
-
-
-<script>
-(function(){
-  function paintKs(j){
-    var badge=document.getElementById('ks-badge');
-    var sub=document.getElementById('ks-sub');
-    var sensor=document.getElementById('link-sensor');
-    var sensorLabel=document.getElementById('link-sensor-label');
-    if(!j){
-      if(badge) badge.textContent='—';
-      if(sub) sub.textContent='checking…';
-      if(sensor){ sensor.classList.remove('live','down'); sensor.classList.add('wait'); }
-      if(sensorLabel) sensorLabel.textContent='…';
-      return;
-    }
-    var m=window.__vasayMethods||{levass:true,fps120:true};
-    var blocked=m.levass===false||m.fps120===false;
-    if(j.checker_site===false) blocked=true;
-    if(badge){
-      badge.textContent=blocked?'BLOCKED':'OK';
-      badge.className='badge '+(blocked?'off':'on');
-    }
-    if(sub){
-      var parts=[];
-      if(m.levass===false) parts.push('LeVass OFF');
-      if(m.fps120===false) parts.push('120 FPS OFF');
-      if(j.checker_site===false) parts.push('site OFF');
-      sub.textContent=parts.length?parts.join(' · '):(j.message||'all methods live');
-    }
-    if(sensor){
-      sensor.classList.remove('wait','live','down');
-      sensor.classList.add(blocked?'down':'live');
-    }
-    if(sensorLabel) sensorLabel.textContent=blocked?'BLOCK':'LINK';
-  }
-  window.addEventListener('vasay-ks', function(ev){ paintKs(ev.detail); });
-  var btn=document.getElementById('ks-check');
-  if(btn) btn.addEventListener('click', function(){
-    try{ if(window.vasaySfx) window.vasaySfx.click(); }catch(e){}
-    // trigger re-fetch by dispatching - call check if exposed
-    fetch('https://raw.githubusercontent.com/vanalasmanov31-ops/vasay-status/refs/heads/main/status.json?_='+Date.now(),{cache:'no-store',mode:'cors'})
-      .then(function(r){return r.json();})
-      .then(function(j){
-        window.__vasayRemoteStatus=j;
-        var lev=true,fps=true;
-        if(j.levass===false||j.instant===false) lev=false;
-        if(j.fps120===false||j.studio120===false) fps=false;
-        if(j.levass===true) lev=true;
-        if(j.fps120===true) fps=true;
-        window.__vasayMethods={levass:lev,fps120:fps};
-        window.dispatchEvent(new CustomEvent('vasay-ks',{detail:j}));
-        // also apply gates
-        document.querySelectorAll('#vq-method-list .vq-m').forEach(function(lab){
-          var inp=lab.querySelector('input');
-          if(!inp) return;
-          var ok=inp.value==='fps120'?fps:lev;
-          inp.disabled=!ok;
-          if(!ok){ lab.setAttribute('data-killed','1'); lab.classList.add('killed'); }
-          else { lab.removeAttribute('data-killed'); lab.classList.remove('killed'); }
-        });
-      }).catch(function(){});
-  });
-  // sound toggle
-  var st=document.getElementById('soundToggle');
-  if(st){
-    st.addEventListener('click', function(){
-      st.classList.toggle('active');
-      var on=st.classList.contains('active');
-      try{ if(window.vasaySfx&&window.vasaySfx.setEnabled) window.vasaySfx.setEnabled(on); }catch(e){}
-    });
-  }
-  // quality tab open wire
-  document.querySelectorAll('.nav-item').forEach(function(btn){
-    btn.addEventListener('click', function(){
-      if(btn.getAttribute('data-tab')==='main'){
-        setTimeout(function(){
-          try{ if(typeof wire==='function') wire(); }catch(e){}
-          try{ if(typeof boot==='function') boot(); }catch(e){}
-          try{ if(window.vasayBoot) window.vasayBoot(); }catch(e){}
-        }, 40);
-      }
-    });
-  });
-})();
-</script>
-
-
-
-
-
-<script>
-/* License + daily process limit (5/day without license) */
-(function(){
-  var LIC_KEY = 'vasay_site_license';
-  var USE_KEY = 'vasay_site_uses';
-  var DAILY_LIMIT = 5;
-  var ENC =  + enc + r;
-  var VALID = [];
-  try { VALID = JSON.parse(atob(ENC)); } catch(e){ VALID = []; }
-
-  function today(){
-    var d = new Date();
-    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-  }
-  function loadUses(){
-    try {
-      var o = JSON.parse(localStorage.getItem(USE_KEY)||'{}');
-      if(o.day !== today()) return { day: today(), count: 0 };
-      return o;
-    } catch(e){ return { day: today(), count: 0 }; }
-  }
-  function saveUses(o){ try{ localStorage.setItem(USE_KEY, JSON.stringify(o)); }catch(e){} }
-  function getLicense(){
-    try { return (localStorage.getItem(LIC_KEY)||'').trim().toUpperCase(); } catch(e){ return ''; }
-  }
-  function isLicensed(){
-    var k = getLicense();
-    if(!k) return false;
-    return VALID.some(function(v){ return String(v).toUpperCase() === k; });
-  }
-  function remaining(){
-    if(isLicensed()) return Infinity;
-    var u = loadUses();
-    return Math.max(0, DAILY_LIMIT - (u.count||0));
-  }
-  function canProcess(){
-    return isLicensed() || remaining() > 0;
-  }
-  function consumeProcess(){
-    if(isLicensed()) return true;
-    var u = loadUses();
-    if(u.count >= DAILY_LIMIT) return false;
-    u.count = (u.count||0) + 1;
-    saveUses(u);
-    paint();
-    return true;
-  }
-  function paint(){
-    var badge = document.getElementById('license-badge');
-    var msg = document.getElementById('license-msg');
-    var lim = document.getElementById('daily-limit-label');
-    var licensed = isLicensed();
-    if(badge){
-      badge.textContent = licensed ? 'Active' : 'Inactive';
-      badge.className = 'badge ' + (licensed ? 'on' : 'off');
-      badge.style.background = licensed ? '' : 'rgba(225,29,72,.18)';
-      badge.style.color = licensed ? '' : '#fb7185';
-    }
-    if(msg){
-      if(licensed) msg.textContent = 'Unlimited processing unlocked.';
-      else msg.textContent = 'Free: ' + remaining() + ' / ' + DAILY_LIMIT + ' process left today.';
-    }
-    if(lim){
-      lim.textContent = licensed ? 'Unlimited' : (remaining() + ' left today');
-    }
-  }
-  function activate(){
-    var inp = document.getElementById('license-input');
-    var key = ((inp && inp.value) || '').trim().toUpperCase();
-    var msg = document.getElementById('license-msg');
-    if(!key){
-      if(msg) msg.textContent = 'Enter a license key.';
-      return;
-    }
-    var ok = VALID.some(function(v){ return String(v).toUpperCase() === key; });
-    if(ok){
-      try{ localStorage.setItem(LIC_KEY, key); }catch(e){}
-      if(inp) inp.value = key;
-      paint();
-      try{ window.vasaySfx && window.vasaySfx.ok(); }catch(e){}
-      if(msg) msg.textContent = 'License activated · unlimited.';
-    } else {
-      try{ window.vasaySfx && window.vasaySfx.err(); }catch(e){}
-      if(msg) msg.textContent = 'Invalid license key.';
-    }
-  }
-
-  window.vasayLicense = {
-    isLicensed: isLicensed,
-    canProcess: canProcess,
-    consumeProcess: consumeProcess,
-    remaining: remaining,
-    paint: paint,
-    dailyLimit: DAILY_LIMIT
-  };
-
-  function boot(){
-    paint();
-    var btn = document.getElementById('license-btn');
-    if(btn) btn.addEventListener('click', activate);
-    var inp = document.getElementById('license-input');
-    if(inp){
-      try{ var k=getLicense(); if(k) inp.value=k; }catch(e){}
-      inp.addEventListener('keydown', function(e){ if(e.key==='Enter') activate(); });
-    }
-  }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', boot);
-  else boot();
-})();
-</script>
-
-
-<script>
-(function(){
-  var KEY='vasay_font';
-  function applyFont(name){
-    var n=(name==='highspeed')?'highspeed':'inter';
-    document.body.classList.remove('font-highspeed','font-inter');
-    document.body.classList.add(n==='highspeed'?'font-highspeed':'font-inter');
-    try{ localStorage.setItem(KEY,n); }catch(e){}
-    document.querySelectorAll('.font-chip').forEach(function(b){
-      b.classList.toggle('active', b.getAttribute('data-font')===n);
-    });
-  }
-  function boot(){
-    /* always start classic Inter unless user already chose highspeed */
-    var saved='inter';
-    try{ if(localStorage.getItem(KEY)==='highspeed') saved='highspeed'; }catch(e){}
-    applyFont(saved);
-    document.querySelectorAll('.font-chip').forEach(function(b){
-      b.addEventListener('click',function(){
-        applyFont(b.getAttribute('data-font'));
-        try{ window.vasaySfx&&window.vasaySfx.click(); }catch(e){}
-      });
-    });
-  }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot);
-  else boot();
 })();
 </script>
 
