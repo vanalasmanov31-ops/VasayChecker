@@ -791,13 +791,7 @@
     .nav-item[data-tab="quality"] .ico { filter: grayscale(0); }
 
     /* About nav button — distinct */
-    .nav-item[data-tab="about"] .ico {
-      font-size: 0 !important;
-      width: 18px; height: 18px; border-radius: 6px;
-      background: linear-gradient(145deg, #ffffff, #8fd63a);
-      box-shadow: 0 0 12px rgba(255,255,255,.25);
-      position: relative;
-    }
+    
     .nav-item[data-tab="about"] .ico::after {
       content: "V";
       position: absolute; inset: 0;
@@ -1960,18 +1954,21 @@ div.ab-card:has(#quickSeedList),
 #snow{position:fixed;inset:0;pointer-events:none;z-index:0}
 
 
-/* tab slide transition */
+
+/* tab slide transition — smooth + blur */
 .tabs-viewport{
   position:relative;
   width:100%;
   overflow:hidden;
   min-height:52vh;
+  mask-image:linear-gradient(90deg, transparent 0%, #000 2%, #000 98%, transparent 100%);
+  -webkit-mask-image:linear-gradient(90deg, transparent 0%, #000 2%, #000 98%, transparent 100%);
 }
 .tabs-track{
   display:flex;
   width:100%;
-  transition:transform .5s cubic-bezier(.16,1,.3,1);
-  will-change:transform;
+  transition:transform .7s cubic-bezier(.22,1,.36,1);
+  will-change:transform,filter;
 }
 .tabs-track .panel{
   display:block!important;
@@ -1980,20 +1977,82 @@ div.ab-card:has(#quickSeedList),
   min-width:100%;
   box-sizing:border-box;
   padding:0 2px;
-  opacity:.35;
-  transform:scale(.98);
-  transition:opacity .45s ease, transform .45s cubic-bezier(.16,1,.3,1);
+  opacity:.25;
+  transform:scale(.96) translateZ(0);
+  filter:blur(10px);
+  transition:
+    opacity .65s cubic-bezier(.22,1,.36,1),
+    transform .7s cubic-bezier(.22,1,.36,1),
+    filter .7s cubic-bezier(.22,1,.36,1);
   pointer-events:none;
 }
 .tabs-track .panel.active{
   opacity:1!important;
-  transform:scale(1)!important;
+  transform:scale(1) translateZ(0)!important;
+  filter:blur(0)!important;
   pointer-events:auto!important;
   animation:none!important;
+}
+.tabs-track.is-sliding .panel.active{
+  filter:blur(3px)!important;
 }
 .panel{display:none}
 .tabs-track .panel{display:block!important}
 
+/* about nav icon */
+.nav-item[data-tab="about"] .ico{
+  font-size:0!important;
+  width:16px!important;height:16px!important;
+  border-radius:50%!important;
+  background:
+    radial-gradient(circle at 50% 32%, #fff 0 2.2px, transparent 2.4px),
+    radial-gradient(circle at 50% 68%, #fff 0 4.5px, transparent 4.7px);
+  background-color:transparent!important;
+  box-shadow:none!important;
+  border:1.5px solid rgba(255,255,255,.55)!important;
+  margin:0 auto 2px!important;
+  opacity:.9;
+}
+.nav-item[data-tab="about"].active .ico{
+  border-color:rgba(255,255,255,.9)!important;
+  opacity:1;
+  box-shadow:0 0 10px rgba(255,255,255,.25)!important;
+}
+
+/* blur everywhere */
+html,body{
+  background:#000!important;
+}
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse at 50% -10%,rgba(40,40,40,.9) 0%,rgba(10,10,10,.95) 45%,#000 100%);
+  backdrop-filter:blur(48px) saturate(1.5);
+  -webkit-backdrop-filter:blur(48px) saturate(1.5);
+}
+.app{
+  backdrop-filter:blur(48px) saturate(1.6)!important;
+  -webkit-backdrop-filter:blur(48px) saturate(1.6)!important;
+}
+.ab-card,.vq-m,.vq-row,.vq-drop,.card,.row-card,.profile-card,.scan-status,
+.tab-hero,.vq-hero,.settings-panel,.bottom-nav{
+  backdrop-filter:blur(20px) saturate(1.35)!important;
+  -webkit-backdrop-filter:blur(20px) saturate(1.35)!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03))!important;
+  border:1px solid rgba(255,255,255,.1)!important;
+}
+.bottom-nav{
+  backdrop-filter:blur(28px) saturate(1.5)!important;
+  -webkit-backdrop-filter:blur(28px) saturate(1.5)!important;
+  background:rgba(0,0,0,.4)!important;
+}
+.logo-mark,.ab-ring{
+  backdrop-filter:blur(12px)!important;
+  -webkit-backdrop-filter:blur(12px)!important;
+}
+
+.nav-item .ico svg{display:block;margin:0 auto;width:16px;height:16px;opacity:.85}
+.nav-item.active .ico svg{opacity:1}
+.nav-item[data-tab="about"] .ico{font-size:inherit!important;width:auto!important;height:auto!important;background:none!important;border:0!important;border-radius:0!important;box-shadow:none!important}
 </style>
 </head>
 <body>
@@ -2570,7 +2629,7 @@ div.ab-card:has(#quickSeedList),
   <button class="nav-item" data-tab="news" type="button"><span class="ico">📰</span>News</button>
   <button class="nav-item" data-tab="videos" type="button"><span class="ico">🎬</span>Videos</button>
   <button class="nav-item" data-tab="quality" type="button"><span class="ico">⚡</span>Quality</button>
-  <button class="nav-item" data-tab="about" type="button"><span class="ico">ℹ️</span>About</button>
+  <button class="nav-item" data-tab="about" type="button"><span class="ico" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span>About</button>
 </nav>
 
 <script>
@@ -5486,7 +5545,10 @@ div.ab-card:has(#quickSeedList),
     });
     var target=document.getElementById('panel-'+tab);
     if(target) target.classList.add('active');
+    track.classList.add('is-sliding');
     track.style.transform='translateX(-'+(idx*(100/n))+'%)';
+    clearTimeout(track._slideT);
+    track._slideT=setTimeout(function(){ track.classList.remove('is-sliding'); }, 720);
   }
   function boot(){
     ensureTrack();
