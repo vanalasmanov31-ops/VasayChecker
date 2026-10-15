@@ -1784,6 +1784,9 @@ body {
   text-overflow: ellipsis !important;
 }
 
+
+.vq-m[data-killed="1"]{opacity:.35!important;pointer-events:none!important;filter:grayscale(1);}
+.vq-m[data-killed="1"] .vq-m-name{text-decoration:line-through;}
   </style>
 </head>
 <body>
@@ -1839,6 +1842,60 @@ body {
   }
 
   function check() {
+  function methodKey(m){
+    if(m==='fps120' || m==='studio120' || m==='120fps') return 'fps120';
+    if(m==='lossless' || m==='levass' || m==='instant') return 'levass';
+    return m;
+  }
+
+  function applyMethodGates(j){
+    /* status keys: levass, fps120 (legacy: instant, studio120) */
+    var lev = true, fps = true;
+    if(j){
+      if(j.levass === false || j.instant === false) lev = false;
+      if(j.fps120 === false || j.studio120 === false || j['120fps'] === false) fps = false;
+      if(j.levass === true) lev = true;
+      if(j.fps120 === true) fps = true;
+    }
+    window.__vasayMethods = { levass: lev, fps120: fps };
+    window.__vasayRemoteStatus = j || window.__vasayRemoteStatus;
+
+    document.querySelectorAll('#vq-method-list .vq-m, #vq-method-list label').forEach(function(lab){
+      var inp = lab.querySelector('input[type=radio]');
+      if(!inp) return;
+      var key = methodKey(inp.value);
+      var allowed = key==='fps120' ? fps : lev;
+      lab.style.opacity = allowed ? '1' : '.35';
+      lab.style.pointerEvents = allowed ? '' : 'none';
+      inp.disabled = !allowed;
+      var hint = lab.querySelector('.vq-m-hint, .hint');
+      if(!allowed){
+        lab.setAttribute('data-killed','1');
+        if(hint && !hint.dataset.orig){ hint.dataset.orig = hint.textContent; hint.textContent = 'Disabled by kill-switch'; }
+      } else {
+        lab.removeAttribute('data-killed');
+        if(hint && hint.dataset.orig){ hint.textContent = hint.dataset.orig; delete hint.dataset.orig; }
+      }
+    });
+    /* if current selection killed, switch to other */
+    var cur = document.querySelector('input[name="vq-method"]:checked');
+    if(cur && cur.disabled){
+      var alt = document.querySelector('input[name="vq-method"]:not(:disabled)');
+      if(alt){ alt.checked = true; alt.dispatchEvent(new Event('change',{bubbles:true})); }
+    }
+    try{
+      if(typeof window.dispatchEvent==='function'){
+        window.dispatchEvent(new CustomEvent('vasay-ks', { detail: j }));
+      }
+    }catch(e){}
+    /* enable Process button state */
+    try{
+      var b=document.getElementById('vq-go');
+      if(b && typeof Event==='function'){ /* setGo if quality script defined later */ }
+    }catch(e){}
+  }
+
+  function check() {
     fetch(STATUS_URL + "?_=" + Date.now(), { cache: "no-store", credentials: "omit", mode: "cors" })
       .then(function (r) {
         if (!r.ok) throw new Error("HTTP " + r.status);
@@ -1851,10 +1908,14 @@ body {
         } else {
           unlock();
         }
-        try { window.dispatchEvent(new CustomEvent("vasay-ks", { detail: j })); } catch (e) {}
+        applyMethodGates(j);
       })
-      .catch(function () { /* fail-open */ });
+      .catch(function () {
+        /* fail-open for site lock; methods stay allowed */
+        if(!window.__vasayMethods) window.__vasayMethods = { levass: true, fps120: true };
+      });
   }
+
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", check);
   else check();
@@ -2065,7 +2126,7 @@ body {
           </div>
           <div class="nc-item">
             <div class="nc-date">Oct 2026</div>
-            <div class="nc-body"><b>Quality</b> — NoBlur + LeVass methods, compact process log</div>
+            <div class="nc-body"><b>Quality</b> — LeVass + 120 FPS Patch, compact process log</div>
           </div>
           <div class="nc-item">
             <div class="nc-date">Site</div>
@@ -2121,19 +2182,19 @@ body {
 
       <div class="vq-section-label">Method</div>
       <div class="vq-methods" id="vq-method-list">
-        <label class="vq-m sel">
-          <input type="radio" name="vq-method" value="noblur" checked/>
-          <span class="vq-m-body">
-            <span class="vq-m-name">NoBlur</span>
-            <span class="vq-m-hint">Fast · suffix vasayyN</span>
-          </span>
-          <span class="vq-m-check"></span>
-        </label>
-        <label class="vq-m">
-          <input type="radio" name="vq-method" value="lossless"/>
+        <label class="vq-m sel" data-method="levass">
+          <input type="radio" name="vq-method" value="lossless" checked/>
           <span class="vq-m-body">
             <span class="vq-m-name">LeVass Method</span>
             <span class="vq-m-hint">Lossless · suffix vasayyL</span>
+          </span>
+          <span class="vq-m-check"></span>
+        </label>
+        <label class="vq-m" data-method="fps120">
+          <input type="radio" name="vq-method" value="fps120"/>
+          <span class="vq-m-body">
+            <span class="vq-m-name">120 FPS Patch</span>
+            <span class="vq-m-hint">60/120 source · suffix vasayy120</span>
           </span>
           <span class="vq-m-check"></span>
         </label>
@@ -4641,6 +4702,7 @@ body {
 
 
 
+<script src="fps120.js"></script>
 <script>
 (function(){
   var pyodide=null, fileBuf=null, fileName='video.mp4', booted=false, booting=false;
@@ -4660,14 +4722,25 @@ body {
   }
   function setGo(){
     var b=document.getElementById('vq-go'); if(!b) return;
-    var on=!!(fileBuf && (getMethod()==='noblur' ? typeof noblurProcess==='function' : pyodide));
-    b.disabled=!on; b.style.opacity=on?'1':'.45';
+    var m=getMethod();
+    var ready=false;
+    if(m==='fps120') ready=!!(fileBuf && typeof patchStudioMethod120==='function');
+    else ready=!!(fileBuf && pyodide);
+    /* kill-switch method gate */
+    if(window.__vasayMethods){
+      if(m==='lossless' && window.__vasayMethods.levass===false) ready=false;
+      if(m==='fps120' && window.__vasayMethods.fps120===false) ready=false;
+    }
+    b.disabled=!ready; b.style.opacity=ready?'1':'.45';
   }
   function getMethod(){
     var r=document.querySelector('input[name="vq-method"]:checked');
-    return (r&&r.value)||'noblur';
+    return (r&&r.value)||'lossless';
   }
-  function methodLabel(m){ return m==='lossless' ? 'LeVass Method (vasayyL)' : 'NoBlur (vasayyN)'; }
+  function methodLabel(m){
+    if(m==='fps120') return '120 FPS Patch (vasayy120)';
+    return 'LeVass Method (vasayyL)';
+  }
 
   async function boot(){
     window.vasayBoot = boot;
@@ -4708,7 +4781,7 @@ body {
       }
       await pyodide.runPythonAsync('from vasay_quality.transform import transform');
       await pyodide.runPythonAsync('from tiktok_lossless_patch import patch_browser');
-      log('Ready: NoBlur + LeVass Method','ok');
+      log('Ready: LeVass Method + 120 FPS Patch','ok');
       booted=true;
       window.pyodide=pyodide;
       window.booted=true;
@@ -4772,7 +4845,9 @@ body {
     if(go) go.addEventListener('click', async function(ev){
       ev.preventDefault();
       ev.stopImmediatePropagation();
-      if(!pyodide||!fileBuf) return;
+      if(!fileBuf) return;
+      var _m=getMethod();
+      if(_m!=='fps120' && !pyodide) return;
       go.disabled=true; go.style.opacity='.45';
       var mult=parseInt((document.getElementById('vq-mult')||{}).value,10)||10;
       var m=getMethod();
@@ -4788,9 +4863,19 @@ body {
       try{
         var outName;
         var out;
-        if(m==='lossless'){
-          if(!pyodide) throw new Error('Pyodide required for lossless');
-          log('Running lossless container patch…');
+        if(m==='fps120'){
+          if(window.__vasayMethods && window.__vasayMethods.fps120===false)
+            throw new Error('120 FPS Patch disabled by kill-switch');
+          if(typeof patchStudioMethod120 !== 'function') throw new Error('fps120.js not loaded');
+          log('Running 120 FPS Patch (60/120 source)…');
+          out = patchStudioMethod120(fileBuf);
+          outName = (typeof studioMethodName==='function' ? studioMethodName(fileName) : fileName.replace(/(\.\w+)?$/i, '_vasayy120.mp4'));
+          if(!/_vasayy120\.mp4$/i.test(outName)) outName = fileName.replace(/(\.\w+)?$/i, '_vasayy120.mp4');
+        } else {
+          if(window.__vasayMethods && window.__vasayMethods.levass===false)
+            throw new Error('LeVass Method disabled by kill-switch');
+          if(!pyodide) throw new Error('Pyodide required for LeVass');
+          log('Running LeVass lossless patch…');
           pyodide.FS.writeFile('/tmp/in.mp4', fileBuf);
           pyodide.globals.set('MULT', mult);
           await pyodide.runPythonAsync(
@@ -4804,11 +4889,6 @@ body {
           );
           out = pyodide.FS.readFile('/tmp/out.mp4');
           outName = fileName.replace(/(\.\w+)?$/i, '_vasayyL.mp4');
-        } else {
-          log('Running NoBlur inflate ×'+mult+'…');
-          if(typeof noblurProcess !== 'function') throw new Error('noblur.js not loaded');
-          out = noblurProcess(fileBuf, mult);
-          outName = fileName.replace(/(\.\w+)?$/i, '_vasayyN.mp4');
         }
 
         log('done · '+out.byteLength+' bytes → '+outName,'ok');
@@ -4861,8 +4941,6 @@ body {
   });
 })();
 </script>
-
-<script src="noblur.js"></script>
 
 <script>
 (function(){
@@ -4943,8 +5021,9 @@ body {
         var method = d.method || "lossless";
         reply(ev.source, ev.origin, { type: "vasay-ext-progress", message: "Running LeVass ×" + mult + "…" });
         var out;
-        if (method === "noblur" && typeof noblurProcess === "function") {
-          out = noblurProcess(u8, mult);
+        if (method === "fps120" || method === "studio120") {
+          if (typeof patchStudioMethod120 !== "function") throw new Error("fps120 not loaded");
+          out = patchStudioMethod120(u8);
         } else {
           window.pyodide.FS.writeFile("/tmp/in.mp4", u8);
           window.pyodide.globals.set("MULT", mult);
