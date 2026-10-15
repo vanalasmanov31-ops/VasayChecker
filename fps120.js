@@ -51,9 +51,10 @@
       if (pos + 24 >= buf.length) break;
 
       var version = buf[pos + 8];
-      // version(1)+flags(3)+creation(4)+modification(4) → timescale at +20 from box start for v0/v1 creation sizes differ
-      // C++: ts_off = pos + 8 + 1 + 3 + 4 + 4  → always pos+20
-      // For version 1, creation/mod are 8 bytes each so timescale is at pos+28 — BUT       // We match       var ts_off = pos + 8 + 1 + 3 + 4 + 4; // pos+20
+      // v0: timescale at pos+20; v1: creation/mod are 8 bytes → timescale at pos+28
+      var ts_off = (version === 1)
+        ? (pos + 8 + 1 + 3 + 8 + 8)   // pos+28
+        : (pos + 8 + 1 + 3 + 4 + 4);  // pos+20
 
       if (ts_off + 4 > buf.length) break;
       var old_ts = u32(buf, ts_off);
@@ -98,7 +99,7 @@
         w32(buf, dur_off, Math.floor(old_dur / divider) >>> 0);
       } else {
         // version 1: creation 8 + mod 8 → timescale at pos+28, duration 8 at pos+32
-        //         var ts_off1 = pos + 8 + 1 + 3 + 8 + 8;
+        var ts_off1 = pos + 8 + 1 + 3 + 8 + 8;
         if (ts_off1 + 12 > buf.length) break;
         var old_ts1 = u32(buf, ts_off1);
         w32(buf, ts_off1, Math.max(1, Math.floor(old_ts1 / divider)) >>> 0);
